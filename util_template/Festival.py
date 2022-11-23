@@ -9,38 +9,35 @@ if './' not in sys.path:
     sys.path.append('./')
 
 
-
-
-
-getfa = {
+getfa = {   
 "Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
     "Dby":[0,1,2],"Rdate":[0,1,2],"Rtime":[1],"Cty":[0,1,2],"Lang":[0,1,2],"Budg":[1],"BO":[1]},
-"Book_tr1":{"P":[1],"Sch":[1],"Fmt":[0,1,2],"Gen":[0,1,2],"PubDate":[1],
-        "NI":[1],"MChar":[0,1,2],"Wby":[0,1,2]},
-"FnD_tr1":{"Mf":[1],"COP":[0,1,2],"VF":[0,1,2],"In":[1],"RPd":[0,1,2],
-    "Abv":[1],"W":[1],"C":[0,1,2],"MIn":[0,1,2],"T":[0,1,2]},
-"Organiz_tr1":{"W":[1],"Hq":[1],"Fd":[1],"In":[0,1,2],"Kp":[0,1,2],"Pdt":[0,1,2],"Ne":[1],"Ta":[0,1,2],"F":[0,1,2],
-    "As":[0,1,2],"T":[1],"S":[0,1,2],"P":[1],"O":[1],"Pred":[1]},
+"Book_tr1":{"Publisher":[1],"Schedule":[1],"Format":[0,1,2],"Genre":[0,1,2],"Publication_date":[1],
+        "No_of_issues":[1],"Main_character":[0,1,2],"Written_by":[0,1,2]},
+"FnD_tr1":{"Manufacturer":[1],"Country_of_origin":[0,1,2],"Variants_Flavour":[0,1,2],"Introduced":[1],"Related_products":[0,1,2],
+    "Alcohol_by_volume":[1],"Website":[1],"Color":[0,1,2],"Main_ingredients":[0,1,2],"Type":[0,1,2]},
+"Organiz_tr1":{"Wesbsite":[1],"Headquarters":[1],"Founded_Formation":[1],"Industry":[0,1,2],"Key_people":[0,1,2],"Products":[0,1,2]
+    ,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder_Founders":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
+    ,"Parent":[1],"Owner":[1],"Predecessor":[1]},
+"Paint_tr1":{"Artist":[1],"Year":[1],"Medium_Type":[1],"Dimensions":[1],"Location":[1]},
 "Fest_tr1":{"Type":[0,1,2],"Observed_by":[0,1,2],"Frequency":[1],"Celebrations":[0,1,2],"Significance":[0,1,2],"Observances":[0,1,2],
     "Date":[1],"Related_to":[0,1,2],"Also_called":[0,1,2],"Official_name":[1],"Begins":[1],"Ends":[1],
     "2021_date":[1],"2020_date":[1],"2019_date":[1],"2018_date":[1]},
 "SpEv_tr1":{"Venue_Location":[0,1,2],"Date_Dates":[1],"Competitors":[0,1,2],"Teams":[1],
-	"No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
-"Univ_tr1":{"W":[1],"T":[0,1,2],"E":[1],"Ug":[1],"Pg":[1],
-    "M":[0,1,2],"L":[1],"N":[1],"C":[1],"Col":[0,1,2],
-    "St":[1],"Ac":[1],"Ad":[1],"Pr":[1],"Edw":[1],"Ma":[1],
-    "Prov":[1],"SAf":[0,1,2],"AAf":[0,1,2],"Fn":[1]}
+    "No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
+"Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
+    "Motto_Motto_in_English":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
+    "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
+    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]},
+"City_tr1":{"Elevation":[1],"Metro":[1],"Urban":[1],"City":[1],"Location":[1],"Government":[1],
+            "Highest_elevation":[1],"Lowest_elevation":[1],"Land":[1],"Water":[1],"Demonym":[1],
+            "Province":[1],"Mayor":[1],"Time_zone":[1],"Named_for":[1],"Area_code":[1],"Postal_code":[1]
+         ,"Coordinates":[1],"Incorporated":[1],"Density":[1],"Urban_density":[1],"Metro_density":[1]}
 }
-
-
-
 
 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories.tsv",sep="\t") 
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-
 
 
 Ptab = np.array(Catg[Catg.category.isin(['Festival'])].table_id)
@@ -48,14 +45,9 @@ tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
 
-
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     keys =[i.text for i in soup.find('tr').find_all('th')]
     keys = []
-#     keys.append(soup.find('caption').text)
     keys =[i.text.replace("\xa0"," ") for i in soup.find('tr').find_all('th')]
     if(soup.find('caption')):
         keys.insert(0,soup.find('caption').text)
@@ -67,7 +59,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -94,34 +85,23 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
-
-
-
-
 N,T = get_Table_Title()
-# T
 
-
-
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -173,7 +153,6 @@ def get_Type(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -187,7 +166,6 @@ def get_Type(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -198,15 +176,6 @@ def get_Type(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# get_Type(T,N,True)[0]
-
-
-
 
 
 def get_Observed_by(T,N,fake=False,sel=0):
@@ -242,15 +211,6 @@ def get_Observed_by(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Observed_by(T,N,True)[0]
-
-
-
-
-
 def get_Frequency(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -259,7 +219,6 @@ def get_Frequency(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -273,7 +232,6 @@ def get_Frequency(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -284,15 +242,6 @@ def get_Frequency(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# get_Frequency(T,N,True)[1]
-
-
-
 
 
 def get_Celebrations(T,N,fake=False,sel=0):
@@ -303,7 +252,6 @@ def get_Celebrations(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -317,7 +265,6 @@ def get_Celebrations(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -330,15 +277,6 @@ def get_Celebrations(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Celebrations(T,N,True)[1]
-
-
-
-
-
 def get_Significance(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -347,7 +285,6 @@ def get_Significance(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -362,7 +299,6 @@ def get_Significance(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -373,15 +309,6 @@ def get_Significance(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# get_Significance(T,N,True)[1]
-
-
-
 
 
 def get_Observances(T,N,fake=False,sel=0):
@@ -392,7 +319,6 @@ def get_Observances(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -406,7 +332,6 @@ def get_Observances(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -417,15 +342,6 @@ def get_Observances(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# getObv()[1]
-
-
-
 
 
 def get_Date(T,N,fake=False,sel=0):
@@ -436,7 +352,6 @@ def get_Date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -450,7 +365,6 @@ def get_Date(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip(".").replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -463,15 +377,6 @@ def get_Date(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getD()[1]
-
-
-
-
-
 def get_Related_to(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -480,7 +385,6 @@ def get_Related_to(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -494,7 +398,6 @@ def get_Related_to(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip("."))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -507,15 +410,6 @@ def get_Related_to(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getRt()[1]
-
-
-
-
-
 def get_Also_called(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -524,7 +418,6 @@ def get_Also_called(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -538,7 +431,6 @@ def get_Also_called(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip(".").replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -551,15 +443,6 @@ def get_Also_called(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getAs()[1]
-
-
-
-
-
 def get_Official_name(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -568,7 +451,6 @@ def get_Official_name(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -582,7 +464,6 @@ def get_Official_name(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip().strip(".").replace("\u200e",""))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -593,15 +474,6 @@ def get_Official_name(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# getOn()[1]
-
-
-
 
 
 def get_Begins(T,N,fake=False,sel=0):
@@ -612,7 +484,6 @@ def get_Begins(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -620,12 +491,10 @@ def get_Begins(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i])
                             d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip())
                     d[dictionary['Tablename']].append(dictionary[k].strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -636,15 +505,6 @@ def get_Begins(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# getBg()[1]
-
-
-
 
 
 def get_Ends(T,N,fake=False,sel=0):
@@ -655,7 +515,6 @@ def get_Ends(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -663,12 +522,10 @@ def get_Ends(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i])
                             d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip())
                     d[dictionary['Tablename']].append(dictionary[k].strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -679,15 +536,6 @@ def get_Ends(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# getEn()[1]
-
-
-
 
 
 def get_2021_date(T,N,fake=False,sel=0):
@@ -698,7 +546,6 @@ def get_2021_date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -706,12 +553,10 @@ def get_2021_date(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i].replace("\xa0"," "))
                             d[dictionary['Tablename']].append(dictionary[k][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip().replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].strip().replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -722,15 +567,6 @@ def get_2021_date(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# get21()[1]
-
-
-
 
 
 def get_2020_date(T,N,fake=False,sel=0):
@@ -741,7 +577,6 @@ def get_2020_date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -749,12 +584,10 @@ def get_2020_date(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i].replace("\xa0"," "))
                             d[dictionary['Tablename']].append(dictionary[k][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip().replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].strip().replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -765,15 +598,6 @@ def get_2020_date(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# get20()[1]
-
-
-
 
 
 def get_2019_date(T,N,fake=False,sel=0):
@@ -784,7 +608,6 @@ def get_2019_date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -792,12 +615,10 @@ def get_2019_date(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i].replace("\xa0"," "))
                             d[dictionary['Tablename']].append(dictionary[k][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip().replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].strip().replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -810,15 +631,6 @@ def get_2019_date(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get19()[1]
-
-
-
-
-
 def get_2018_date(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -827,7 +639,6 @@ def get_2018_date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -835,12 +646,10 @@ def get_2018_date(T,N,fake=False,sel=0):
                             u.add(dictionary[k][i].replace("\xa0"," "))
                             d[dictionary['Tablename']].append(dictionary[k][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].strip().replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].strip().replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -852,17 +661,7 @@ def get_2018_date(T,N,fake=False,sel=0):
             
     return list(u),d
 
-
-
-
-
-# get18()[1]
-
-
-# #### Dictionary of all extracted data from html/json :
-
-
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -876,13 +675,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences and premises generator :
-
-
-
+# Sentence generator :
 
 def TypeSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
@@ -919,15 +713,6 @@ def TypeSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# TypeSent(T,N,get_Data()["Type"],2,False,True)
-
-
-
 
 
 def Observed_bySent(tb,dn,F,it,tval=True,prem=False):
@@ -970,15 +755,6 @@ def Observed_bySent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# ObySent(T,N,getOby()[1],getOby()[0],0)
-
-
-
-
-
 def FrequencySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1013,15 +789,6 @@ def FrequencySent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# FSent(T,N,getF()[1],getF()[0],0,False)
-
-
-
 
 
 def CelebrationsSent(tb,dn,F,it,tval=True,prem=False):
@@ -1061,15 +828,6 @@ def CelebrationsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# CSent(T,N,getC()[1],getC()[0],1)
-
-
-
 
 
 def SignificanceSent(tb,dn,F,it,tval=True,prem=False):
@@ -1118,15 +876,6 @@ def SignificanceSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# SSent(T,N,getS()[1],getS()[0],1,False)
-
-
-
-
-
 def ObservancesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1166,15 +915,6 @@ def ObservancesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# ObvSent(T,N,getObv()[1],getObv()[0],0,False)
-
-
-
-
-
 def DateSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1204,15 +944,6 @@ def DateSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-
-
-
-# DSent(T,N,getD()[1],getD()[0],0,False)
-
-
-
 
 
 def Related_toSent(tb,dn,F,it,tval=True,prem=False):
@@ -1262,15 +993,6 @@ def Related_toSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# RtSent(T,N,getRt()[1],getRt()[0],0,False)
-
-
-
-
-
 def Also_calledSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1311,15 +1033,6 @@ def Also_calledSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# AsSent(T,N,getAs()[1],getAs()[0],0,False)
-
-
-
 
 
 def Official_nameSent(tb,dn,F,it,tval=True,prem=False):
@@ -1367,15 +1080,6 @@ def Official_nameSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# OnSent(T,N,getOn()[1],getOn()[0],0,False)
-
-
-
-
-
 def BeginsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1410,15 +1114,6 @@ def BeginsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# BgSent(T,N,getBg()[1],getBg()[0],3)
-
-
-
-
-
 def EndsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1450,15 +1145,6 @@ def EndsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-
-
-
-# EnSent(T,N,getEn()[1],getEn()[0],3,False)
-
-
-
 
 
 # give the year to use it for example 21,20,19,18
@@ -1496,15 +1182,6 @@ def _2021_dateSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# Y2021Sent(2021,T,N,get2021()[1],get2021()[0],6)
-
-
-
-
-
 def _2020_dateSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1537,9 +1214,6 @@ def _2020_dateSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-
 
 
 def _2019_dateSent(tb,dn,F,it,tval=True,prem=False):
@@ -1576,13 +1250,9 @@ def _2019_dateSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
 def _2018_dateSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1614,9 +1284,7 @@ def _2018_dateSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     
     Nm = dn[tb[it]][0]
@@ -1660,15 +1328,7 @@ def multi_row1(tb,dn,F,it,tval=True):
     return ts
 
 
-
-
-
-# multi_row1(T,N,get_Data(),0,False)
-
-
-
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Uo,O = F["Official_name"]
     Ua,A = F["Also_called"]
@@ -1695,15 +1355,7 @@ def multi_row2(tb,dn,F,it,tval=True):
     return ts
 
 
-
-
-
-# multi_row2(T,N,get_Data(),0,False)
-
-
-
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Uo,O = F["Observances"]
     Us,S = F["Significance"]
@@ -1743,22 +1395,3 @@ def multi_row3(tb,dn,F,it,tval=True):
             ts["Celebrations,Significance"].append( Al2+" is signified by "+Al1 )
         
     return ts
-
-
-
-
-
-# multi_row3(T,N,get_Data(),5,False)
-
-
-
-
-
-
-
-
-
-
-
-
-

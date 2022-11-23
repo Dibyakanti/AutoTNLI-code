@@ -15,37 +15,35 @@ if './' not in sys.path:
 
 
 
-getfa = {	
+getfa = {   
 "Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
     "Dby":[0,1,2],"Rdate":[0,1,2],"Rtime":[1],"Cty":[0,1,2],"Lang":[0,1,2],"Budg":[1],"BO":[1]},
-"Book_tr1":{"P":[1],"Sch":[1],"Fmt":[0,1,2],"Gen":[0,1,2],"PubDate":[1],
-        "NI":[1],"MChar":[0,1,2],"Wby":[0,1,2]},
-"FnD_tr1":{"Manufacturer":[1],"Country_of_origin":[0,1,2],"Variants":[0,1,2],"Introduced":[1],"Related_products":[0,1,2],
+"Book_tr1":{"Publisher":[1],"Schedule":[1],"Format":[0,1,2],"Genre":[0,1,2],"Publication_date":[1],
+        "No_of_issues":[1],"Main_character":[0,1,2],"Written_by":[0,1,2]},
+"FnD_tr1":{"Manufacturer":[1],"Country_of_origin":[0,1,2],"Variants_Flavour":[0,1,2],"Introduced":[1],"Related_products":[0,1,2],
     "Alcohol_by_volume":[1],"Website":[1],"Color":[0,1,2],"Main_ingredients":[0,1,2],"Type":[0,1,2]},
 "Organiz_tr1":{"Wesbsite":[1],"Headquarters":[1],"Founded_Formation":[1],"Industry":[0,1,2],"Key_people":[0,1,2],"Products":[0,1,2]
-	,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder_Founders":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
-	,"Parent":[1],"Owner":[1],"Predecessor":[1]},
+    ,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder_Founders":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
+    ,"Parent":[1],"Owner":[1],"Predecessor":[1]},
 "Paint_tr1":{"Artist":[1],"Year":[1],"Medium_Type":[1],"Dimensions":[1],"Location":[1]},
 "Fest_tr1":{"Type":[0,1,2],"Observed_by":[0,1,2],"Frequency":[1],"Celebrations":[0,1,2],"Significance":[0,1,2],"Observances":[0,1,2],
     "Date":[1],"Related_to":[0,1,2],"Also_called":[0,1,2],"Official_name":[1],"Begins":[1],"Ends":[1],
     "2021_date":[1],"2020_date":[1],"2019_date":[1],"2018_date":[1]},
 "SpEv_tr1":{"Venue_Location":[0,1,2],"Date_Dates":[1],"Competitors":[0,1,2],"Teams":[1],
-	"No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
+    "No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
 "Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
     "Motto_Motto_in_English":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
     "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
-    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
+    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]},
+"City_tr1":{"Elevation":[1],"Metro":[1],"Urban":[1],"City":[1],"Location":[1],"Government":[1],
+            "Highest_elevation":[1],"Lowest_elevation":[1],"Land":[1],"Water":[1],"Demonym":[1],
+            "Province":[1],"Mayor":[1],"Time_zone":[1],"Named_for":[1],"Area_code":[1],"Postal_code":[1]
+         ,"Coordinates":[1],"Incorporated":[1],"Density":[1],"Urban_density":[1],"Metro_density":[1]}
 }
-
-
-
 
 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t")
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-
 
 
 Ptab = np.array(Catg[Catg.category.isin(['Food&Drink'])].table_id)
@@ -112,20 +110,16 @@ def get_Table_Title():
 
 
 N,T = get_Table_Title()
-# T
 
 
-
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add

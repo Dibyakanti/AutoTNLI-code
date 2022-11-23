@@ -28,18 +28,17 @@ getfa = {
 "Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
     "Motto_Motto_in_English":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
     "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
-    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
+    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]},
+"City_tr1":{"Elevation":[1],"Metro":[1],"Urban":[1],"City":[1],"Location":[1],"Government":[1],
+            "Highest_elevation":[1],"Lowest_elevation":[1],"Land":[1],"Water":[1],"Demonym":[1],
+            "Province":[1],"Mayor":[1],"Time_zone":[1],"Named_for":[1],"Area_code":[1],"Postal_code":[1]
+         ,"Coordinates":[1],"Incorporated":[1],"Density":[1],"Urban_density":[1],"Metro_density":[1]}
 }
-
-
 
 
 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t")
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-
 
 
 Ptab = np.array(Catg[Catg.category.isin(['Book'])].table_id)
@@ -52,17 +51,14 @@ tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     print(soup)
     keys =[i.text for i in soup.find('tr').find_all('th')]
     vals = []
-#     soup.replace('br',',')
     for i in soup.find('tr').find_all('td'):
         result = [val.text.strip().replace("\n", "").replace("\t", "") for val in i.find_all('li')]
         if not result:
             if(i.find('br')):
                 for x in i.findAll('br'):
                     x.replace_with(',')
-#                 print(i.text)
                 result = i.text.split(',')
             elif "â€“" in i.text:
                 result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -76,9 +72,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -87,33 +80,25 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
 
-
-
-
 N,T = get_Table_Title()
 
 
-
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -126,7 +111,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -154,18 +139,14 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     return None
 
 
-
-
-
 def get_Publisher(T,N,fake=False,sel=0):
     u = set([])
     d = {}
     k = "Publisher"
     for n in range(51):
-        if(int(Ptab[n][1:]) <=2800 ):
+        if(int(Ptab[n][1:]) <= 2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -176,7 +157,6 @@ def get_Publisher(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -190,24 +170,14 @@ def get_Publisher(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getP()
-
-
-
-
-
 def get_Schedule(T,N,fake=False,sel=0):
     u = set([])
     d = {}
     k = "Schedule"
     for n in range(51):
-        if(int(Ptab[n][1:]) <=2800 ):
+        if(int(Ptab[n][1:]) <= 2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -218,7 +188,6 @@ def get_Schedule(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -230,15 +199,6 @@ def get_Schedule(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d        
-
-
-
-
-
-# U,D = getSch()
-
-
-
 
 
 def get_Format(T,N,fake=False,sel=0):
@@ -246,10 +206,9 @@ def get_Format(T,N,fake=False,sel=0):
     d = {}
     k = "Format"
     for n in range(51):
-        if(int(Ptab[n][1:]) <=2800 ):
+        if(int(Ptab[n][1:]) <= 2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -260,7 +219,6 @@ def get_Format(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -274,24 +232,14 @@ def get_Format(T,N,fake=False,sel=0):
     return list(u),d        
 
 
-
-
-
-# U,D = getFmt()
-
-
-
-
-
 def get_Genre(T,N,fake=False,sel=0):
     u = set([])
     d = {}
     k = "Genre"
     for n in range(51):
-        if(int(Ptab[n][1:]) <=2800 ):
+        if(int(Ptab[n][1:]) <= 2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -306,7 +254,6 @@ def get_Genre(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k].strip().lower())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -318,15 +265,6 @@ def get_Genre(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-
-
-
-# getGen()[1]
-
-
-
 
 
 def get_Publication_date(T,N,fake=False,sel=0):
@@ -337,7 +275,6 @@ def get_Publication_date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -348,7 +285,6 @@ def get_Publication_date(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k].replace('\xa0',' '))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -362,15 +298,6 @@ def get_Publication_date(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# U,D = getPubDate()
-
-
-
-
-
 def get_No_of_issues(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -379,9 +306,7 @@ def get_No_of_issues(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
-#                 d[dictionary['Tablename']].append(dictionary[k])
                 if(type(dictionary[k]) == list):
                     r = re.findall("[0-9]+",",".join(dictionary[k])) 
                     s = 0
@@ -398,7 +323,6 @@ def get_No_of_issues(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(s)
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -412,15 +336,6 @@ def get_No_of_issues(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getNI()[1]
-
-
-
-
-
 def get_Main_character(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -429,7 +344,6 @@ def get_Main_character(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -440,7 +354,6 @@ def get_Main_character(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -454,15 +367,6 @@ def get_Main_character(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# U,D = getMChar()
-
-
-
-
-
 def get_Written_by(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -471,7 +375,7 @@ def get_Written_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
+
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -482,7 +386,7 @@ def get_Written_by(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
+
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -495,10 +399,7 @@ def get_Written_by(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# #### Extract all data :
-
-
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -511,19 +412,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-
-
-
-# get_Data()["Publisher"][1]
-
-
-# #### Sentences :
-
-
-
+# Sentence generator :
 
 def PublisherSent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
@@ -553,15 +443,6 @@ def PublisherSent(tb,dn,F,it,tval = True,prem = False):
             ts1 = [None]
     
         return ts1
-
-
-
-
-
-# PublisherSent(T,N,get_Publisher(T,N),51,False)
-
-
-
 
 
 def ScheduleSent(tb,dn,F,it,tval = True,prem = False):
@@ -594,15 +475,6 @@ def ScheduleSent(tb,dn,F,it,tval = True,prem = False):
     return ts1
 
 
-
-
-
-# SchSent(T,N,getSch()[1],getSch()[0],4,False)
-
-
-
-
-
 def FormatSent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
     univ = F[0]
@@ -627,15 +499,6 @@ def FormatSent(tb,dn,F,it,tval = True,prem = False):
         else:
             ts1 = [None]
         return ts1
-
-
-
-
-
-# FmtSent(T,N,getFmt()[1],getFmt()[0],4,False)
-
-
-
 
 
 def GenreSent(tb,dn,F,it,tval = True,prem = False):
@@ -670,15 +533,6 @@ def GenreSent(tb,dn,F,it,tval = True,prem = False):
         return ts1
 
 
-
-
-
-# GenSent(T,N,getGen()[1],getGen()[0],10,False)
-
-
-
-
-
 def Publication_dateSent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
     univ = F[0]
@@ -708,22 +562,11 @@ def Publication_dateSent(tb,dn,F,it,tval = True,prem = False):
         return ts1
 
 
-
-
-
-# PubDateSent(T,N,getPubDate()[1],getPubDate()[0],5,False,True)
-
-
-
-
-
 def No_of_issuesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" went to "," worked at "," employed at ",]
     if(prem):
         if(di[tb[it]][0] != None):
-#         All = ','.join(di[tb[it]])
             ps1 = [ "The no. of issues of the book is "+str(di[tb[it]][0])
                   , "The book has "+str(di[tb[it]][0])+" issues"]
         else:
@@ -733,15 +576,12 @@ def No_of_issuesSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append(dn[tb[it]][0]+" had "+str(di[tb[it]][0])+" issues" )
                 ts.append(dn[tb[it]][0]+" had more than "+str(random.randint(0,di[tb[it]][0]-1))+" issues")
                 ts.append(dn[tb[it]][0]+" had less than "+str(random.randint(di[tb[it]][0]+2,di[tb[it]][0]+15))+" issues")
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)
-#                 All = ','.join(NT)
                 ts.append(dn[tb[it]][0]+" had "+str(random.randint(di[tb[it]][0]+2,di[tb[it]][0]+15))+" issues" )
                 ts.append(dn[tb[it]][0]+" had less than "+str(random.randint(0,di[tb[it]][0]-1))+" issues")
                 ts.append(dn[tb[it]][0]+" had more than "+str(random.randint(di[tb[it]][0]+2,di[tb[it]][0]+15))+" issues")
@@ -749,15 +589,6 @@ def No_of_issuesSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# NISent(T,N,getNI()[1],getNI()[0],1,False)
-
-
-
 
 
 def Main_characterSent(tb,dn,F,it,tval = True,prem = False):
@@ -791,15 +622,6 @@ def Main_characterSent(tb,dn,F,it,tval = True,prem = False):
         return ts1
 
 
-
-
-
-# MCharSent(T,N,getMChar()[1],getMChar()[0],4)
-
-
-
-
-
 def Written_bySent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
     univ = F[0]
@@ -831,54 +653,15 @@ def Written_bySent(tb,dn,F,it,tval = True,prem = False):
         
         return ts1    
 
-
-
-
-
-# WbySent(T,N,getWby()[1],getWby()[0],0)
-
-
-
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ug,G = F["Genre"]
     Up,P = F["Publisher"]
     Uni,Ni = F["No_of_issues"]
-    
-#     count_gp = {} # publishers per genre
-#     count_gni = {} # issues per genre
-    
-#     for i in Ni.keys():
-#         if(Ni[i][0] != None and G[i][0] != None):
-#             for j in G[i]:
-#                 if j in count_gni.keys():
-#                     count_gni[j] += Ni[i][0]
-#                 else:
-#                     count_gni[j] = Ni[i][0]
-                    
-#     for i in P.keys():
-#         if(G[i][0] != None and P[i][0] != None):
-#             for j in G[i]:
-#                 if j in count_gp.keys():
-#                     count_gp[j] += 1
-#                 else:
-#                     count_gp[j] = 1
-                    
+
     ts = {}
     
     if(tval):
-#         ts1 = []
-#         for i in count_gni.keys():
-#             ts1.append(str(count_gni[i])+" publishers published in "+i+" genre")
-#         ts2 = []
-#         for i in count_gp.keys():
-#             ts2.append(str(count_gp[i])+" number of issues in "+i+" genre")
-#         ts =[]
-#         [g1,g2] = random.sample(count_gp.keys(),2)
-#         ts.append( "There are "+("more" if (count_gp[g1]>count_gp[g2]) else "less" )+" publishers in "+g1+"than in "+g2+" genre" )
-#         [g1,g2] = random.sample(count_gni.keys(),2)
-#         ts.append( "There are "+("more" if (count_gni[g1]>count_gni[g2]) else "less" )+" number of issues in "+g1+"than in "+g2+" genre" )
         if(P[tb[it]][0]!= None and G[tb[it]][0] != None):
             ts["Publisher,Genre"] = []
             Al1 = ",".join(P[tb[it]])
@@ -886,23 +669,11 @@ def multi_row1(tb,dn,F,it,tval=True):
             ts["Publisher,Genre"].append(Al1+" publishes in "+Al2+" genres")
         if(Ni[tb[it]][0]!= None and G[tb[it]][0] != None):
             ts["No_of_issues,Genre"] = []
-#             Al1 = ",".join(P[tb[it]])
             Al2 = ",".join(random.sample(G[tb[it]],random.randint(1,len(G[tb[it]])) ) )
             ts["No_of_issues,Genre"].append(str(Ni[tb[it]][0])+" number of issues in "+Al2+"genres")
             ts["No_of_issues,Genre"].append("There are "+("more" if (Ni[tb[it]][0]>len(G[tb[it]])) else "less") +" number of issues than genres")
             
     else:
-#         ts1 = []
-#         for i in count_gni.keys():
-#             ts1.append(str(random.randint(count_gni[i]+1,count_gni[i]+10))+" publishers published in "+i+" genre")
-#         ts2 = []
-#         for i in count_gp.keys():
-#             ts2.append(str(random.randint(count_gp[i]+1,count_gp[i]+10))+" number of issues in "+i+" genre")
-#         ts = []
-#         [g1,g2] = random.sample(count_gp.keys(),2)
-#         ts.append( "There are "+("more" if (count_gp[g1]<count_gp[g2]) else "less")+" publishers in "+g1+"than in "+g2+" genre" )
-#         [g1,g2] = random.sample(count_gni.keys(),2)
-#         ts.append( "There are "+("more" if (count_gni[g1]<count_gni[g2]) else "less")+" number of issues in "+g1+"than in "+g2+" genre" )        
         if(P[tb[it]][0]!= None and G[tb[it]][0] != None):
             ts["Publisher,Genre"] = []
             Al1 = ",".join(P[tb[it]])
@@ -911,24 +682,13 @@ def multi_row1(tb,dn,F,it,tval=True):
             ts["Publisher,Genre"].append(Al1+" publishes in "+Al2+" genres")
         if(Ni[tb[it]][0]!= None and G[tb[it]][0] != None):
             ts["No_of_issues,Genre"] = []
-#             Al1 = ",".join(P[tb[it]])
             Al2 = ",".join(random.sample(G[tb[it]],random.randint(1,len(G[tb[it]])) ) )
             ts["No_of_issues,Genre"].append(str(random.randint(Ni[tb[it]][0]+1,Ni[tb[it]][0]+10))+" number of issues in "+Al2+"genres")
             ts["No_of_issues,Genre"].append("There are "+("more" if (Ni[tb[it]][0]<len(G[tb[it]])) else "less") +" number of issues than genres")
         
     return ts
 
-
-
-
-
-# multi_row1(T,N,10)[3]
-# getGen()[1]
-
-
-
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F1,it,tval=True):
     Uw,W = F1["Written_by"]
     Us,S = F1["Schedule"]
@@ -964,16 +724,7 @@ def multi_row2(tb,dn,F1,it,tval=True):
             ts["Written_by,Format"].append( ",".join(NW)+" writes in "+NF[0]+ " format" )
     return ts
 
-
-
-
-
-# multi_row2(T,N,8,False)
-
-
-
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Uw,W = F["Written_by"]
     Um,M = F["Main_character"]
@@ -1023,16 +774,7 @@ def multi_row3(tb,dn,F,it,tval=True):
         
     return ts
 
-
-
-
-
-# multi_row3(T,N,8,False)
-
-
-
-
-
+# 4th multi-row templates
 def multi_row4(tb,dn,F,it,tval=True):
     Uw,W = F["Written_by"]
     Upd,Pd = F["Publication_date"]
@@ -1055,16 +797,3 @@ def multi_row4(tb,dn,F,it,tval=True):
             ts["Written_by,Publication_date"].append(Al2+" was alive on "+Al1)
         
     return ts
-
-
-
-
-
-# multi_row4(T,N,-6,False)
-
-
-
-
-
-
-

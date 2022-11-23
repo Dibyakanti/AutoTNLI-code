@@ -10,15 +10,31 @@ if './' not in sys.path:
     sys.path.append('./')
 
 
-getfa = {
+getfa = {   
+"Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
+    "Dby":[0,1,2],"Rdate":[0,1,2],"Rtime":[1],"Cty":[0,1,2],"Lang":[0,1,2],"Budg":[1],"BO":[1]},
+"Book_tr1":{"Publisher":[1],"Schedule":[1],"Format":[0,1,2],"Genre":[0,1,2],"Publication_date":[1],
+        "No_of_issues":[1],"Main_character":[0,1,2],"Written_by":[0,1,2]},
+"FnD_tr1":{"Manufacturer":[1],"Country_of_origin":[0,1,2],"Variants_Flavour":[0,1,2],"Introduced":[1],"Related_products":[0,1,2],
+    "Alcohol_by_volume":[1],"Website":[1],"Color":[0,1,2],"Main_ingredients":[0,1,2],"Type":[0,1,2]},
+"Organiz_tr1":{"Wesbsite":[1],"Headquarters":[1],"Founded_Formation":[1],"Industry":[0,1,2],"Key_people":[0,1,2],"Products":[0,1,2]
+    ,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder_Founders":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
+    ,"Parent":[1],"Owner":[1],"Predecessor":[1]},
+"Paint_tr1":{"Artist":[1],"Year":[1],"Medium_Type":[1],"Dimensions":[1],"Location":[1]},
+"Fest_tr1":{"Type":[0,1,2],"Observed_by":[0,1,2],"Frequency":[1],"Celebrations":[0,1,2],"Significance":[0,1,2],"Observances":[0,1,2],
+    "Date":[1],"Related_to":[0,1,2],"Also_called":[0,1,2],"Official_name":[1],"Begins":[1],"Ends":[1],
+    "2021_date":[1],"2020_date":[1],"2019_date":[1],"2018_date":[1]},
+"SpEv_tr1":{"Venue_Location":[0,1,2],"Date_Dates":[1],"Competitors":[0,1,2],"Teams":[1],
+    "No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
+"Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
+    "Motto_Motto_in_English":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
+    "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
+    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]},
 "City_tr1":{"Elevation":[1],"Metro":[1],"Urban":[1],"City":[1],"Location":[1],"Government":[1],
             "Highest_elevation":[1],"Lowest_elevation":[1],"Land":[1],"Water":[1],"Demonym":[1],
             "Province":[1],"Mayor":[1],"Time_zone":[1],"Named_for":[1],"Area_code":[1],"Postal_code":[1]
          ,"Coordinates":[1],"Incorporated":[1],"Density":[1],"Urban_density":[1],"Metro_density":[1]}
 }
-
-
-
 
 
 # Catg = pd.read_csv("../../data/table_categories modified.tsv",sep="\t") 
@@ -27,13 +43,7 @@ Ptab = np.array(Catg[Catg.category.isin(['City'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 
 
-
-
-
 # tablesFolder = "../../data/json/"
-
-
-
 
 
 def parseFile(filename,tablesFolder):
@@ -45,9 +55,6 @@ def parseFile(filename,tablesFolder):
     return data
 
 
-
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -56,33 +63,25 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n], tablesFolder)
             tb.append(dictionary['Tablename'])
             if("title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']] = dictionary['title']
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
 
-
-
-
 N,T = get_Table_Title()
 
 
-
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -123,11 +122,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     return None
 
 
-# #### Extract each key separately :
-
-
-
-
 def get_Elevation(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -152,15 +146,6 @@ def get_Elevation(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
     
     return list(u),d
-
-
-
-
-
-# get_Elevation(T,N)[1]
-
-
-
 
 
 def get_Location(T,N,fake=False,sel=0): # Country Location State
@@ -203,15 +188,6 @@ def get_Location(T,N,fake=False,sel=0): # Country Location State
     return list(u),d
 
 
-
-
-
-# get_Location(T,N)[1]
-
-
-
-
-
 def get_Government(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -246,15 +222,6 @@ def get_Government(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Government(T,N)[1]
-
-
-
-
-
 def get_Highest_elevation(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -280,15 +247,6 @@ def get_Highest_elevation(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Highest_elevation(T,N)[1]
-
-
-
 
 
 def get_Demonym(T,N,fake=False,sel=0):
@@ -318,15 +276,6 @@ def get_Demonym(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Demonym(T,N)[1]
-
-
-
-
-
 def get_Province(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -352,62 +301,6 @@ def get_Province(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Province(T,N)[1]
-
-
-
-
-
-'''
-President and Vice President is for country not for city
-'''
-# def get_President(T,N,fake=False,sel=0):
-#     u = set([])
-#     d = {}
-#     k = "President"
-#     for n in range(194):
-#         if(int(Ptab[n][1:]) <= 2800):
-#             dictionary = parseFile(Ptab[n], tablesFolder)
-#             if(k in dictionary.keys()):
-#                 d[dictionary['Tablename']] = []
-#                 for i in range(len(dictionary[k])):
-#                     u.add(dictionary[k][i])
-#                     d[dictionary['Tablename']].append(dictionary[k][i])
-                    
-#             else:
-#                 d[dictionary['Tablename']] = []
-#                 d[dictionary['Tablename']].append(None)
-#     return list(u),d
-
-# get_President(T,N)
-
-# def get_Vice_President(T,N,fake=False,sel=0):
-#     u = set([])
-#     d = {}
-#     k = "Vice President"
-#     for n in range(194):
-#         if(int(Ptab[n][1:]) <= 2800):
-#             dictionary = parseFile(Ptab[n], tablesFolder)
-#             if(k in dictionary.keys()):
-#                 d[dictionary['Tablename']] = []
-#                 for i in range(len(dictionary[k])):
-#                     u.add(dictionary[k][i])
-#                     d[dictionary['Tablename']].append(dictionary[k][i])
-                    
-#             else:
-#                 d[dictionary['Tablename']] = []
-#                 d[dictionary['Tablename']].append(None)
-#     return list(u),d
-
-# get_Vice_President(T,N)
-
-
-
 
 
 def get_Mayor(T,N,fake=False,sel=0):
@@ -437,15 +330,6 @@ def get_Mayor(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Mayor(T,N)[1]
-
-
-
-
-
 def get_Time_zone(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -471,15 +355,6 @@ def get_Time_zone(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Time_zone(T,N)[1]
-
-
-
 
 
 def get_Lowest_elevation(T,N,fake=False,sel=0):
@@ -509,15 +384,6 @@ def get_Lowest_elevation(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Lowest_elevation(T,N)[1]
-
-
-
-
-
 def get_Named_for(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -543,15 +409,6 @@ def get_Named_for(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Named_for(T,N)[1]
-
-
-
 
 
 def get_Area_code(T,N,fake=False,sel=0):
@@ -581,15 +438,6 @@ def get_Area_code(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Area_code(T,N)[0]
-
-
-
-
-
 def get_Postal_code(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -615,15 +463,6 @@ def get_Postal_code(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Postal_code(T,N)[0]
-
-
-
 
 
 def get_Coordinates(T,N,fake=False,sel=0):
@@ -653,15 +492,6 @@ def get_Coordinates(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Coordinates(T,N)[0]
-
-
-
-
-
 def get_Incorporated(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -687,15 +517,6 @@ def get_Incorporated(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Incorporated(T,N)[0]
-
-
-
 
 
 def get_Metro(T,N,fake=False,sel=0):
@@ -725,15 +546,6 @@ def get_Metro(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Metro(T,N)[1]
-
-
-
-
-
 def get_Urban(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -758,15 +570,6 @@ def get_Urban(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Urban()[1]
-
-
-
 
 
 def get_Density(T,N,fake=False,sel=0):
@@ -796,15 +599,6 @@ def get_Density(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Density(T,N)[1]
-
-
-
-
-
 def get_Metro_density(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -830,15 +624,6 @@ def get_Metro_density(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Metro_density(T,N)[1]
-
-
-
 
 
 def get_Urban_density(T,N,fake=False,sel=0):
@@ -868,15 +653,6 @@ def get_Urban_density(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Urban_density(T,N)[1]
-
-
-
-
-
 def get_Area(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -902,15 +678,6 @@ def get_Area(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
             
     return list(u),d
-
-
-
-
-
-# get_Area(T,N)[1]
-
-
-
 
 
 def get_City(T,N,fake=False,sel=0):
@@ -940,15 +707,6 @@ def get_City(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_City(T,N)[1]
-
-
-
-
-
 def get_Land(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -976,15 +734,6 @@ def get_Land(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Land(T,N)[1]
-
-
-
-
-
 def get_Water(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -1010,17 +759,7 @@ def get_Water(T,N,fake=False,sel=0):
             
     return list(u),d
 
-
-
-
-
-# get_Water(T,N)[1]
-
-
-# #### Extract all data :
-
-
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -1034,19 +773,9 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
 
-
-
-
-# get_Data(True)
-
-
-# #### Sentence generator :
-
-
-
+# Sentence generator :
 
 def ElevationSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
@@ -1082,17 +811,6 @@ def ElevationSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# ElevationSent(T,N,get_Elevation(T,N),0)
-# for i in range(194):
-#     ElevationSent(T,N,get_Elevation(T,N),i,False)
-
-
-
-
-
 def LocationSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     locations = F[1]
@@ -1113,15 +831,6 @@ def LocationSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append(Nm + ' is a city in ' + location)
         sentences.append(Nm + ' is a part of ' + location)
     return sentences
-
-
-
-
-
-# LocationSent(T,N,get_Location(T,N),0,False)
-
-
-
 
 
 def GovernmentSent(table,t_name,F,it,tval=True,premise=False):
@@ -1146,15 +855,6 @@ def GovernmentSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# GovernmentSent(T,N,get_Government(T,N),102,False)
-
-
-
-
-
 def Highest_elevationSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1176,15 +876,6 @@ def Highest_elevationSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append(value + ' is the highest peak in the ' + Nm + ' city.')
     
     return sentences
-
-
-
-
-
-# Highest_elevationSent(T,N,get_Highest_elevation(T,N),1,False)
-
-
-
 
 
 def DemonymSent(table,t_name,F,it,tval=True,premise=False):
@@ -1211,15 +902,6 @@ def DemonymSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append('The city ' + Nm + ' demonym is ' + value)
         
     return sentences
-
-
-
-
-
-# DemonymSent(T,N,get_Demonym(T,N),5)
-
-
-
 
 
 def ProvinceSent(table,t_name,F,it,tval=True,premise=False):
@@ -1276,15 +958,6 @@ def MayorSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# MayorSent(T,N,get_Mayor(T,N),102)
-
-
-
-
-
 def Time_zoneSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1317,15 +990,6 @@ def Time_zoneSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# Time_zoneSent(T,N,get_Time_zone(T,N),102)
-
-
-
-
-
 def Lowest_elevationSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1355,15 +1019,6 @@ def Lowest_elevationSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# Lowest_elevationSent(T,N,get_Lowest_elevation(T,N),1)
-
-
-
-
-
 def Named_forSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1383,16 +1038,6 @@ def Named_forSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append(Nm + ' is named for ' + value)
         sentences.append('This city is named after ' + value)
     return sentences
-
-
-
-
-
-# Named_forSent(T,N,get_Named_for(T,N),65)
-# get_Named_for(T,N)[1]
-
-
-
 
 
 def Area_codeSent(table,t_name,F,it,tval=True,premise=False):
@@ -1415,16 +1060,6 @@ def Area_codeSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append(value + ' is the area code of ' + Nm)
         sentences.append(' The city area code is ' + value)
     return sentences
-
-
-
-
-
-# Area_codeSent(T,N,get_Area_code(T,N),3)
-# get_Area_code(T,N)[1]
-
-
-
 
 
 def Postal_codeSent(table,t_name,F,it,tval=True,premise=False):
@@ -1451,16 +1086,6 @@ def Postal_codeSent(table,t_name,F,it,tval=True,premise=False):
         sentences.append('The postal code of the city is ' + value)
         sentences.append('The city has the postal code ' + value)
     return sentences
-
-
-
-
-
-# Postal_codeSent(T,N,get_Postal_code(T,N),0)
-# get_Postal_code(T,N)[1]
-
-
-
 
 
 def CoordinatesSent(table,t_name,F,it,tval=True,premise=False):
@@ -1491,16 +1116,6 @@ def CoordinatesSent(table,t_name,F,it,tval=True,premise=False):
     return sentences            
 
 
-
-
-
-# CoordinatesSent(T,N,get_Coordinates(T,N),0)
-# get_Coordinates(T,N)[1]
-
-
-
-
-
 def IncorporatedSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1524,26 +1139,12 @@ def IncorporatedSent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# IncorporatedSent(T,N,get_Incorporated(T,N),26)
-# get_Incorporated(T,N)[1]
-
-
-
-
-
 def MetroSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
     sentences = []
     synonyms = [" people"," citizen"," residents"]
     value = values[table[it]]
-#     if(tval):
-#         value = values[table[it]]
-#     else: # same as True case since numeric value is there
-#         value = values[table[it]]
     
     if (values[table[it]][0]==None):
         return [None]
@@ -1600,16 +1201,6 @@ def MetroSent(table,t_name,F,it,tval=True,premise=False):
                 sentences.append(sent)
                 
     return sentences
-
-
-
-
-
-# MetroSent(T,N,get_Metro(T,N),4)
-# get_Metro(T,N)[1]
-
-
-
 
 
 def UrbanSent(table,t_name,F,it,tval=True,premise=False):
@@ -1674,16 +1265,6 @@ def UrbanSent(table,t_name,F,it,tval=True,premise=False):
                 sentences.append(sent)
                 
     return sentences
-
-
-
-
-
-# UrbanSent(T,N,get_Urban(T,N),15)
-# get_Urban(T,N)[1]
-
-
-
 
 
 def CitySent(table,t_name,F,it,tval=True,premise=False):
@@ -1755,16 +1336,6 @@ def CitySent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# CitySent(T,N,get_City(T,N),-106)
-# get_City(T,N)[1]
-
-
-
-
-
 def DensitySent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1802,15 +1373,6 @@ def DensitySent(table,t_name,F,it,tval=True,premise=False):
         sentences.append(value[0]+" is the density of"+random.sample(synonyms,1)[0]+" in "+Nm)
                 
     return sentences
-
-
-
-
-
-# DensitySent(T,N,get_Density(T,N),3,premise = True)
-
-
-
 
 
 def Urban_densitySent(table,t_name,F,it,tval=True,premise=False):
@@ -1852,16 +1414,6 @@ def Urban_densitySent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# Urban_densitySent(T,N,get_Urban_density(T,N),8)
-# get_Urban_density(T,N)[1]
-
-
-
-
-
 def Metro_densitySent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1901,16 +1453,6 @@ def Metro_densitySent(table,t_name,F,it,tval=True,premise=False):
     return sentences
 
 
-
-
-
-# Metro_densitySent(T,N,get_Metro_density(T,N),6)
-# get_Metro_density(T,N)[1]
-
-
-
-
-
 def LandSent(table,t_name,F,it,tval=True,premise=False):
     Nm = t_name[table[it]][0]
     values = F[1]
@@ -1943,16 +1485,6 @@ def LandSent(table,t_name,F,it,tval=True,premise=False):
             sentences.append("The city land area is "+val)
                 
     return sentences
-
-
-
-
-
-# LandSent(T,N,get_Land(T,N),10)
-# get_Land(T,N)[1]
-
-
-
 
 
 def WaterSent(table,t_name,F,it,tval=True,premise=False):
@@ -2267,4 +1799,3 @@ def multi_row3(tb,dn,F,it,tval=True):
                 ts["Highest_elevation","Lowest_elevation"].append( "The elevation range of "+Nm+" is "+str(diff)+" ft" )
         
     return ts
-
