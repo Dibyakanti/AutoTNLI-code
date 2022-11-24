@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -13,12 +7,6 @@ import sys
 
 if './' not in sys.path:
     sys.path.append('./')
-    
-# from Py_f import Psn as P
-
-
-# In[1]:
-
 
 getfa = {
 "Movie_tr1":{"Directed_by":[0,1,2],"Produced_by":[0,1,2],"Screenplay_by":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
@@ -42,30 +30,16 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-# In[4]:
-
-
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories.tsv",sep="\t")
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-# In[5]:
-
 
 Ptab = np.array(Catg[Catg.category.isin(["Sports","Sports Event"])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
-
-# In[6]:
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     keys =[i.text for i in soup.find('tr').find_all('th')]
     keys = []
-#     keys.append(soup.find('caption').text)
     keys =[i.text.replace("\xa0"," ") for i in soup.find('tr').find_all('th')]
     if(soup.find('caption')):
         keys.insert(0,soup.find('caption').text)
@@ -77,7 +51,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -92,10 +65,6 @@ def parseFile(filename, tablesFolder):
     dictionary["Tablename"] = filename.split(".")[0]
     return dictionary
 
-
-# In[9]:
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -104,34 +73,23 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
-
-# In[10]:
-
-
 N,T = get_Table_Title()
-# N
 
-
-# In[23]:
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -144,7 +102,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -172,9 +130,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     return None
 
 
-# In[24]:
-
-
 def get_Venue(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -184,7 +139,6 @@ def get_Venue(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -198,7 +152,6 @@ def get_Venue(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k1].split(")")[i].strip().strip(".").strip(",") +(")" if length>1 else ""))
             
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
@@ -212,7 +165,6 @@ def get_Venue(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k2].split(")")[i].strip().strip(".").strip(",") +(")" if length>1 else ""))
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys()):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -225,15 +177,6 @@ def get_Venue(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[25]:
-
-
-# getVL(T,N,0)[1]
-
-
-# In[26]:
-
-
 def get_Date(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -243,14 +186,12 @@ def get_Date(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
                         u.add(dictionary[k1][i].replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k1][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k1].split(","))):
                     length = len(dictionary[k1].split(")"))
                     for i in range(length):
                         if(len(dictionary[k1].split(")")[i])>1):
@@ -258,14 +199,12 @@ def get_Date(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k1].split(")")[i].strip().strip(".") .replace("\xa0"," ")+(")" if length>1 else ""))
             
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
                         u.add(dictionary[k2][i].replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k2][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k2].split(","))):
                     length = len(dictionary[k2].split(")"))
                     for i in range(length):
                         if(len(dictionary[k2].split(")")[i])>1):
@@ -273,7 +212,6 @@ def get_Date(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(dictionary[k2].split(")")[i].strip().strip(".") .replace("\xa0"," ")+(")" if length>1 else ""))
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys()):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -286,15 +224,6 @@ def get_Date(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[27]:
-
-
-# getD(T,N,0)[1]
-
-
-# In[28]:
-
-
 def get_Competitors(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -303,7 +232,6 @@ def get_Competitors(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -313,11 +241,8 @@ def get_Competitors(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i] .replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i] .replace("\xa0"," "))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -327,16 +252,6 @@ def get_Competitors(T,N,fake=False,sel=0):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
     return list(u),d
-
-
-# In[29]:
-
-
-# getC()[1]
-# table 254 does not have country so split by "from"
-
-
-# In[30]:
 
 
 def get_Teams(T,N,fake=False,sel=0):
@@ -347,7 +262,6 @@ def get_Teams(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -357,11 +271,8 @@ def get_Teams(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i] .replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i] .replace("\xa0"," "))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -373,15 +284,6 @@ def get_Teams(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[31]:
-
-
-# getT()[1]
-
-
-# In[32]:
-
-
 def get_No_of_events(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -390,7 +292,6 @@ def get_No_of_events(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -402,7 +303,6 @@ def get_No_of_events(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i] .replace("\xa0"," "))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -414,15 +314,6 @@ def get_No_of_events(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[33]:
-
-
-# getN()[1]
-
-
-# In[34]:
-
-
 def get_Established(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -432,31 +323,26 @@ def get_Established(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
                         u.add(dictionary[k1][i].replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k1][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k1].split(","))):
                         u.add(dictionary[k1].strip().strip(".") .replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k1].strip().strip(".") .replace("\xa0"," "))
             
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
                         u.add(dictionary[k2][i].replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k2][i].replace("\xa0"," "))
                 else:
-#                     for i in range(len(dictionary[k2].split(","))):
                         u.add(dictionary[k2].strip().strip(".") .replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k2].strip().strip(".") .replace("\xa0"," "))
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys()):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -469,15 +355,6 @@ def get_Established(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[35]:
-
-
-# getEF()[1]
-
-
-# In[36]:
-
-
 def get_Official_site(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -486,7 +363,6 @@ def get_Official_site(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -496,11 +372,8 @@ def get_Official_site(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i] .replace("\xa0"," "))
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i] .replace("\xa0"," "))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -512,17 +385,7 @@ def get_Official_site(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-# In[37]:
-
-
-# getO()[1]
-
-
-# #### Dictionary of all extracted data from html/json:
-
-# In[ ]:
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -535,13 +398,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences :
-
-# In[39]:
-
+# Sentence generator :
 
 def VenueSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
@@ -567,7 +425,6 @@ def VenueSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( random.sample(di[tb[it]],1)[0]+" was the official place where "+Nm+" happened" )
                 ts.append( Nm+" was held in "+random.sample(di[tb[it]],1)[0] )
                 ts.append( Nm+" happened in "+("multiple" if length>1 else "single")+" place" )
-#                 ts.append( Nm+" takes place in more than "+str(random.randint(0,length-1))+" places" )
                 ts.append( Nm+" took place in "+random.sample(di[tb[it]],1)[0] )
                 
             else:
@@ -578,22 +435,12 @@ def VenueSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( random.sample(NT,1)[0]+" was the official place where "+Nm+" happened" )
                 ts.append( Nm+" was held in "+random.sample(NT,1)[0] )
                 ts.append( Nm+" happened in "+("multiple" if length>1 else "single")+" place" )
-#                 ts.append( Nm+" takes place in more than "+str(random.randint(0,length-1))+" places" )
                 ts.append( Nm+" took place in "+random.sample(NT,1)[0] )
                 
         else:
             ts.append(None)
             
         return ts
-
-
-# In[40]:
-
-
-# VLSent(T,N,getVL()[1],getVL()[0],10)
-
-
-# In[41]:
 
 
 def DateSent(tb,dn,F,it,tval=True,prem=False):
@@ -618,8 +465,6 @@ def DateSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( "The sporting event "+Nm+" took place on "+random.sample(di[tb[it]],1)[0] )
                 ts.append( Nm+" was held over a few days" )
                 ts.append( Nm+" was a "+("single" if length <=2 else "multiple")+" day event" )
-#                 ts.append(  )
-#                 ts.append(  )
                 
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(1,2))
@@ -632,15 +477,6 @@ def DateSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[42]:
-
-
-# DSent(T,N,getD(),1)
-
-
-# In[43]:
 
 
 def CompetitorsSent(tb,dn,F,it,tval=True,prem=False):
@@ -684,8 +520,6 @@ def CompetitorsSent(tb,dn,F,it,tval=True,prem=False):
                     ts.append( "The sport "+Nm+" has more than"+str(random.randint(5,X-4))+random.sample(syn,1)[0]+" from more than "+str(random.randint(0,Y-1))+" nations" )
                     ts.append( "The sport "+Nm+" has less than"+str(random.randint(X+4,X+20))+random.sample(syn,1)[0]+" from less than "+str(random.randint(Y+2,Y+20))+" nations" )
             else:
-#                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)
-#                 All = ','.join(NT)
                 X = re.findall("[0-9]+",','.join(di[tb[it]]))[0] 
                 X = int(X.strip())
                 nX = random.randint(X+1,X+7)
@@ -715,15 +549,6 @@ def CompetitorsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[44]:
-
-
-# CSent(T,N,getC()[1],getC()[0],10)
-
-
-# In[45]:
-
-
 def TeamsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -740,10 +565,8 @@ def TeamsSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(re.findall("[0-9]"," ".join(di[tb[it]])))
             X = int(re.findall("[0-9]+",di[tb[it]][0])[0])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( "The number of"+random.sample(syn,1)[0]+"in the sport "+Nm+" is "+str(X) )
                 ts.append( "There are "+str(X)+random.sample(syn,1)[0]+"in sport "+Nm )
                 ts.append( "There are more than "+str(random.randint(2,X-4))+random.sample(syn,1)[0]+"in sport "+Nm )
@@ -752,8 +575,6 @@ def TeamsSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( Nm+" saw a competition between "+str(X)+random.sample(syn,1)[0] )
                 
             else:
-#                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(1,2))
-#                 All = ','.join(NT)
                 nX = random.randint(X+1,X+7)
                 ts.append( "The number of"+random.sample(syn,1)[0]+"in the sport "+Nm+" is "+str(nX) )
                 ts.append( "There are "+str(nX)+random.sample(syn,1)[0]+"in sport "+Nm )
@@ -768,15 +589,6 @@ def TeamsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[46]:
-
-
-# TSent(T,N,getT()[1],getT()[0],20)
-
-
-# In[47]:
-
-
 def No_of_eventsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -784,7 +596,6 @@ def No_of_eventsSent(tb,dn,F,it,tval=True,prem=False):
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
-    #         All = ','.join(di[tb[it]])
             X = int(di[tb[it]][0].strip().strip("."))
             ps1 = [ "The no. of events in sport was "+str(X)
                    , str(X)+" events were there in "+Nm ]
@@ -794,10 +605,8 @@ def No_of_eventsSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(re.findall("[0-9]"," ".join(di[tb[it]])))
             X = int(di[tb[it]][0].strip().strip("."))
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( "There were "+str(X)+random.sample(syn,1)[0]+"in "+Nm )
                 ts.append( "There were more than "+str(random.randint(1,X-2))+random.sample(syn,1)[0]+"in "+Nm )
                 ts.append( "There were less than "+str(random.randint(X+2,X+8))+random.sample(syn,1)[0]+"in "+Nm )
@@ -806,8 +615,6 @@ def No_of_eventsSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( "Less than "+str(random.randint(X+2,X+8))+random.sample(syn,1)[0]+"were held in "+Nm )
                 
             else:
-#                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(1,2))
-#                 All = ','.join(NT)
                 nX = random.randint(X+1,X+7)
                 ts.append( "There were "+str(nX)+random.sample(syn,1)[0]+"in "+Nm )
                 ts.append( "There were less than "+str(random.randint(1,X-2))+random.sample(syn,1)[0]+"in "+Nm )
@@ -820,15 +627,6 @@ def No_of_eventsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[48]:
-
-
-# NSent(T,N,getN()[1],getN()[0],20)
-
-
-# In[49]:
 
 
 def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
@@ -849,7 +647,6 @@ def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(re.findall("[0-9]"," ".join(di[tb[it]])))
             year = int(re.findall("[0-9][0-9][0-9][0-9]",di[tb[it]][0])[0])
             if(tval):
                 All = ','.join(di[tb[it]])
@@ -876,27 +673,16 @@ def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
                         ts.append(Nm+" event has celebrated it's "+jub[i]+"jubilee on "+str(nyear+i))
                     else:
                         ts.append(Nm+" will celebrate it's "+jub[i]+"jubilee on "+str(nyear+i))
-                
-                
+
         else:
             ts.append(None)
             
         return ts
 
 
-# In[51]:
-
-
-# EFSent(T,N,getEF(),15)
-
-
-# In[36]:
-
-
 def Official_siteSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" events "," games "]
     udom = ["com","in","edu","uk","co","us"]
     Nm = dn[tb[it]][0]
     if(prem):
@@ -910,7 +696,6 @@ def Official_siteSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(re.findall("[0-9]"," ".join(di[tb[it]])))
             dom = []
             for i in range(len(di[tb[it]][0].split("."))):
                 if(len(di[tb[it]][0].split(".")[i])<=3 and i>0):
@@ -934,18 +719,7 @@ def Official_siteSent(tb,dn,F,it,tval=True,prem=False):
             
         return ts
 
-
-# In[37]:
-
-
-# OSent(T,N,getO()[1],getO()[0],44)
-
-
-# #### Multi-row :
-
-# In[1]:
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ul,L = F["Venue"]
     Ud,D = F["Date"]
@@ -969,16 +743,7 @@ def multi_row1(tb,dn,F,it,tval=True):
         
     return ts
 
-
-# In[39]:
-
-
-# multi_row1(T,N,5)
-
-
-# In[40]:
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Ut,T = F["Teams"]
     Un,N = F["No_of_events"]
@@ -1001,10 +766,3 @@ def multi_row2(tb,dn,F,it,tval=True):
             ts["Teams,No_of_events"].append( Al1+" teams played "+Al2+" games" )
         
     return ts
-
-
-# In[41]:
-
-
-# multi_row2(T,N,35)
-

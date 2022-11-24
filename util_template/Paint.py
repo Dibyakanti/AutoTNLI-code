@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
-
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -13,10 +7,6 @@ import sys
 
 if './' not in sys.path:
     sys.path.append('./')
-
-
-
-
 
 getfa = {	
 "Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
@@ -39,24 +29,12 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-
-
-
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t") 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t") 
-
-
-
-
 
 Ptab = np.array(Catg[Catg.category.isin(['Painting'])].table_id)
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
-
-
-
-
 
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
@@ -69,7 +47,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -84,27 +61,6 @@ def parseFile(filename, tablesFolder):
     dictionary["Tablename"] = filename.split(".")[0]
     return dictionary
 
-
-
-
-
-# key = {}
-# for n in range(130):
-#     if(int(Ptab[n][1:]) <=2800 ): # not necessary
-#         dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-#         print(dictionary['Tablename'] ," : ")
-#         for k in dictionary.keys():
-#             if(k in key.keys()):
-#                 key[k] += 1
-#             else:
-#                 key[k] = 1
-#             print(k)
-# {k: v for k, v in sorted(key.items(), key=lambda item: item[1])}
-
-
-
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -113,22 +69,14 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
-
-
-
-
 N,T = get_Table_Title()
-# T
-
 
 def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whethet to substitute/delete/add
     '''
@@ -150,7 +98,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute 
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -178,9 +126,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
     return None
 
 
-
-
-
 def get_Artist(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -189,7 +134,6 @@ def get_Artist(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in dictionary[k]:
@@ -205,7 +149,6 @@ def get_Artist(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(None)
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -218,15 +161,6 @@ def get_Artist(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Artist(T,N,0)[1]
-
-
-
-
-
 def get_Year(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -235,7 +169,6 @@ def get_Year(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 r = re.findall("[0-9][0-9][0-9]+",dictionary[k])
                 t = 0
@@ -247,7 +180,6 @@ def get_Year(T,N,fake=False,sel=0):
                         t = int(s.strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -260,15 +192,6 @@ def get_Year(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Year(T,N,0)[1]
-
-
-
-
-
 def get_Medium(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -278,7 +201,6 @@ def get_Medium(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -290,7 +212,6 @@ def get_Medium(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k1].split(",")[i].lower())
                         
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
@@ -302,7 +223,6 @@ def get_Medium(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].lower())
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -315,15 +235,6 @@ def get_Medium(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Medium(T,N,0)[1]
-
-
-
-
-
 def get_Dimensions(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -332,7 +243,6 @@ def get_Dimensions(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 s = dictionary[k].replace('\xa0','').replace('\u200b','')
                 r = re.findall("[0-9.]+",s)
@@ -341,7 +251,6 @@ def get_Dimensions(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(float(ss.strip()))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -354,15 +263,6 @@ def get_Dimensions(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Dimensions(T,N,True)[1]
-
-
-
-
-
 def get_Location(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -371,10 +271,8 @@ def get_Location(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
-#                     for i in range(len(dictionary[k])):
                     u.add(",".join(dictionary[k]))
                     d[dictionary['Tablename']].append(",".join(dictionary[k]))
                 else:
@@ -382,7 +280,6 @@ def get_Location(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -394,17 +291,7 @@ def get_Location(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-
-
-
-# get_Location(T,N,0)[1]
-
-
-# #### All extracted data :
-
-
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -416,18 +303,12 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences :
-
-
-
+# Sentence generator :
 
 def ArtistSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["sector","area","field"]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -457,19 +338,9 @@ def ArtistSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# AtSent(T,N,getAt()[1],getAt()[0],7)
-
-
-
-
-
 def YearSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["sector","area","field"]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -492,7 +363,6 @@ def YearSent(tb,dn,F,it,tval=True,prem=False):
                 
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-#                 All = ','.join(NT)
                 ts.append( dn[tb[it]][0]+" was painted in the year "+NT )
                 ts.append( dn[tb[it]][0]+" was painted after "+str(random.randint(y+20,y+100)) )
                 ts.append( dn[tb[it]][0]+" was painted before "+str(random.randint(1000,y-30)) )
@@ -504,19 +374,9 @@ def YearSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# YSent(T,N,getY()[1],getY()[0],7)
-
-
-
-
-
 def MediumSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["sector","area","field"]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -546,21 +406,11 @@ def MediumSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# MTSent(T,N,getMT()[1],getMT()[0],10)
-
-
-
-
-
 def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
     if(prem):
         if(di[tb[it]][0] != None):
-#             All = ','.join(di[tb[it]])
             dd = di[tb[it]]
             lc = dd[0] if dd[0] > dd[1] else dd[1]
             wc = dd[0] if dd[0] < dd[1] else dd[1]
@@ -581,7 +431,6 @@ def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
             li = dd[2] if dd[2] > dd[3] else dd[3]
             wi = dd[2] if dd[2] < dd[3] else dd[3]
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( "The painting is "+str(lc)+" cm by "+str(wc)+" cm in size" )
                 ts.append( "The painting is "+str(li)+" inch by "+str(wi)+" inch in size" )
                 ts.append( "The area is "+str(lc*wc)+" sq.cm" )
@@ -591,8 +440,6 @@ def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( "The perimeter of the painting is "+str(2*(lc+wc))+" cm" )
                 
             else:
-#                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)
-#                 All = ','.join(NT)
                 rnd = float(random.randint(3,8))
                 ts.append( "The painting is "+str(lc+rnd)+" cm by "+str(wc+rnd)+" cm in size" )
                 ts.append( "The painting is "+str(wi)+" inch by "+str(li)+" inch in size" )
@@ -606,16 +453,6 @@ def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# DSent(T,N,getD()[1],getD()[0],10)
-# get_Data(True)["Dimensions"][1]
-
-
-
 
 
 def LocationSent(tb,dn,F,it,tval=True,prem=False):
@@ -650,15 +487,6 @@ def LocationSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# LSent(T,N,getL()[1],getL()[0],10)
-
-
-
-
-
 def multi_row1(tb,dn,F,it,tval=True):
     Ua,A = F["Artist"]
     Um,M = F["Medium"]
@@ -685,7 +513,6 @@ def multi_row1(tb,dn,F,it,tval=True):
     else: 
         if(A[tb[it]][0] != None and M[tb[it]][0] != None):
             ts["Artist,Medium"] = []
-#             NA = random.sample(list(set(Ua)-set(A[tb[it]])),1)
             NM = random.sample(list(set(Um)-set(M[tb[it]])),1)
             Al1 = ",".join(A[tb[it]])
             Al2 = ",".join(NM)
@@ -693,13 +520,11 @@ def multi_row1(tb,dn,F,it,tval=True):
         if(A[tb[it]][0] != None and L[tb[it]][0] != None):
             ts["Artist,Location"] = [] 
             NA = random.sample(list(set(Ua)-set(A[tb[it]])),1)
-#             NL = random.sample(list(set(Ul)-set(L[tb[it]])),1)
             Al1 = ",".join(NA)
             Al2 = ",".join(L[tb[it]])
             ts["Artist,Location"].append( Al1+"'s painting is located in "+Al2 )
         if(A[tb[it]][0] != None and L[tb[it]][0] != None):
             ts["Artist,Location"] = []
-#             NA = random.sample(list(set(Ua)-set(A[tb[it]])),1)
             NL = random.sample(list(set(Ul)-set(L[tb[it]])),1)
             Al1 = ",".join(A[tb[it]])
             Al2 = ",".join(NL)
@@ -707,16 +532,7 @@ def multi_row1(tb,dn,F,it,tval=True):
         
     return ts
 
-
-
-
-
-# multi_row1(T,N,14,False)
-
-
-
-
-
+# 1st multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Ua,A = F["Artist"]
     Ud,D = F["Dimensions"]
@@ -727,7 +543,6 @@ def multi_row2(tb,dn,F,it,tval=True):
         if(A[tb[it]][0] != None and Y[tb[it]][0] != None):
             ts["Artist,Year"] = []
             Al1 = ",".join(A[tb[it]])
-#             Al2 = ",".join(M[tb[it]])
             year = int(Y[tb[it]][0])
             ts["Artist,Year"].append( dn[tb[it]][0]+" was created by "+Al1+" in the "+str(int(year/100)+1)+"th century" )
             ts["Artist,Year"].append( Al1+" made a painting in "+str(int(year/100)+1)+"th century" )
@@ -741,14 +556,12 @@ def multi_row2(tb,dn,F,it,tval=True):
             li = dd[2] if dd[2] > dd[3] else dd[3]
             wi = dd[2] if dd[2] < dd[3] else dd[3]
             Al1 = ",".join(A[tb[it]])
-#             Al2 = ",".join(L[tb[it]])
             ts["Artist,Dimensions"].append( Al1+"'s painting was "+str(lc)+" cm by "+str(wc)+" cm in size" )
             ts["Artist,Dimensions"].append( Al1+"'s painting was "+str(li)+" cm by "+str(wi)+" cm in size" )
         
     else: 
         if(A[tb[it]][0] != None and Y[tb[it]][0] != None):
             ts["Artist,Year"] = []
-#             NA = random.sample(list(set(Ua)-set(A[tb[it]])),1)
             Al1 = ",".join(A[tb[it]])
             year = int(Y[tb[it]][0])
             ts["Artist,Year"].append( dn[tb[it]][0]+" was created by "+Al1+" in the "+str(int(year/100)-random.randint(1,3))+"th century" )
@@ -763,15 +576,7 @@ def multi_row2(tb,dn,F,it,tval=True):
             li = dd[2] if dd[2] > dd[3] else dd[3]
             wi = dd[2] if dd[2] < dd[3] else dd[3]
             Al1 = ",".join(A[tb[it]])
-#             Al2 = ",".join(L[tb[it]])
             rnd = float(random.randint(3,8))
             ts["Artist,Dimensions"].append( Al1+"'s painting was "+str(lc+rnd)+" cm by "+str(wc-rnd)+" cm in size" )
             ts["Artist,Dimensions"].append( Al1+"'s painting was "+str(li+rnd)+" inch by "+str(wi+rnd)+" inch in size" )
     return ts
-
-
-
-
-
-# multi_row2(T,N,14,False)
-

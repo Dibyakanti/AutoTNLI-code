@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -15,10 +9,6 @@ import json
 
 if './' not in sys.path:
     sys.path.append('./')
-
-
-# In[2]:
-
 
 getfa = {
 "Movie_tr1":{"Directed_by":[0,1,2],"Produced_by":[0,1,2],"Screenplay_by":[1],"Starring":[0,1,2],"Music_by":[0,1,2],"Cinematography":[1]
@@ -43,30 +33,16 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-# In[3]:
-
-
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories.tsv",sep="\t")
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-# In[28]:
-
 
 Ptab = np.array(Catg[Catg.category.isin(['University'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
-
-# In[29]:
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     keys =[i.text for i in soup.find('tr').find_all('th')]
     keys = []
-#     keys.append(soup.find('caption').text)
     keys =[i.text.replace("\xa0"," ") for i in soup.find('tr').find_all('th')]
     if(soup.find('caption')):
         keys.insert(0,soup.find('caption').text)
@@ -78,7 +54,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -94,9 +69,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-# In[30]:
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -105,34 +77,23 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
-
-# In[31]:
-
-
 N,T = get_Table_Title()
-# T
 
-
-# In[32]:
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -145,7 +106,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -172,10 +133,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     
     return None
 
-
-# In[64]:
-
-
 '''
 fake : represent if we have to make a fake dictionary or not
 it : selected which index to create the fake for
@@ -195,7 +152,6 @@ def get_Website(T,N,fake=False,sel=0):
             if(k in dictionary.keys()):
                 u.add(dictionary[k])
                 d[dictionary['Tablename']].append(dictionary[k])
-#                 print(dictionary[k].split("."))
                 if(len(dictionary[k].split("."))>3):
                     for i in range(2,len(dictionary[k].split("."))):
                         dom[dictionary["Tablename"]].append(dictionary[k].split(".")[i])
@@ -219,15 +175,6 @@ def get_Website(T,N,fake=False,sel=0):
     return list(u),d,dom
 
 
-# In[66]:
-
-
-# get_Website(T,N)[2]
-
-
-# In[35]:
-
-
 def get_Type(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -236,7 +183,6 @@ def get_Type(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -247,7 +193,6 @@ def get_Type(T,N,fake=False,sel=0):
                         u.add(dictionary[k].split(",")[i].strip())
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -258,15 +203,6 @@ def get_Type(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[36]:
-
-
-# getT()[1]
-
-
-# In[37]:
 
 
 def get_Established(T,N,fake=False,sel=0):
@@ -277,23 +213,19 @@ def get_Established(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
-#                     for i in range(len(dictionary[k])):
                     r = " ".join(dictionary[k].replace("\xa0"," "))
                     y = re.findall("[0-9][0-9][0-9][0-9]",r)[0]
                     u.add(y)
                     d[dictionary['Tablename']].append(y)
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     r = dictionary[k].replace("\xa0"," ")
                     y = re.findall("[0-9][0-9][0-9][0-9]",r)[0]
                     u.add(y)
                     d[dictionary['Tablename']].append(y)
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -304,15 +236,6 @@ def get_Established(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[38]:
-
-
-# getE()[1]
-
-
-# In[39]:
 
 
 def get_Undergraduates(T,N,fake=False,sel=0):
@@ -323,18 +246,14 @@ def get_Undergraduates(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
     
                 r = dictionary[k]
                 n = re.findall("[0-9,]+",r)[0]
                 u.add(n.replace(",",""))
                 d[dictionary['Tablename']].append(n.replace(",",""))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -345,15 +264,6 @@ def get_Undergraduates(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[40]:
-
-
-# getUg()[1]
-
-
-# In[41]:
 
 
 def get_Postgraduates(T,N,fake=False,sel=0):
@@ -364,18 +274,14 @@ def get_Postgraduates(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
     
                 r = dictionary[k]
                 n = re.findall("[0-9,]+",r)[0]
                 u.add(n.replace(",",""))
                 d[dictionary['Tablename']].append(n.replace(",",""))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -386,15 +292,6 @@ def get_Postgraduates(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[42]:
-
-
-# getPg()[1]
-
-
-# In[43]:
 
 
 def get_Motto(T,N,fake=False,sel=0):
@@ -407,7 +304,6 @@ def get_Motto(T,N,fake=False,sel=0):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             d[dictionary['Tablename']] = []
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
                         u.add(dictionary[k1][i])
@@ -425,7 +321,6 @@ def get_Motto(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k2])
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys()):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(37): # for getting all the fakes in one go
@@ -437,15 +332,6 @@ def get_Motto(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[44]:
-
-
-# getM()[1]
-
-
-# In[76]:
-
-
 def get_Location(T,N,fake=False,sel=0):
     ul,uc = set([]),set([])
     dl,dc = {},{}
@@ -454,7 +340,6 @@ def get_Location(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 dc[dictionary['Tablename']] = []
                 dl[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -473,7 +358,6 @@ def get_Location(T,N,fake=False,sel=0):
 
                 else:
                     r = dictionary[k].replace("\ufeff","")
-#                     c = re.findall("[a-z]+.[:].[0-9°′″wnse]+.[0-9°′″wnse]+",r)
                     c = re.findall("[A-Za-z]+.[:].+",r)
                     p = re.findall("[A-Za-z,.][A-Za-z,.]+",r)
                     if(not c):
@@ -487,7 +371,6 @@ def get_Location(T,N,fake=False,sel=0):
                     dl[dictionary['Tablename']].append(p)
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 dc[dictionary['Tablename']] = []
                 dc[dictionary['Tablename']].append(None)
                 dl[dictionary['Tablename']] = []
@@ -507,15 +390,6 @@ def get_Location(T,N,fake=False,sel=0):
     return list(uc),list(ul),dl,dc
 
 
-# In[77]:
-
-
-# get_Location(T,N,True)[3]
-
-
-# In[78]:
-
-
 def get_Nickname(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -524,7 +398,6 @@ def get_Nickname(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -534,11 +407,8 @@ def get_Nickname(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i])
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -551,15 +421,6 @@ def get_Nickname(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[79]:
-
-
-# getN()[1]
-
-
-# In[80]:
-
-
 def get_Campus(T,N,fake=False,sel=0):
     u1 = set([])
     u2 = set([])
@@ -570,14 +431,12 @@ def get_Campus(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d1[dictionary['Tablename']] = []
                 d2[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     r = ",".join(dictionary[k]).replace("\xa0"," ")
                     a = re.findall("[0-9][0-9,.]+.[A-Za-z2]+",r)
                     b = re.findall("[A-Za-z]+urban",r)
-#                     print(a,b)
                     if(len(a)!=0):
                         for i in range(2):
                             d1[dictionary['Tablename']].append(a[i])
@@ -586,14 +445,10 @@ def get_Campus(T,N,fake=False,sel=0):
                         for i in b:
                             d2[dictionary['Tablename']].append(i.lower())
                             u2.add(i.lower())
-#                     for i in range(len(dictionary[k])):
-#                         u.add(dictionary[k][i].replace("\xa0"," "))
-#                         d[dictionary['Tablename']].append(dictionary[k][i].replace("\xa0"," "))
                 else:
                     r = dictionary[k].replace("\xa0"," ")
                     a = re.findall("[0-9][0-9,.]+.[A-Za-z2]+",r)
                     b = re.findall("[A-Za-z]+rban",r)
-#                     print(a,b)
                     if(len(a)!=0):
                         l = min(len(a),2)
                         for i in range(l):
@@ -607,12 +462,8 @@ def get_Campus(T,N,fake=False,sel=0):
                     d2[dictionary['Tablename']].append(None)
                 if(len(d1[dictionary['Tablename']])<1):
                     d1[dictionary['Tablename']].append(None)
-#                     for i in range(len(dictionary[k].split(","))):
-#                     u.add(dictionary[k].replace("\xa0"," "))
-#                     d[dictionary['Tablename']].append(dictionary[k].replace("\xa0"," "))
         
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d1[dictionary['Tablename']] = []
                 d1[dictionary['Tablename']].append(None)
                 d2[dictionary['Tablename']] = []
@@ -638,15 +489,6 @@ def get_Campus(T,N,fake=False,sel=0):
     return list(u1),list(u2),d1,d2
 
 
-# In[81]:
-
-
-# get_Campus(T,N)[3]
-
-
-# In[82]:
-
-
 def get_Colors(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -655,7 +497,6 @@ def get_Colors(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -670,7 +511,6 @@ def get_Colors(T,N,fake=False,sel=0):
 
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -681,15 +521,6 @@ def get_Colors(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[83]:
-
-
-# getCol()[1]
-
-
-# In[84]:
 
 
 def get_Students(T,N,fake=False,sel=0):
@@ -700,7 +531,6 @@ def get_Students(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 r = dictionary[k]
                 n = re.findall("[0-9,]+",r)[0]
@@ -708,7 +538,6 @@ def get_Students(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(n.replace(",",""))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -719,15 +548,6 @@ def get_Students(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[152]:
-
-
-# get_Students(T,N)[1][T[26]]
-
-
-# In[86]:
 
 
 def get_Academic_staff(T,N,fake=False,sel=0):
@@ -738,7 +558,6 @@ def get_Academic_staff(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     r = " ".join(dictionary[k])
@@ -754,7 +573,6 @@ def get_Academic_staff(T,N,fake=False,sel=0):
 
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -765,15 +583,6 @@ def get_Academic_staff(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[87]:
-
-
-# getAc()[1]
-
-
-# In[88]:
 
 
 def get_Administrative_staff(T,N,fake=False,sel=0):
@@ -784,7 +593,6 @@ def get_Administrative_staff(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     r = " ".join(dictionary[k])
@@ -793,7 +601,6 @@ def get_Administrative_staff(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(n.replace(",",""))
 
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     r = dictionary[k]
                     n = re.findall("[0-9,]+",r)[0]
                     u.add(n.replace(",",""))
@@ -801,7 +608,6 @@ def get_Administrative_staff(T,N,fake=False,sel=0):
 
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -812,15 +618,6 @@ def get_Administrative_staff(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[89]:
-
-
-# getAd()[1]
-
-
-# In[90]:
 
 
 def get_President(T,N,fake=False,sel=0):
@@ -831,7 +628,6 @@ def get_President(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -841,11 +637,8 @@ def get_President(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i])
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -856,15 +649,6 @@ def get_President(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[91]:
-
-
-# getPr()[1]
-
-
-# In[92]:
 
 
 def get_Endowment(T,N,fake=False,sel=0):
@@ -875,23 +659,16 @@ def get_Endowment(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 r = dictionary[k]
                 m = re.findall("\$[0-9.]+.[a-z]illion",r)
-#                 print(m)
                 if(not m):
                     d[dictionary['Tablename']].append(dictionary[k])
                 else:
                     u.add(m[0])
                     d[dictionary['Tablename']].append(m[0])
-#                 u.add(dictionary[k])
-#                 d[dictionary['Tablename']].append(dictionary[k])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -902,15 +679,6 @@ def get_Endowment(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[93]:
-
-
-# getEdw()[1]
-
-
-# In[94]:
 
 
 def get_Mascot(T,N,fake=False,sel=0):
@@ -921,21 +689,16 @@ def get_Mascot(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
                         u.add(dictionary[k][i])
                         d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k])
                     d[dictionary['Tablename']].append(dictionary[k])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -946,15 +709,6 @@ def get_Mascot(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[95]:
-
-
-# getMa()[1]
-
-
-# In[96]:
 
 
 def get_Provost(T,N,fake=False,sel=0):
@@ -965,7 +719,6 @@ def get_Provost(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -975,11 +728,8 @@ def get_Provost(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i])
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -990,15 +740,6 @@ def get_Provost(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[97]:
-
-
-# getProv()[1]
-
-
-# In[98]:
 
 
 def get_Sporting_affiliations(T,N,fake=False,sel=0):
@@ -1009,21 +750,16 @@ def get_Sporting_affiliations(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
                         u.add(dictionary[k][i])
                         d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].replace("\xa0"," "))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -1034,15 +770,6 @@ def get_Sporting_affiliations(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[99]:
-
-
-# getSAf()[1]
-
-
-# In[100]:
 
 
 def get_Academic_affiliations(T,N,fake=False,sel=0):
@@ -1053,21 +780,16 @@ def get_Academic_affiliations(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
                         u.add(dictionary[k][i])
                         d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].split(","))):
                     u.add(dictionary[k].replace("\xa0"," "))
                     d[dictionary['Tablename']].append(dictionary[k].replace("\xa0"," "))
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -1080,15 +802,6 @@ def get_Academic_affiliations(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[101]:
-
-
-# getAAf()[1]
-
-
-# In[102]:
-
-
 def get_Former_names(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -1097,7 +810,6 @@ def get_Former_names(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -1109,7 +821,6 @@ def get_Former_names(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i].replace("\xa0"," ").strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -1121,17 +832,7 @@ def get_Former_names(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-# In[103]:
-
-
-# getFn()[1]
-
-
-# #### Extract all data :
-
-# In[104]:
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -1145,13 +846,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences :
-
-# In[105]:
-
+# Sentence generator :
 
 def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
     dom = F[2]
@@ -1197,19 +893,9 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[106]:
-
-
-# WebsiteSent(T,N,getW(),1,False)
-
-
-# In[107]:
-
-
 def TypeSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" start"," initiate"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1261,15 +947,6 @@ def TypeSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[108]:
-
-
-# TSent(T,N,getT()[1],getT()[0],1,False)
-
-
-# In[109]:
-
-
 def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1293,7 +970,6 @@ def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
             year = int(di[tb[it]][0])
             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"in "+str(year) )
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"before "+str(random.randint(year+10,2020)) )
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"after "+str(random.randint(year-100,year-10)) )
@@ -1307,7 +983,6 @@ def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
                 
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)
-#                 year = int(NT[0])
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"in "+NT[0] )
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"after "+str(random.randint(year+10,2020)) )
                 ts.append( Nm+" was"+random.sample(syn,1)[0]+"before "+str(random.randint(year-100,year-10)) )
@@ -1327,19 +1002,9 @@ def EstablishedSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[110]:
-
-
-# ESent(T,N,getE()[1],getE()[0],1,True)
-
-
-# In[111]:
-
-
 def UndergraduatesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" university"," college"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1381,19 +1046,9 @@ def UndergraduatesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[112]:
-
-
-# UgSent(T,N,getUg()[1],getUg()[0],1,False)
-
-
-# In[113]:
-
-
 def PostgraduatesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" university"," college"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1434,19 +1089,9 @@ def PostgraduatesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[114]:
-
-
-# PgSent(T,N,getPg()[1],getPg()[0],1)
-
-
-# In[115]:
-
-
 def MottoSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" lives by"," believes in"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1459,7 +1104,6 @@ def MottoSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( random.sample(di[tb[it]],1)[0]+" are the words the university "+random.sample(["lives by ","believes in "],1)[0] )
@@ -1476,15 +1120,6 @@ def MottoSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[116]:
-
-
-# MSent(T,N,getM()[1],getM()[0],1)
-
-
-# In[117]:
 
 
 def LocationSent(tb,dn,F,it,tval=True,prem=False):
@@ -1510,9 +1145,7 @@ def LocationSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(diP[tb[it]][0] != None or diC[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 if(diP[tb[it]][0]!=None):
                     ts.append( Nm+" is"+random.sample(syn,1)[0]+diP[tb[it]][0] )
                     ts.append( Nm+" is"+random.sample(syn,1)[0]+random.sample(diP[tb[it]][0].split(",")[1:],1)[0] )
@@ -1533,19 +1166,9 @@ def LocationSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[118]:
-
-
-# LSent(T,N,getL(T,N,0),0,False)
-
-
-# In[119]:
-
-
 def NicknameSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" lives by"," believes in"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1558,7 +1181,6 @@ def NicknameSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( 'The students of '+Nm+" university are called "+random.sample(di[tb[it]],1)[0] )
@@ -1577,15 +1199,6 @@ def NicknameSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[120]:
-
-
-# NSent(T,N,getN()[1],getN()[0],2)
-
-
-# In[121]:
 
 
 def CampusSent(tb,dn,F,it,tval=True,prem=False):
@@ -1610,9 +1223,7 @@ def CampusSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if( len(diA[tb[it]])>0 and diA[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( "The size of "+Nm+" is "+random.sample(diA[tb[it]],1)[0] )
                 ts.append( Nm+" is spread in "+random.sample(diA[tb[it]],1)[0] )
                 ts.append( Nm+" has an area of "+random.sample(diA[tb[it]],1)[0] )
@@ -1646,20 +1257,9 @@ def CampusSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[122]:
-
-
-# CSent(T,N,getC(T,N,0),10,False,True)
-# getC(T,N,0)[3]
-
-
-# In[123]:
-
-
 def ColorsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" lives by"," believes in"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1672,7 +1272,6 @@ def ColorsSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( random.sample(di[tb[it]],1)[0]+" is the school color of "+Nm )
@@ -1691,19 +1290,9 @@ def ColorsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[124]:
-
-
-# ColSent(T,N,getCol()[1],getCol()[0],10)
-
-
-# In[125]:
-
-
 def StudentsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" university"," college"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1744,19 +1333,9 @@ def StudentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[126]:
-
-
-# StSent(T,N,getSt()[1],getSt()[0],1)
-
-
-# In[127]:
-
-
 def Academic_staffSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" lives by"," believes in"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1769,7 +1348,6 @@ def Academic_staffSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( "There are "+All+" full time employees in the university" )
@@ -1790,19 +1368,9 @@ def Academic_staffSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[128]:
-
-
-# AcSent(T,N,getAc()[1],getAc()[0],10,False)
-
-
-# In[129]:
-
-
 def Administrative_staffSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" lives by"," believes in"]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -1815,7 +1383,6 @@ def Administrative_staffSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( "There are "+All+" full time employees in the university" )
@@ -1834,15 +1401,6 @@ def Administrative_staffSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[130]:
-
-
-# AdSent(T,N,getAd()[1],getAd()[0],10,False)
-
-
-# In[131]:
 
 
 def PresidentSent(tb,dn,F,it,tval=True,prem=False):
@@ -1861,7 +1419,6 @@ def PresidentSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( All+" is the head of the institution" )
@@ -1886,15 +1443,6 @@ def PresidentSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[132]:
-
-
-# PrSent(T,N,getPr()[1],getPr()[0],10,False)
-
-
-# In[133]:
-
-
 def EndowmentSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1911,7 +1459,6 @@ def EndowmentSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             m = float(re.findall("[0-9.]+",di[tb[it]][0])[0])
             mm = re.findall("[mb]illion",di[tb[it]][0])[0]
             if(tval):
@@ -1936,15 +1483,6 @@ def EndowmentSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[134]:
-
-
-# EdwSent(T,N,getEdw()[1],getEdw()[0],14)
-
-
-# In[135]:
-
-
 def MascotSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1961,7 +1499,6 @@ def MascotSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( All+" represent the "+Nm )
@@ -1984,15 +1521,6 @@ def MascotSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[136]:
-
-
-# MaSent(T,N,getMa()[1],getMa()[0],14)
-
-
-# In[137]:
-
-
 def ProvostSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2009,11 +1537,9 @@ def ProvostSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( All+" is second to the head of the institution" )
-#                 ts.append( All+" heads "+Nm+" university" )
                 ts.append( All+" is the second highest governing body of the university" )
                 ts.append( All+" makes the most "+random.sample(syn,1)[0]+" decision of the institution" )
                 ts.append( All+" is responsible for the university" )
@@ -2022,7 +1548,6 @@ def ProvostSent(tb,dn,F,it,tval=True,prem=False):
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
                 ts.append( NT+" is second to the head of the institution" )
-#                 ts.append( NT+" heads "+Nm+" university" )
                 ts.append( NT+" is the second highest governing body of the university" )
                 ts.append( NT+" makes the most "+random.sample(syn,1)[0]+" decision of the institution" )
                 ts.append( NT+" is responsible for the university" )
@@ -2032,15 +1557,6 @@ def ProvostSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
             
         return ts
-
-
-# In[138]:
-
-
-# ProvSent(T,N,getProv()[1],getProv()[0],14)
-
-
-# In[139]:
 
 
 def Sporting_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2059,7 +1575,6 @@ def Sporting_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( Nm+" is"+random.sample(syn,1)[0]+All+" in sports" )
@@ -2079,15 +1594,6 @@ def Sporting_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[140]:
-
-
-# SAfSent(T,N,getSAf()[1],getSAf()[0],14)
-
-
-# In[141]:
-
-
 def Academic_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2104,7 +1610,6 @@ def Academic_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
                 All = ','.join(di[tb[it]])
                 ts.append( Nm+" is"+random.sample(syn,1)[0]+All+" in academics" )
@@ -2124,19 +1629,9 @@ def Academic_affiliationsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[142]:
-
-
-# AAfSent(T,N,getAAf()[1],getAAf()[0],14)
-
-
-# In[143]:
-
-
 def Former_namesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" affiliated to "," associated with "," allied with "]
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
@@ -2149,9 +1644,7 @@ def Former_namesSent(tb,dn,F,it,tval=True,prem=False):
     else:
         ts = []
         if(di[tb[it]][0] != None):
-#             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 p = random.sample(di[tb[it]],1)[0]
                 ts.append( "The past name of "+Nm+" is "+p )
                 ts.append( Nm+" was also known by "+p+" in the past" )
@@ -2177,16 +1670,7 @@ def Former_namesSent(tb,dn,F,it,tval=True,prem=False):
             
         return ts
 
-
-# In[144]:
-
-
-# FnSent(T,N,getFn()[1],getFn()[0],14)
-
-
-# In[158]:
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ug,G = F["Undergraduates"]
     Up,P = F["Postgraduates"]
@@ -2242,16 +1726,7 @@ def multi_row1(tb,dn,F,it,tval=True):
         
     return ts
 
-
-# In[160]:
-
-
-# multi_row1(T,N,get_Data(),26)
-
-
-# In[ ]:
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Um,M = F["Mascot"]
     Un,N = F["Nickname"]
@@ -2287,16 +1762,7 @@ def multi_row2(tb,dn,F,it,tval=True):
         
     return ts
 
-
-# In[147]:
-
-
-# multi_row2(T,N,0)
-
-
-# In[148]:
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Um,M = F["Motto"]
     Us,S = F["Sporting_affiliations"]
@@ -2338,11 +1804,3 @@ def multi_row3(tb,dn,F,it,tval=True):
             ts["Sporting_affiliations,Academic_affiliations"].append( "Affiliations of the university are "+Al1+", "+Al2 )
         
     return ts
-
-
-# In[146]:
-
-
-# multi_row3(T,N,get_Data(),13)
-# get_Data()["Motto"][1][T[13]]
-

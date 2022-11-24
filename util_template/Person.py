@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
-
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -16,16 +10,8 @@ import json
 if './' not in sys.path:
     sys.path.append('./')
 
-
-
-
-
 rev_d_Months = {'January':1,'February':2,'March':3,'April':4,'May':5,'June':6,'July':7,'August':8,'September':9,'October':10,'November':11,'December':12}
 d_Months = {1: 'January',2: 'February',3: 'March',4: 'April',5: 'May',6: 'June',7: 'July',8: 'August',9: 'September',10: 'October',11: 'November',12: 'December'}
-
-
-
-
 
 getfa = {
 "Psn":{"Spouse":[1],"Occupation":[0,1,2],"Education":[1],"Children":[1],"Genres":[0,1,2],"Labels":[0,1,2],"Website":[1]
@@ -53,24 +39,12 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-
-
-
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t") 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t") 
-
-
-
-
 
 Ptab = np.array(Catg[Catg.category.isin(['Person','Musician'])].table_id)
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
-
-
-
-
 
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
@@ -83,7 +57,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -99,11 +72,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-
-
-
-# Ptab = np.array(Catg[Catg.category.isin(['Person','Musician'])].table_id)
-# tablesFolderJ = "../files/json/"
 tablesFolderJ = "/content/drive/My Drive/Auto-TNLI/data/json/"
 def parseFileJ(filename,tablesFolder):
     
@@ -112,10 +80,6 @@ def parseFileJ(filename,tablesFolder):
     data['Tablename'] = filename
     
     return data
-
-
-
-
 
 def get_Table_Title():
     d = {}
@@ -137,17 +101,9 @@ def get_Table_Title():
                         d[dictionary['Tablename']].append(None)
     return d,tb
 
-
-
-
-
 N,T = get_Table_Title()
 
-
-
-
-
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True):
     '''
     d1 : dict for that table
     univ : list of a set
@@ -167,7 +123,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute 
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -194,10 +150,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
     
     return None
 
-
-
-
-
 '''
 DfB : Date of birth/death dataframe
 DfS : Marriage info dataframe
@@ -220,10 +172,6 @@ def FakeDFB(DfB):
             df['Age'][it]= int(df['Died_Y'][it]) - int(df['Born_Y'][it])
     return df
 
-
-
-
-
 '''
 The BIRTH and DEAD dates and then converted them into a dataframe and also found the AGE
 '''
@@ -240,16 +188,13 @@ def get_BDA(T,N,fake=False,sel=1):
     data['Name'] = []
     placeB = {}
     placeD = {}
-#     nn = 0
     for n in range(700):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if ("Born" in dictionary.keys() and len(dictionary["Born"].split('(')) > 1): #and int(dictionary["Born"].split("(")[1].split(')')[0][0])<=9 ):
                 yB = re.findall("[0-9][0-9][0-9]+-[0-9]+-[0-9]+",dictionary["Born"])
                 if("Died" not in dictionary.keys() and len(yB)>0): # died not in dict
-#                     nn = nn+1
                     yB = yB[0]
-#                     print(dictionary['Tablename']," "," : ",yB," ; " ,"Still alive !")
                     data["Table"].append(dictionary['Tablename'])
                     data['Born_Y'].append(int(yB.split('-')[0]))
                     data['Born_M'].append(d_Months[int(yB.split('-')[1])])
@@ -320,7 +265,6 @@ def get_BDA(T,N,fake=False,sel=1):
     
     for i in placeB.keys(): # rules for getting country,state,place to be used while making sentences
         p = placeB[i]
-#         print(i,p)
         if(p[0] != None):
             if(len(p)==1):
                 place.add(p[0])
@@ -384,15 +328,6 @@ def get_BDA(T,N,fake=False,sel=1):
     return df,placeB,placeD,country,state,place
 
 
-
-
-
-# get_BDA(T,N)[0]
-
-
-
-
-
 def get_Spouse(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -436,15 +371,6 @@ def get_Spouse(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Spouse(T,N,1)[1]
-
-
-
-
-
 def get_Children(T,N,fake=False,sel=0):
     u = set([])
     ds = {}
@@ -452,12 +378,9 @@ def get_Children(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if ("Born" in dictionary.keys() and len(dictionary["Born"].split('(')) > 1):
-#                 ds['Table'].append(dictionary['Tablename'])
                 if("Children" in dictionary.keys()):
                     ds[dictionary["Tablename"]] = []
-#                     print(dictionary['Tablename'],':',dictionary["Children"])
                     if(type(dictionary['Children']) == list):
-#                         ds['No.Ch'].append(len(dictionary['Children']))
                         u.add(len(dictionary['Children']))
                         ds[dictionary["Tablename"]].append(len(dictionary['Children']))
                     elif(len(dictionary['Children'].split(",")) <= 1):
@@ -466,7 +389,6 @@ def get_Children(T,N,fake=False,sel=0):
                         for i in range(len(re.findall('[0-9]',dictionary['Children']))):
                             n = n + t*int(re.findall('[0-9]',dictionary['Children'])[len(re.findall('[0-9]',dictionary['Children'])) - i -1 ])                        
                             t = t*10
-#                         ds['No.Ch'].append(n)
                         u.add(n)
                         ds[dictionary["Tablename"]].append(n)
                     else:
@@ -486,15 +408,6 @@ def get_Children(T,N,fake=False,sel=0):
     return list(u),ds
 
 
-
-
-
-# get_Children(T,N)[1]
-
-
-
-
-
 def get_Occupation(T,N,fake=False,sel=0):
     s = set([]) # universal set of all occupations
     occ = {}    # dictionary of table number to occupation
@@ -506,19 +419,16 @@ def get_Occupation(T,N,fake=False,sel=0):
                 if "Occupation" in dictionary.keys():
                     occ[dictionary['Tablename']] = []
                     if(type(dictionary['Occupation'])==list):
-#                         print(dictionary['Tablename'],':',dictionary["Occupation"])
                         for i in range(len(dictionary['Occupation'])):
                             s.add(dictionary['Occupation'][i])
                             occ[dictionary['Tablename']].append(dictionary['Occupation'][i])
                     else:
-#                         print(dictionary['Tablename'],':',dictionary["Occupation"].split(', '))
                         for i in range(len(dictionary['Occupation'].split(', '))):
                             s.add(dictionary['Occupation'].split(', ')[i])
                             occ[dictionary['Tablename']].append(dictionary['Occupation'].split(', ')[i])
                 else:
                     occ[dictionary['Tablename']] = []
                     occ[dictionary['Tablename']].append(None)
-#                     print(dictionary['Tablename'],':',"!!!")
     if(fake):
         for it in range(len(T)): # for getting all the fakes in one go
             sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
@@ -527,15 +437,6 @@ def get_Occupation(T,N,fake=False,sel=0):
             occ = FakeDICT(T,N,s,occ,it,sel)
         
     return list(s),occ
-
-
-
-
-
-# getOcc(T,N,0)[1]
-
-
-
 
 
 def get_Education(T,N,fake=False,sel=0):  
@@ -550,7 +451,6 @@ def get_Education(T,N,fake=False,sel=0):
                 ed[dictionary['Tablename']] = []
                 al[dictionary['Tablename']] = []
                 if("Education" in dictionary.keys()):
-#                     print(dictionary['Tablename'],':',re.findall("[a-zA-Z ][a-zA-Z]+","".join(dictionary["Education"]) ))
                     if(type(dictionary['Education']) == list): #and len(dictionary['Education'])>1):
                         dictionary['Education'] = ", ".join(dictionary['Education'])
                         dictionary['Education'] = re.sub("\(.*\)","",dictionary['Education'])
@@ -566,7 +466,6 @@ def get_Education(T,N,fake=False,sel=0):
                                 al[dictionary['Tablename']].append(None)
                                 
                 elif("Alma mater" in dictionary.keys()):
-#                     print(dictionary['Tablename'],':',re.findall("[a-zA-Z ][a-zA-Z ]+","".join(dictionary["Alma mater"]) ))
                     if(type(dictionary['Alma mater']) == list): #and len(dictionary['Alma mater'])>1):
                         dictionary['Alma mater'] = ", ".join(dictionary['Alma mater'])
                         dictionary['Alma mater'] = re.sub("\(.*\)","",dictionary['Alma mater'])
@@ -581,7 +480,6 @@ def get_Education(T,N,fake=False,sel=0):
                                 al[dictionary['Tablename']].append(dictionary['Alma mater'].split(',')[i].strip())
                                 ed[dictionary['Tablename']].append(None)
                 else:
-#                     print(dictionary['Tablename'],':',"?!!")
                     ed[dictionary['Tablename']].append(None)
                     al[dictionary['Tablename']].append(None)
     
@@ -598,15 +496,6 @@ def get_Education(T,N,fake=False,sel=0):
             al = FakeDICT(T,N,u,al,it,sel,subNone = False)
         
     return list(u),ed,al
-
-
-
-
-
-# get_Education(T,N,True)
-
-
-
 
 
 def get_Genres(T,N,fake=False,sel=0):
@@ -641,15 +530,6 @@ def get_Genres(T,N,fake=False,sel=0):
     return list(s),G
 
 
-
-
-
-# get_Genres(T,N)[1]
-
-
-
-
-
 def get_Labels(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -681,15 +561,6 @@ def get_Labels(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# get_Labels(T,N)[1]
-
-
-
-
-
 def get_Website(T,N,fake=False,sel=0):
     W = {}
     u = set([])
@@ -712,15 +583,6 @@ def get_Website(T,N,fake=False,sel=0):
             W = FakeDICT(T,N,u,W,it,sel)
         
     return list(u),W
-
-
-
-
-
-# get_Website(T,N)[1]
-
-
-
 
 
 def get_Conviction(T,N,fake=False,sel=0):
@@ -764,17 +626,383 @@ def get_Conviction(T,N,fake=False,sel=0):
         
     return list(s),C
 
+def get_Institutions(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Institutions"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",",").strip())
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i].strip())
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
 
 
+def get_Fields(T,N,it,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Fields"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",",").strip())
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i].strip())
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
 
 
-# get_Conviction(T,N)[1]
+def get_Doctoral_students(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Doctoral students"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",","))
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i])
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
 
 
-# #### Extract all data:
+def get_Awards(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Awards"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        if(not (re.findall(" list",dictionary[k][i]) or re.findall("List ",dictionary[k][i])) ):
+                            u.add(dictionary[k][i].replace(",,",",").strip())
+                            d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
+                        else:
+                            d[dictionary['Tablename']].append(None)
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        if(not (re.findall(" list",dictionary[k].split(",")[i]) or re.findall(".*List ",dictionary[k].split(",")[i])) ):
+                            u.add(dictionary[k].split(",")[i].strip())
+                            d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
+                        else:
+                            d[dictionary['Tablename']].append(None)
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
 
 
+def get_Relatives(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Relatives"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",","))
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i])
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
 
+
+def get_Resting_place(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Resting place"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",","))
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i])
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
+
+
+def get_Parents(T,N,fake=False,sel=0):
+    u1 = set([])
+    u2 = set([])
+    d = {}
+    k1 = "Parent(s)"
+    k2 = "Parents"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <= 2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k1 in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k1]) == list):
+                    for i in range(len(dictionary[k1])):
+                        u1.add(dictionary[k1][i].replace(",,",",").strip())
+                        d[dictionary['Tablename']].append(dictionary[k1][i].replace(",,",",").strip())
+                else:
+                    dictionary[k1] = dictionary[k1].replace(",,",",")
+                    dictionary[k1] = dictionary[k1].replace(" and ",",")
+                    for i in range(len(dictionary[k1].split(","))):
+                        u1.add(dictionary[k1].split(",")[i].strip())
+                        d[dictionary['Tablename']].append(dictionary[k1].split(",")[i].strip())
+                        
+            if(k2 in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k2]) == list):
+                    for i in range(len(dictionary[k2])):
+                        u1.add(dictionary[k2][i].replace(",,",",").strip())
+                        d[dictionary['Tablename']].append(dictionary[k2][i].replace(",,",",").strip())
+                else:
+                    dictionary[k2] = dictionary[k2].replace(",,",",")
+                    dictionary[k2] = dictionary[k2].replace(" and ",",")
+                    for i in range(len(dictionary[k2].split(","))):
+                        u1.add(dictionary[k2].split(",")[i].strip())
+                        d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].strip())
+
+            if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"]["Parents"],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u1,d,it,sel,subNone = False)
+        
+    return list(u1),d
+
+
+def get_Instruments(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Instruments"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",","))
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i])
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
+
+
+def get_Residence(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Residence"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                if(type(dictionary[k]) == list):
+                    for i in range(len(dictionary[k])):
+                        u.add(dictionary[k][i].replace(",,",","))
+                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
+                else:
+                    dictionary[k].replace(",,",",")
+                    for i in range(len(dictionary[k].split(","))):
+                        u.add(dictionary[k].split(",")[i])
+                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
+                    
+            else:
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel)
+        
+    return list(u),d
+
+
+def get_Years_active(T,N,fake=False,sel=0):
+    u = set([])
+    d = {}
+    k = "Years active"
+    for n in range(700):
+        if(int(Ptab[n][1:]) <=2800 ):
+            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+            if(k in dictionary.keys()):
+                d[dictionary['Tablename']] = []
+                r = []
+                if(type(dictionary[k]) == list):
+                    X = re.findall("[0-9][0-9]+"," ".join(dictionary[k]).replace("\xa0","") )
+                    for i in range(len(X)):
+                        if(len(X[i])>2):
+                            r.append(X[i])
+                        else:
+                            r.append(X[i-1][:2]+X[i])
+                        
+                    X = re.findall("present"," ".join(dictionary[k]).replace("\xa0","") )
+                    if(X or len(r)%2!=0):
+                        store = r[-1]
+                        r = []
+                        r.append(store)
+                        r.append('present')
+                else:
+                    dictionary[k].replace(",,",",")
+                    X = re.findall("[0-9][0-9]+",dictionary[k].replace("\xa0","") )
+                    for i in range(len(X)):
+                        if(len(X[i])>2):
+                            r.append(X[i])
+                        else:
+                            r.append(X[i-1][:2]+X[i])
+                    X = re.findall("present",dictionary[k].replace("\xa0","") )
+                    if(X or len(r)%2!=0):
+                        store = r[-1]
+                        r = []
+                        r.append(store)
+                        r.append('present')
+                        
+                for i in range(len(r)):
+                    d[dictionary['Tablename']].append(r[i])
+                    u.add(r[i])
+            if(k not in dictionary.keys() or len(d[dictionary['Tablename']])<1):
+                d[dictionary['Tablename']] = []
+                d[dictionary['Tablename']].append(None)
+    if(fake):
+        for it in range(len(T)): # for getting all the fakes in one go
+            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
+            if(sel==2 and len(d[T[it]])<2):
+                sel = 1
+            d = FakeDICT(T,N,u,d,it,sel,subNone=False)
+            if(len(d[T[it]])>1 and d[T[it]][0] == "present" and d[T[it]][1]=="present"):
+                d[T[it]][0] = str(random.randint(1965,1975))
+            elif(len(d[T[it]])==1 and d[T[it]][0] == "present"):
+                d[T[it]][0] = str(random.randint(1965,1975))
+            if(d[T[it]][0]!=None and d[T[it]][0]!="present" and d[T[it]][0]>d[T[it]][-1]):
+                temp = d[T[it]][0]
+                d[T[it]][0] = d[T[it]][-1]
+                d[T[it]][-1] = temp
+            elif(d[T[it]][0] == "present"):
+                temp = d[T[it]][0]
+                d[T[it]][0] = d[T[it]][-1]
+                d[T[it]][-1] = temp
+
+    return list(u),d
+
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -788,19 +1016,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-
-
-
-# get_Data()
-
-
-# ### Rules and functions to create sentences
-
-
-
+# Sentence generator :
 
 '''
 Born sentences true and false
@@ -899,15 +1116,6 @@ def BornSent(tb,dn,F,it,tval=True,prem=False):
         return ts        
 
 
-
-
-
-# BSent(T,N,getBirthDeathAge(300),125,False)
-
-
-
-
-
 def DiedSent(tb,dn,F,it,tval=True,prem=False):
     df = F[0]
     pB = F[1]
@@ -990,15 +1198,6 @@ def DiedSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# DSent(T,N,getBDA(T,N,0),2,True,True)
-
-
-
-
-
 def AgeSent(tb,dn,F,it,tval=True,prem=False):
     df = F[0]
     if(prem):
@@ -1054,15 +1253,6 @@ def AgeSent(tb,dn,F,it,tval=True,prem=False):
     return ts
 
 
-
-
-
-# ASent(T,N,getBDA(T,N,0),2,False,True)
-
-
-
-
-
 def OccupationSent(tb,dn,F,it,tval=True,prem=False): # input : dictionary,list(uninversal),...
     di = F[1]
     univ = F[0]
@@ -1098,15 +1288,6 @@ def OccupationSent(tb,dn,F,it,tval=True,prem=False): # input : dictionary,list(u
                 ts.append(None)
     
     return ts
-
-
-
-
-
-# OccSent(T,N,getOcc(T,N,0),2,True,True)
-
-
-
 
 
 def SpouseSent(tb,dn,F,it,tval=True,prem=False):
@@ -1174,15 +1355,6 @@ def SpouseSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# SpSent(T,N,getSp(T,N,0),2,True,True)
-
-
-
-
-
 def ChildrenSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1214,16 +1386,7 @@ def ChildrenSent(tb,dn,F,it,tval=True,prem=False):
     
         return ts
 
-
-
-
-
-# ChSent(T,N,getCh(),3,True)
-
-
-
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Uc,C = F["Children"]
     Us,S = F["Spouse"]
@@ -1238,7 +1401,6 @@ def multi_row1(tb,dn,F,it,tval=True):
     if(tval):
         if(C[tb[it]][0] != None and S[tb[it]][0] != None):
             ts["Children,Spouse"] = []
-#             Al1 = ", ".join(random.sample(T[tb[it]],1))
             Al1 = int(C[tb[it]][0])
             Al2 = len(S[tb[it]])
             ts["Children,Spouse"].append( Nm+" has "+str(Al1)+" children and "+str(Al2)+" number of spouses" )
@@ -1248,7 +1410,6 @@ def multi_row1(tb,dn,F,it,tval=True):
             age = int(y[0])-int(B.Born_Y[it])
             ts["Born,Spouse"].append(Nm+" was married "+str(age)+" years after being born")
         if(B.isna().Born_Y[it]==False and len(y)>1):
-#             ts["Born,Spouse"] = []
             age = int(y[1])-int(B.Born_Y[it])
             ts["Born,Spouse"].append(Nm+" was divorced "+str(age)+" years after being born")
         
@@ -1293,16 +1454,7 @@ def multi_row1(tb,dn,F,it,tval=True):
         
     return ts
 
-
-
-
-
-# multi_row1(T,N,7)
-
-
-
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     B = F["BDA"][0]
     Uy,Y = F["Years_active"]
@@ -1369,29 +1521,6 @@ def multi_row2(tb,dn,F,it,tval=True):
     return ts
 
 
-
-
-
-# multi_row2(T,N,1)
-
-
-
-
-
-
-
-#!/usr/bin/env python
-# coding: utf-8
-
-
-
-
-# %run Psn_tr1.ipynb
-
-
-
-
-
 def GenresSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1432,15 +1561,6 @@ def GenresSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append(None)
 
         return ts
-
-
-
-
-
-# GenSent(T,N,getG(300),5,False)
-
-
-
 
 
 def EducationSent(tb,dn,F,it,tval=True,prem=False):
@@ -1490,15 +1610,6 @@ def EducationSent(tb,dn,F,it,tval=True,prem=False):
             return [ts2]
 
 
-
-
-
-# EdSent(T,N,diA,diE,UE,27,False,True)
-
-
-
-
-
 def LabelsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1542,15 +1653,6 @@ def LabelsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# LSent(T,N,getL(300),5,True)
-
-
-
-
-
 def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1585,15 +1687,6 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append(None)
             
         return ts
-
-
-
-
-
-# WSent(T,N,getW(T,N,0),1)
-
-
-
 
 
 def ConvictionSent(tb,dn,F,it,tval=True,prem=False):
@@ -1636,486 +1729,6 @@ def ConvictionSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append(None)      
 
         return ts
-
-
-
-
-
-# CRSent(T,N,getCR(300),2,False)
-
-
-# # Second part starts here
-
-
-
-
-def get_Institutions(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Institutions"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",",").strip())
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i].strip())
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# get_Institutions(T,N,True)[1]
-
-
-
-
-
-def get_Fields(T,N,it,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Fields"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",",").strip())
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i].strip())
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getFl(300)[1]
-
-
-
-
-
-def get_Doctoral_students(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Doctoral students"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",","))
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i])
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getStD(300)[1]
-
-
-
-
-
-def get_Awards(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Awards"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        if(not (re.findall(" list",dictionary[k][i]) or re.findall("List ",dictionary[k][i])) ):
-                            u.add(dictionary[k][i].replace(",,",",").strip())
-                            d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",",").strip())
-                        else:
-                            d[dictionary['Tablename']].append(None)
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        if(not (re.findall(" list",dictionary[k].split(",")[i]) or re.findall(".*List ",dictionary[k].split(",")[i])) ):
-                            u.add(dictionary[k].split(",")[i].strip())
-                            d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
-                        else:
-                            d[dictionary['Tablename']].append(None)
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getAw(300)[1]
-
-
-
-
-
-def get_Relatives(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Relatives"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",","))
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i])
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getRel(300)[1]
-
-
-
-
-
-def get_Resting_place(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Resting place"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",","))
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i])
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getRP(300)[1]
-
-
-
-
-
-def get_Parents(T,N,fake=False,sel=0):
-    u1 = set([])
-    u2 = set([])
-    d = {}
-    k1 = "Parent(s)"
-    k2 = "Parents"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <= 2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k1 in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k1]) == list):
-                    for i in range(len(dictionary[k1])):
-                        u1.add(dictionary[k1][i].replace(",,",",").strip())
-                        d[dictionary['Tablename']].append(dictionary[k1][i].replace(",,",",").strip())
-                else:
-                    dictionary[k1] = dictionary[k1].replace(",,",",")
-                    dictionary[k1] = dictionary[k1].replace(" and ",",")
-                    for i in range(len(dictionary[k1].split(","))):
-                        u1.add(dictionary[k1].split(",")[i].strip())
-                        d[dictionary['Tablename']].append(dictionary[k1].split(",")[i].strip())
-                        
-            if(k2 in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k2]) == list):
-                    for i in range(len(dictionary[k2])):
-                        u1.add(dictionary[k2][i].replace(",,",",").strip())
-                        d[dictionary['Tablename']].append(dictionary[k2][i].replace(",,",",").strip())
-                else:
-                    dictionary[k2] = dictionary[k2].replace(",,",",")
-                    dictionary[k2] = dictionary[k2].replace(" and ",",")
-                    for i in range(len(dictionary[k2].split(","))):
-                        u1.add(dictionary[k2].split(",")[i].strip())
-                        d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].strip())
-
-            if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"]["Parents"],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u1,d,it,sel,subNone = False)
-        
-    return list(u1),d
-
-
-
-
-
-# getPrnt(300)[1]
-
-
-
-
-
-def get_Instruments(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Instruments"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",","))
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i])
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# getIns(300)[1]
-
-
-
-
-
-def get_Residence(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Residence"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                if(type(dictionary[k]) == list):
-                    for i in range(len(dictionary[k])):
-                        u.add(dictionary[k][i].replace(",,",","))
-                        d[dictionary['Tablename']].append(dictionary[k][i].replace(",,",","))
-                else:
-                    dictionary[k].replace(",,",",")
-                    for i in range(len(dictionary[k].split(","))):
-                        u.add(dictionary[k].split(",")[i])
-                        d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-                    
-            else:
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel)
-        
-    return list(u),d
-
-
-
-
-
-# get_Residence(T,N,True)[1]
-
-
-
-
-
-def get_Years_active(T,N,fake=False,sel=0):
-    u = set([])
-    d = {}
-    k = "Years active"
-    for n in range(700):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
-            if(k in dictionary.keys()):
-                d[dictionary['Tablename']] = []
-                r = []
-                if(type(dictionary[k]) == list):
-                    X = re.findall("[0-9][0-9]+"," ".join(dictionary[k]).replace("\xa0","") )
-                    for i in range(len(X)):
-                        if(len(X[i])>2):
-                            r.append(X[i])
-                        else:
-                            r.append(X[i-1][:2]+X[i])
-                        
-                    X = re.findall("present"," ".join(dictionary[k]).replace("\xa0","") )
-                    if(X or len(r)%2!=0):
-                        store = r[-1]
-                        r = []
-                        r.append(store)
-                        r.append('present')
-                else:
-                    dictionary[k].replace(",,",",")
-                    X = re.findall("[0-9][0-9]+",dictionary[k].replace("\xa0","") )
-                    for i in range(len(X)):
-                        if(len(X[i])>2):
-                            r.append(X[i])
-                        else:
-                            r.append(X[i-1][:2]+X[i])
-                    X = re.findall("present",dictionary[k].replace("\xa0","") )
-                    if(X or len(r)%2!=0):
-                        store = r[-1]
-                        r = []
-                        r.append(store)
-                        r.append('present')
-                        
-                for i in range(len(r)):
-                    d[dictionary['Tablename']].append(r[i])
-                    u.add(r[i])
-            if(k not in dictionary.keys() or len(d[dictionary['Tablename']])<1):
-                d[dictionary['Tablename']] = []
-                d[dictionary['Tablename']].append(None)
-    if(fake):
-        for it in range(len(T)): # for getting all the fakes in one go
-            sel = random.sample(getfa["Psn"][k.replace(" ","_")],1)[0]
-            if(sel==2 and len(d[T[it]])<2):
-                sel = 1
-            d = FakeDICT(T,N,u,d,it,sel,subNone=False)
-            if(len(d[T[it]])>1 and d[T[it]][0] == "present" and d[T[it]][1]=="present"):
-                d[T[it]][0] = str(random.randint(1965,1975))
-            elif(len(d[T[it]])==1 and d[T[it]][0] == "present"):
-                d[T[it]][0] = str(random.randint(1965,1975))
-            if(d[T[it]][0]!=None and d[T[it]][0]!="present" and d[T[it]][0]>d[T[it]][-1]):
-                temp = d[T[it]][0]
-                d[T[it]][0] = d[T[it]][-1]
-                d[T[it]][-1] = temp
-            elif(d[T[it]][0] == "present"):
-                temp = d[T[it]][0]
-                d[T[it]][0] = d[T[it]][-1]
-                d[T[it]][-1] = temp
-
-    return list(u),d
-
-
-
-
-
-# get_Years_active(T,N,True)[1]
-
-
-# #### Sentences :
-
-
 
 
 def InstitutionsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2168,15 +1781,6 @@ def InstitutionsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# InSent(T,N,getIn(300),12,False)
-
-
-
-
-
 def FieldsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2223,21 +1827,6 @@ def FieldsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# FlSent(T,N,getFl(T,N,39),39,False)
-
-
-
-
-
-# getFl(300)[1]
-
-
-
 
 
 def Doctoral_studentsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2294,15 +1883,6 @@ def Doctoral_studentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# StDSent(T,N,getStD(300),-12)
-
-
-
-
-
 def AwardsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2348,15 +1928,6 @@ def AwardsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# AwSent(T,N,getAw(300),-12,True)
-
-
-
 
 
 def RelativesSent(tb,dn,F,it,tval=True,prem=False):
@@ -2421,15 +1992,6 @@ def RelativesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# RelSent(T,N,getRel(300),6,False)
-
-
-
-
-
 def Resting_placeSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2474,15 +2036,6 @@ def Resting_placeSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# RPSent(T,N,getRP(300),20)
-
-
-
 
 
 def ParentsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2556,15 +2109,6 @@ def ParentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# ParentsSent(T,N,get_Parents(T,N),427)
-
-
-
-
-
 def InstrumentsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2617,15 +2161,6 @@ def InstrumentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# IntSent(T,N,getInt(300),5)
-
-
-
-
-
 def ResidenceSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -2667,15 +2202,6 @@ def ResidenceSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# ResdSent(T,N,getResd(300),-10,False,True)
-
-
-
 
 
 def Years_activeSent(tb,dn,F,it,tval=True,prem=False):
@@ -2735,16 +2261,7 @@ def Years_activeSent(tb,dn,F,it,tval=True,prem=False):
         
         return ts
 
-
-
-
-
-# YASent(T,N,getYA(),51)
-
-
-
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     B = F["BDA"][0]
     Ur,R = F["Relatives"]
@@ -2780,16 +2297,3 @@ def multi_row3(tb,dn,F,it,tval=True):
             ts["Born,Parents"].append(Al1+" was born after "+str(random.randint(y+1,y+5)) )
         
     return ts
-
-
-
-
-
-# multi_row3(T,N,6)
-
-
-
-
-
-
-
