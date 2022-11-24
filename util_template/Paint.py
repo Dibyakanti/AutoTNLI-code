@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+
 
 
 from bs4 import BeautifulSoup
@@ -15,7 +15,7 @@ if './' not in sys.path:
     sys.path.append('./')
 
 
-# In[2]:
+
 
 
 getfa = {	
@@ -40,14 +40,14 @@ getfa = {
 }
 
 
-# In[3]:
+
 
 
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t") 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t") 
 
 
-# In[4]:
+
 
 
 Ptab = np.array(Catg[Catg.category.isin(['Painting'])].table_id)
@@ -55,7 +55,7 @@ Ptab = np.array(Catg[Catg.category.isin(['Painting'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 
 
-# In[5]:
+
 
 
 def parseFile(filename, tablesFolder):
@@ -85,7 +85,7 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-# In[6]:
+
 
 
 # key = {}
@@ -102,7 +102,7 @@ def parseFile(filename, tablesFolder):
 # {k: v for k, v in sorted(key.items(), key=lambda item: item[1])}
 
 
-# In[7]:
+
 
 
 def get_Table_Title():
@@ -123,24 +123,21 @@ def get_Table_Title():
     return d,tb
 
 
-# In[8]:
+
 
 
 N,T = get_Table_Title()
 # T
 
 
-# In[28]:
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
 def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whethet to substitute/delete/add
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -181,7 +178,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
     return None
 
 
-# In[10]:
+
 
 
 def get_Artist(T,N,fake=False,sel=0):
@@ -221,13 +218,13 @@ def get_Artist(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[11]:
+
 
 
 # get_Artist(T,N,0)[1]
 
 
-# In[12]:
+
 
 
 def get_Year(T,N,fake=False,sel=0):
@@ -263,13 +260,13 @@ def get_Year(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[13]:
+
 
 
 # get_Year(T,N,0)[1]
 
 
-# In[14]:
+
 
 
 def get_Medium(T,N,fake=False,sel=0):
@@ -318,13 +315,13 @@ def get_Medium(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[15]:
+
 
 
 # get_Medium(T,N,0)[1]
 
 
-# In[49]:
+
 
 
 def get_Dimensions(T,N,fake=False,sel=0):
@@ -357,13 +354,13 @@ def get_Dimensions(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[50]:
+
 
 
 # get_Dimensions(T,N,True)[1]
 
 
-# In[18]:
+
 
 
 def get_Location(T,N,fake=False,sel=0):
@@ -398,7 +395,7 @@ def get_Location(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[19]:
+
 
 
 # get_Location(T,N,0)[1]
@@ -406,7 +403,7 @@ def get_Location(T,N,fake=False,sel=0):
 
 # #### All extracted data :
 
-# In[20]:
+
 
 
 def get_Data(fake=False):
@@ -424,7 +421,7 @@ def get_Data(fake=False):
 
 # #### Sentences :
 
-# In[21]:
+
 
 
 def ArtistSent(tb,dn,F,it,tval=True,prem=False):
@@ -460,13 +457,13 @@ def ArtistSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[22]:
+
 
 
 # AtSent(T,N,getAt()[1],getAt()[0],7)
 
 
-# In[23]:
+
 
 
 def YearSent(tb,dn,F,it,tval=True,prem=False):
@@ -507,13 +504,13 @@ def YearSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[24]:
+
 
 
 # YSent(T,N,getY()[1],getY()[0],7)
 
 
-# In[25]:
+
 
 
 def MediumSent(tb,dn,F,it,tval=True,prem=False):
@@ -549,13 +546,13 @@ def MediumSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[9]:
+
 
 
 # MTSent(T,N,getMT()[1],getMT()[0],10)
 
 
-# In[26]:
+
 
 
 def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
@@ -611,14 +608,14 @@ def DimensionsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[29]:
+
 
 
 # DSent(T,N,getD()[1],getD()[0],10)
 # get_Data(True)["Dimensions"][1]
 
 
-# In[11]:
+
 
 
 def LocationSent(tb,dn,F,it,tval=True,prem=False):
@@ -653,13 +650,13 @@ def LocationSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[13]:
+
 
 
 # LSent(T,N,getL()[1],getL()[0],10)
 
 
-# In[32]:
+
 
 
 def multi_row1(tb,dn,F,it,tval=True):
@@ -711,13 +708,13 @@ def multi_row1(tb,dn,F,it,tval=True):
     return ts
 
 
-# In[15]:
+
 
 
 # multi_row1(T,N,14,False)
 
 
-# In[50]:
+
 
 
 def multi_row2(tb,dn,F,it,tval=True):
@@ -773,7 +770,7 @@ def multi_row2(tb,dn,F,it,tval=True):
     return ts
 
 
-# In[16]:
+
 
 
 # multi_row2(T,N,14,False)

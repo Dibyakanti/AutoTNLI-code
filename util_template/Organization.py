@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
 
 from bs4 import BeautifulSoup
 import numpy as np
@@ -13,12 +8,6 @@ import sys
 
 if './' not in sys.path:
     sys.path.append('./')
-    
-# from Py_f import Psn as P
-
-
-# In[3]:
-
 
 getfa = {	
 "Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
@@ -42,30 +31,16 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-# In[4]:
-
-
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t")
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-# In[5]:
-
 
 Ptab = np.array(Catg[Catg.category.isin(['Organization'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
-
-# In[8]:
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     keys =[i.text for i in soup.find('tr').find_all('th')]
     keys = []
-#     keys.append(soup.find('caption').text)
     keys =[i.text.replace("\xa0"," ") for i in soup.find('tr').find_all('th')]
     if(soup.find('caption')):
         keys.insert(0,soup.find('caption').text)
@@ -77,7 +52,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -93,9 +67,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-# In[9]:
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -104,34 +75,25 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
 
-# In[10]:
-
-
 N,T = get_Table_Title()
-# T
 
 
-# In[11]:
-
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -144,7 +106,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute 
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -172,9 +134,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     return None
 
 
-# In[12]:
-
-
 def get_Website(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -183,7 +142,6 @@ def get_Website(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -195,7 +153,6 @@ def get_Website(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -208,15 +165,6 @@ def get_Website(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[13]:
-
-
-# getW()[1]
-
-
-# In[14]:
-
-
 def get_Headquarters(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -225,7 +173,6 @@ def get_Headquarters(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -236,7 +183,6 @@ def get_Headquarters(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -249,15 +195,6 @@ def get_Headquarters(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[15]:
-
-
-# getHq()[1]
-
-
-# In[23]:
-
-
 def get_Founded(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -267,34 +204,24 @@ def get_Founded(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
-#                     for i in range(len(dictionary[k1])):
                         u.add(",".join(dictionary[k1]).replace('\xa0',' '))
                         d[dictionary['Tablename']].append(",".join(dictionary[k1]).replace('\xa0',' '))
                 else:
-#                     for i in range(len(dictionary[k1].split(","))):
-                    u.add(dictionary[k1].replace("\xa0"," ")) # .split(",")[i].replace('\xa0',''))
-                    d[dictionary['Tablename']].append(dictionary[k1].replace('\xa0',' '))# .split(",")[i].replace('\xa0',''))
-#                     u.add(dictionary[k1])
-#                     d[dictionary['Tablename']].append(dictionary[k1])
+                    u.add(dictionary[k1].replace("\xa0"," "))
+                    d[dictionary['Tablename']].append(dictionary[k1].replace('\xa0',' '))
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
                         u.add(",".join(dictionary[k2]).replace('\xa0',' '))
                         d[dictionary['Tablename']].append(",".join(dictionary[k2]).replace('\xa0',' '))
                 else:
-#                     for i in range(len(dictionary[k2].split(","))):
-                    u.add(dictionary[k2].replace('\xa0',' '))#.split(",")[i].replace('\xa0',''))
-                    d[dictionary['Tablename']].append(dictionary[k2].replace('\xa0',' '))# .split(",")[i].replace('\xa0',''))
-#                     u.add(dictionary[k2])
-#                     d[dictionary['Tablename']].append(dictionary[k2])
+                    u.add(dictionary[k2].replace('\xa0',' '))
+                    d[dictionary['Tablename']].append(dictionary[k2].replace('\xa0',' '))
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -307,15 +234,6 @@ def get_Founded(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[25]:
-
-
-# get_Founded(T,N)[1]
-
-
-# In[1]:
-
-
 def get_Industry(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -324,7 +242,6 @@ def get_Industry(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -334,11 +251,8 @@ def get_Industry(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].replace(",,",",").split(","))):
                         u.add(dictionary[k].replace(",,",",").lower().split(",")[i].strip())
                         d[dictionary['Tablename']].append(dictionary[k].replace(",,",",").lower().split(",")[i].strip())
-#                     u.add(dictionary[k].replace(",,",","))
-#                     d[dictionary['Tablename']].append(dictionary[k].replace(",,",","))
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -351,15 +265,6 @@ def get_Industry(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[59]:
-
-
-# getIn()[1]
-
-
-# In[60]:
-
-
 def get_Key_people(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -368,7 +273,6 @@ def get_Key_people(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -384,7 +288,6 @@ def get_Key_people(T,N,fake=False,sel=0):
                             d[dictionary['Tablename']].append(re.sub(r"\(.*\)","",s).strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -398,15 +301,6 @@ def get_Key_people(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[61]:
-
-
-# getKp()[1]
-
-
-# In[62]:
-
-
 def get_Products(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -415,7 +309,6 @@ def get_Products(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -427,7 +320,6 @@ def get_Products(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].replace(",,",",").split(",")[i].strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -439,15 +331,6 @@ def get_Products(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[63]:
-
-
-# getPdt()[1]
-
-
-# In[64]:
 
 
 def get_Number_of_employees(T,N,fake=False,sel=0):
@@ -458,21 +341,18 @@ def get_Number_of_employees(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
                         u.add(dictionary[k][i])
                         d[dictionary['Tablename']].append(dictionary[k][i])
                 else:
-#                     for i in range(len(dictionary[k].replace(",,",",").split(","))):
                     s = dictionary[k].replace("\xa0"," ").replace(",","")
                     if(len(re.sub(r"\(.*\)","",s).strip())!=0):
                         u.add(re.sub(r"\(.*\)","",s).strip())
                         d[dictionary['Tablename']].append(re.sub(r"\(.*\)","",s).strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -486,15 +366,6 @@ def get_Number_of_employees(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[65]:
-
-
-# getNe()[1]
-
-
-# In[66]:
-
-
 def get_Traded_as(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -503,7 +374,6 @@ def get_Traded_as(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary[k])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -520,7 +390,6 @@ def get_Traded_as(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(t[j])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -534,15 +403,6 @@ def get_Traded_as(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[67]:
-
-
-# getTa()[1]
-
-
-# In[68]:
-
-
 def get_Founder(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -552,7 +412,6 @@ def get_Founder(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -564,7 +423,6 @@ def get_Founder(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k1].split(",")[i])
                         
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
@@ -576,7 +434,6 @@ def get_Founder(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k2].split(",")[i])
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -590,15 +447,6 @@ def get_Founder(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[69]:
-
-
-# getF()[1]
-
-
-# In[70]:
-
-
 def get_Area_served(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -607,7 +455,6 @@ def get_Area_served(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -619,7 +466,6 @@ def get_Area_served(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -633,15 +479,6 @@ def get_Area_served(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[71]:
-
-
-# getAs()[1]
-
-
-# In[72]:
-
-
 def get_Type(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -650,7 +487,6 @@ def get_Type(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -662,7 +498,6 @@ def get_Type(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -675,15 +510,6 @@ def get_Type(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[73]:
-
-
-# getT()[1]
-
-
-# In[74]:
-
-
 def get_Subsidiaries(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -692,7 +518,6 @@ def get_Subsidiaries(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -704,7 +529,6 @@ def get_Subsidiaries(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i].strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -716,15 +540,6 @@ def get_Subsidiaries(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[75]:
-
-
-# getS()[1]
-
-
-# In[76]:
 
 
 def get_Parent(T,N,fake=False,sel=0):
@@ -735,7 +550,6 @@ def get_Parent(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -747,7 +561,6 @@ def get_Parent(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
         
@@ -759,15 +572,6 @@ def get_Parent(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[77]:
-
-
-# getP()[1]
-
-
-# In[78]:
 
 
 def get_Owner(T,N,fake=False,sel=0):
@@ -778,7 +582,6 @@ def get_Owner(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys() and n!=78):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -790,7 +593,6 @@ def get_Owner(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -802,15 +604,6 @@ def get_Owner(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[79]:
-
-
-# getO()[1]
-
-
-# In[80]:
 
 
 def get_Predecessor(T,N,fake=False,sel=0):
@@ -821,7 +614,6 @@ def get_Predecessor(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys() and n!=78):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -833,7 +625,6 @@ def get_Predecessor(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -846,17 +637,7 @@ def get_Predecessor(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-# In[81]:
-
-
-# getPred()[1]
-
-
-# #### All extracted data :
-
-# In[123]:
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -870,22 +651,15 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences :
-
-# In[83]:
-
+# Sentence generator :
 
 def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["ordered","purchased"]
     alldom = [".com",".co.in",".co.fr",".co.za",".com.br",".org"]
     if(prem):
         if(di[tb[it]][0] != None):
-    #         All = ','.join(di[tb[it]])
             ps1 = [ "The name of the website is "+di[tb[it]][0]
                   , "It has a website named "+di[tb[it]][0] 
                   , di[tb[it]][0]+" is the name of it's website"]
@@ -918,19 +692,9 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[84]:
-
-
-# WSent(T,N,getW()[1],getW()[0],24,False)
-
-
-# In[85]:
-
-
 def HeadquartersSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["ordered","purchased"]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -966,22 +730,12 @@ def HeadquartersSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[86]:
-
-
-# HqSent(T,N,getHq()[1],getHq()[0],24)
-
-
-# In[87]:
-
-
 def FoundedSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
     if(prem):
         if(di[tb[it]][0] != None):
             year = int(re.findall("[0-9][0-9][0-9][0-9]" , ",".join(di[tb[it]]) )[0])
-    #         All = ','.join(di[tb[it]])
             ps1 = [ "It was founded in "+str(year) 
                   , "In "+str(year)+" this company was founded"
                   , "This company was found on "+str(year) ]
@@ -994,8 +748,6 @@ def FoundedSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             year = int(re.findall("[0-9][0-9][0-9][0-9]" , ",".join(di[tb[it]]) )[0])
             if(tval):
-#                 All = ','.join(di[tb[it]])
-#                 dom = re.findall("\.[a-z.]+",",".join(di[tb[it]][0]))
                 ts.append( dn[tb[it]][0] +" was established in "+str(year) )
                 ts.append( "It was set up in "+str(year) )
                 ts.append( "It was established after "+str(random.randint(year-40,year-5)) )
@@ -1004,10 +756,7 @@ def FoundedSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( "It was set up "+str(2020-year)+" years ago")
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)
-#                 All = ','.join(NT)
                 nyear = int(re.findall("[0-9][0-9][0-9][0-9]" , ",".join(NT))[0] )
-#                 dom = re.findall("\.[a-z.]+",",".join(di[tb[it]]))
-#                 ndom = random.sample(list(set(alldom)-set(dom)),random.randint(1,2))
                 ts.append( dn[tb[it]][0] +" was established in "+str(nyear) )
                 ts.append( "It was set up in "+str(nyear) )
                 ts.append( "It was established before "+str(random.randint(year-40,year-5)) )
@@ -1019,15 +768,6 @@ def FoundedSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-# In[88]:
-
-
-# FdSent(T,N,getFd()[1],getFd()[0],0)
-
-
-# In[89]:
 
 
 def IndustrySent(tb,dn,F,it,tval=True,prem=False):
@@ -1070,19 +810,9 @@ def IndustrySent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[90]:
-
-
-# InSent(T,N,getIn()[1],getIn()[0],7,False,True)
-
-
-# In[91]:
-
-
 def Key_peopleSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = ["sector","area","field"]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1124,15 +854,6 @@ def Key_peopleSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[92]:
-
-
-# KpSent(T,N,getKp()[1],getKp()[0],7,False)
-
-
-# In[93]:
-
-
 def ProductsSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1172,24 +893,13 @@ def ProductsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[94]:
-
-
-# PdtSent(T,N,getPdt()[1],getPdt()[0],9)
-
-
-# In[95]:
-
-
 def Number_of_employeesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" make "," manufacture "]
     typ = ["micro","small","medium-sized","large"]
     if(prem):
         if(di[tb[it]][0] != None):
             ne = int(re.findall("[0-9]+",di[tb[it]][0])[0])
-    #         All = ','.join(di[tb[it]])
             ps1 = [ "There are "+str(ne)+" employees in it"
                   , "It has "+str(ne)+" employees"]
         else:
@@ -1203,14 +913,12 @@ def Number_of_employeesSent(tb,dn,F,it,tval=True,prem=False):
             ne = int(re.findall("[0-9]+",di[tb[it]][0])[0])
             t = (typ[2] if ne<250 else typ[3])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( "There are "+str(ne)+" employees working in the company" )
                 ts.append( "There are more than "+str(random.randint(ne-100,ne-50))+" employees working in "+dn[tb[it]][0] )
                 ts.append( "There are less than "+str(random.randint(ne+100,ne+200))+" employees working in "+dn[tb[it]][0] )
                 ts.append( "It is a "+ t +" enterprise" )
             else: # not done
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-#                 All = ','.join(NT)
                 nt = random.sample(list(set(typ)-set([t])),1)[0]
                 ts.append( "There are "+str(re.findall("[0-9]+",NT)[0])+" employees working in the company" )
                 ts.append( "There are less than "+str(random.randint(ne-100,ne-50))+" employees working in "+dn[tb[it]][0] )
@@ -1223,19 +931,9 @@ def Number_of_employeesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[96]:
-
-
-# NeSent(T,N,getNe()[1],getNe()[0],8,False)
-
-
-# In[97]:
-
-
 def Traded_asSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" make "," manufacture "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1250,7 +948,6 @@ def Traded_asSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 rr = random.sample(di[tb[it]],1)[0]
                 r = rr.split(":")
                 ts.append( "It is traded in "+r[0]+" as "+r[1] )
@@ -1263,7 +960,6 @@ def Traded_asSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append( r[1]+" are the stocks of "+dn[tb[it]][0]+" in "+r[0] )
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(2,4))
-#                 All = ','.join(NT)
                 rr = random.sample(NT,1)[0]
                 r = rr.split(":")
                 ts.append( "It is traded in "+r[0]+" as "+r[1] )
@@ -1279,15 +975,6 @@ def Traded_asSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-# In[98]:
-
-
-# TaSent(T,N,getTa()[1],getTa()[0],36,False,True)
-
-
-# In[99]:
 
 
 def FounderSent(tb,dn,F,it,tval=True,prem=False):
@@ -1331,15 +1018,6 @@ def FounderSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[100]:
-
-
-# FSent(T,N,getF()[1],getF()[0],1,True)
-
-
-# In[101]:
-
-
 def Area_servedSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1380,7 +1058,6 @@ def Area_servedSent(tb,dn,F,it,tval=True,prem=False):
                     ts.append( "It does not serve Worldwide" )
                     ts.append( dn[tb[it]][0]+" company"+random.sample(syn,1)[0]+"in "+All )
                     ts.append( "It"+random.sample(syn,1)[0]+"in less than "+str(random.randint(0,length-1))+" places" )
-#                     ts.append( "It"+random.sample(syn,1)[0]+"in more than "+random.randint(length+1,length+6)+" places" )
                     ts.append( "Services by this company can be accessed in "+random.sample(NT,1)[0] )
                 else:
                     NT = random.sample(list(set(univ)-set(di[tb[it]])-set(["Worldwide"])),random.randint(1,3))
@@ -1402,19 +1079,9 @@ def Area_servedSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[102]:
-
-
-# AsSent(T,N,getAs()[1],getAs()[0],9,False)
-
-
-# In[103]:
-
-
 def TypeSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1470,19 +1137,9 @@ def TypeSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[104]:
-
-
-# TSent(T,N,getT()[1],getT()[0],12,False)
-
-
-# In[105]:
-
-
 def SubsidiariesSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1521,19 +1178,9 @@ def SubsidiariesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[106]:
-
-
-# SSent(T,N,getS()[1],getS()[0],9)
-
-
-# In[107]:
-
-
 def ParentSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1548,14 +1195,12 @@ def ParentSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( di[tb[it]][0]+" owns "+dn[tb[it]][0] )
                 ts.append( di[tb[it]][0]+" manages "+dn[tb[it]][0] )
                 ts.append( di[tb[it]][0]+" is a holding company of "+dn[tb[it]][0] )
                 ts.append( dn[tb[it]][0]+" is a subsidiary of "+di[tb[it]][0] )
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-#                 All = ','.join(NT)
                 ts.append( NT+" owns "+dn[tb[it]][0] )
                 ts.append( NT+" manages "+dn[tb[it]][0] )
                 ts.append( NT+" is a holding company of "+dn[tb[it]][0] )
@@ -1566,19 +1211,9 @@ def ParentSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[108]:
-
-
-# PSent(T,N,getP()[1],getP()[0],9,False)
-
-
-# In[109]:
-
-
 def OwnerSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1593,14 +1228,12 @@ def OwnerSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             length = len(di[tb[it]])
             if(tval):
-#                 All = ','.join(di[tb[it]])
                 ts.append( di[tb[it]][0]+" is a parent of "+dn[tb[it]][0] )
                 ts.append( di[tb[it]][0]+" manages "+dn[tb[it]][0] )
                 ts.append( di[tb[it]][0]+" is a holding company of "+dn[tb[it]][0] )
                 ts.append( dn[tb[it]][0]+" is a subsidiary of "+di[tb[it]][0] )
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-#                 All = ','.join(NT)
                 ts.append( NT+" is a parent of "+dn[tb[it]][0] )
                 ts.append( NT+" manages "+dn[tb[it]][0] )
                 ts.append( NT+" is a holding company of "+dn[tb[it]][0] )
@@ -1611,19 +1244,9 @@ def OwnerSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[110]:
-
-
-# OSent(T,N,getO()[1],getO()[0],14)
-
-
-# In[111]:
-
-
 def PredecessorSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
-#     syn = [" creators "," founding fathers "]
     if(prem):
         if(di[tb[it]][0] != None):
             All = ','.join(di[tb[it]])
@@ -1656,16 +1279,7 @@ def PredecessorSent(tb,dn,F,it,tval=True,prem=False):
         
         return ts
 
-
-# In[112]:
-
-
-# PredSent(T,N,getPred()[1],getPred()[0],29)
-
-
-# In[135]:
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ua,A = F["Area_served"]
     Ufd,Fd = F["Founded"]
@@ -1701,16 +1315,7 @@ def multi_row1(tb,dn,F,it,tval=True):
         
     return ts
 
-
-# In[133]:
-
-
-# multi_row1(T,N,get_Data(),0)
-
-
-# In[1]:
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,Ff,it,tval=True):
     Uk,K = Ff["Key_people"]
     Un,N = Ff["Number_of_employees"]
@@ -1725,7 +1330,6 @@ def multi_row2(tb,dn,Ff,it,tval=True):
         if(K[tb[it]][0] != None and N[tb[it]][0] != None):
             ts["Key_people,Number_of_employees"] = []
             Al1 = ",".join(K[tb[it]])
-#             Al2 = ",".join(H[tb[it]])
             ts["Key_people,Number_of_employees"].append( Al1+" runs company for "+str(ne)+" employees" )
         if(K[tb[it]][0] != None and F[tb[it]][0] != None):
             ts["Key_people,Founder"] = []
@@ -1788,16 +1392,7 @@ def multi_row2(tb,dn,Ff,it,tval=True):
         
     return ts
 
-
-# In[138]:
-
-
-# multi_row2(T,N,14,True)
-
-
-# In[117]:
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Up,P = F["Products"]
     Ui,I = F["Industry"]
@@ -1819,7 +1414,6 @@ def multi_row3(tb,dn,F,it,tval=True):
         if(P[tb[it]][0] != None and I[tb[it]][0] != None):
             ts["Products,Industry"] = []
             NP = random.sample(list(set(Up)-set(P[tb[it]])),random.randint(1,4))
-#             NI = random.sample(list(set(Ui)-set(I[tb[it]])),random.randint(1,2))
             Al1 = ",".join(random.sample(NP,random.randint(1,len(NP))) )
             Al2 = ",".join(random.sample(I[tb[it]],random.randint(1,len(I[tb[it]]))) )
             ts["Products,Industry"].append( Al1+" products are made in "+Al2+" industry" )
@@ -1828,10 +1422,3 @@ def multi_row3(tb,dn,F,it,tval=True):
             ts["Parent,Predecessor"].append( dn[tb[it]][0]+" is not a stand alone company" )
         
     return ts
-
-
-# In[118]:
-
-
-# multi_row3(T,N,14,False)
-

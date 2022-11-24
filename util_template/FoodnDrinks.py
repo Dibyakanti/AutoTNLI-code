@@ -8,12 +8,6 @@ import math
 
 if './' not in sys.path:
     sys.path.append('./')
-    
-# from Py_f import Psn as P
-
-
-
-
 
 getfa = {   
 "Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
@@ -51,13 +45,9 @@ tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
 
-
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
     keys = []
-#     keys.append(soup.find('caption').text)
     keys =[i.text for i in soup.find('tr').find_all('th')]
     if(soup.find('caption')):
         keys.insert(0,soup.find('caption').text)
@@ -69,7 +59,6 @@ def parseFile(filename, tablesFolder):
                 if(i.find('br')):
                     for x in i.findAll('br'):
                         x.replace_with(',')
-#                 print(i.text)
                     result = i.text.split(',')
                 if "â€“" in i.text:
                     result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
@@ -85,9 +74,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -96,17 +82,12 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
-
-
-
 
 
 N,T = get_Table_Title()
@@ -132,7 +113,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
         add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
         d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
         return d1
-    elif(sel==1): 
+    elif(sel==1): # substitute
         if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
             if(len(di[tb[it]])>1):
                 keep = random.sample(d1[tb[it]],1)
@@ -160,9 +141,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
     return None
 
 
-
-
-
 def get_Manufacturer(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -171,7 +149,6 @@ def get_Manufacturer(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -182,7 +159,6 @@ def get_Manufacturer(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -195,15 +171,6 @@ def get_Manufacturer(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getMf()[0]
-
-
-
-
-
 def get_Country_of_origin(T,N,fake=False,sel=0):
     u1 = set([])
     u2 = set([])
@@ -214,7 +181,6 @@ def get_Country_of_origin(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <= 2800):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -227,7 +193,6 @@ def get_Country_of_origin(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k1].split(",")[i].strip())
                         
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
@@ -240,7 +205,6 @@ def get_Country_of_origin(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].strip())
 
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -254,15 +218,6 @@ def get_Country_of_origin(T,N,fake=False,sel=0):
     return list(u1),d
 
 
-
-
-
-# getCOP()[0]
-
-
-
-
-
 def get_Variants(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -272,7 +227,6 @@ def get_Variants(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -295,11 +249,8 @@ def get_Variants(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k2].split(","))):
                         u.add(dictionary[k2].split(",")[i].strip())
                         d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].strip())
-#                     u.add(dictionary[k].split(",")[])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -312,15 +263,6 @@ def get_Variants(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getVF()[0]
-
-
-
-
-
 def get_Introduced(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -329,7 +271,6 @@ def get_Introduced(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -342,7 +283,6 @@ def get_Introduced(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(year)
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -355,15 +295,6 @@ def get_Introduced(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getIn()[1]
-
-
-
-
-
 def get_Related_products(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -372,7 +303,6 @@ def get_Related_products(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -384,7 +314,6 @@ def get_Related_products(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i].lower().strip())
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -398,15 +327,6 @@ def get_Related_products(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getRPd()[1]
-
-
-
-
-
 def get_Alcohol_by_volume(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -415,7 +335,6 @@ def get_Alcohol_by_volume(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -430,7 +349,6 @@ def get_Alcohol_by_volume(T,N,fake=False,sel=0):
                         d[dictionary['Tablename']].append(perc[j])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -444,15 +362,6 @@ def get_Alcohol_by_volume(T,N,fake=False,sel=0):
     return list(u),d        
 
 
-
-
-
-# getAbv()[1]
-
-
-
-
-
 def get_Website(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -461,7 +370,6 @@ def get_Website(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -472,7 +380,6 @@ def get_Website(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -486,15 +393,6 @@ def get_Website(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getW()[1]
-
-
-
-
-
 def get_Color(T,N,it,fake=False,sel=0):
     u = set([])
     d = {}
@@ -504,7 +402,6 @@ def get_Color(T,N,it,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
                     for i in range(len(dictionary[k1])):
@@ -514,10 +411,7 @@ def get_Color(T,N,it,fake=False,sel=0):
                     for i in range(len(dictionary[k1].split(","))):
                         u.add(dictionary[k1].split(",")[i].lower())
                         d[dictionary['Tablename']].append(dictionary[k1].split(",")[i].lower())
-#                     u.add(dictionary[k1])
-#                     d[dictionary['Tablename']].append(dictionary[k1])
             if(k2 in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k2]) == list):
                     for i in range(len(dictionary[k2])):
@@ -527,11 +421,8 @@ def get_Color(T,N,it,fake=False,sel=0):
                     for i in range(len(dictionary[k2].split(","))):
                         u.add(dictionary[k2].split(",")[i].lower())
                         d[dictionary['Tablename']].append(dictionary[k2].split(",")[i].lower())
-#                     u.add(dictionary[k2])
-#                     d[dictionary['Tablename']].append(dictionary[k2])
                     
             if(k1 not in dictionary.keys() and k2 not in dictionary.keys() ):
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -545,15 +436,6 @@ def get_Color(T,N,it,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getC()[1]
-
-
-
-
-
 def get_Main_ingredients(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -562,7 +444,6 @@ def get_Main_ingredients(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -572,11 +453,8 @@ def get_Main_ingredients(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i])
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     
@@ -590,15 +468,6 @@ def get_Main_ingredients(T,N,fake=False,sel=0):
     return list(u),d
 
 
-
-
-
-# getMIn()[1]
-
-
-
-
-
 def get_Type(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -607,7 +476,6 @@ def get_Type(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -617,11 +485,8 @@ def get_Type(T,N,fake=False,sel=0):
                     for i in range(len(dictionary[k].split(","))):
                         u.add(dictionary[k].split(",")[i])
                         d[dictionary['Tablename']].append(dictionary[k].split(",")[i])
-#                     u.add(dictionary[k])
-#                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -633,17 +498,7 @@ def get_Type(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-
-
-
-# getT()[1]
-
-
-# #### Extract all data:
-
-
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -656,20 +511,14 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Sentences:
-
-
-
+# Sentence generator :
 
 def ManufacturerSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
     if(prem):
         if(di[tb[it]][0] != None):
-#         All = ','.join(di[tb[it]])
             ps1 = [ dn[tb[it]][0]+" is manufactured by "+di[tb[it]][0] 
                    ,"It is manufactured by "+di[tb[it]][0] 
                    ,di[tb[it]][0]+" manufactured "+dn[tb[it]][0] ]
@@ -680,13 +529,11 @@ def ManufacturerSent(tb,dn,F,it,tval=True,prem=False):
         ts = []
         if(di[tb[it]][0] != None):
             if(tval):
-    #             All = ','.join(di[tb[it]])
                 ts.append('The food was manufactured by '+di[tb[it]][0])
                 ts.append(di[tb[it]][0]+" was made by "+dn[tb[it]][0]+" company")
                 ts.append(dn[tb[it]][0]+" company makes "+di[tb[it]][0])
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-    #             All = ','.join(NT)
                 ts.append('The food was manufactured by '+NT)
                 ts.append(dn[tb[it]][0]+" was made by "+NT+" company")
                 ts.append(NT+" company makes "+dn[tb[it]][0])
@@ -694,15 +541,6 @@ def ManufacturerSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
                 
         return ts
-
-
-
-
-
-# MfSent(T,N,getMf()[1],getMf()[0],10,False)
-
-
-
 
 
 def Country_of_originSent(tb,dn,F,it,tval=True,prem=False):
@@ -743,15 +581,6 @@ def Country_of_originSent(tb,dn,F,it,tval=True,prem=False):
         else:
             ts.append(None)
         return ts
-
-
-
-
-
-# COPSent(T,N,getCOP()[1],getCOP()[0],10,False)
-
-
-
 
 
 def VariantsSent(tb,dn,F,it,tval=True,prem=False):
@@ -795,22 +624,12 @@ def VariantsSent(tb,dn,F,it,tval=True,prem=False):
             return [None]
 
 
-
-
-
-# VFSent(T,N,getVF()[1],getVF()[0],19,True)
-
-
-
-
-
 def IntroducedSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
     syn = ["brought into existence","launched","inaugurated","instigated"]
     if(prem):
         if(di[tb[it]][0] != None):
-#         All = ','.join(di[tb[it]])
             ps1 = [ "It was introduced in "+di[tb[it]][0]
                   , di[tb[it]][0]+" is when it was introduced"
                   , dn[tb[it]][0]+" was introduced in "+di[tb[it]][0]]
@@ -821,13 +640,11 @@ def IntroducedSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             year = int(di[tb[it]][0])
             if(tval):
-    #             All = ','.join(di[tb[it]])
                 ts1 = "It was  "+random.sample(syn,1)[0]+" in "+di[tb[it]][0]
                 ts2 = "It was "+random.sample(syn,1)[0]+" after "+str(random.randint(year-50,year-10))
                 ts3 = "It was "+random.sample(syn,1)[0]+" before "+str(random.randint(year+10,year+60))
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-    #             All = ','.join(NT)
                 ts1 = "It was "+random.sample(syn,1)[0]+" in "+NT
                 ts2 = "It was "+random.sample(syn,1)[0]+" before "+str(random.randint(year-50,year-10))
                 ts3 = "It was "+random.sample(syn,1)[0]+" after "+str(random.randint(year+10,year+60))
@@ -835,15 +652,6 @@ def IntroducedSent(tb,dn,F,it,tval=True,prem=False):
             return ts1,ts2,ts3
         else:
             return [None]
-
-
-
-
-
-# InSent(T,N,getIn()[1],getIn()[0],19,True)
-
-
-
 
 
 def Related_productsSent(tb,dn,F,it,tval=True,prem=False):
@@ -864,14 +672,12 @@ def Related_productsSent(tb,dn,F,it,tval=True,prem=False):
         length = len(di[tb[it]])
         if(di[tb[it]][0] != None):
             if(tval):
-    #             All = ','.join(di[tb[it]])
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to "+ ','.join(random.sample(di[tb[it]],random.randint(1,length))) )
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to "+str(length)+" products" )
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to more than "+str(random.randint(0,length-1)) )
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to less than "+str(random.randint(length+1,length+5)) )
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(1,4))
-    #             All = ','.join(NT)
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to "+ ','.join(random.sample(NT,random.randint(1,len(NT)))) )
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to "+str(random.randint(length+1,length+3))+" products" )
                 ts.append(dn[tb[it]][0] +" is "+ random.sample(syn,1)[0] +" to less than "+str(random.randint(0,length-1))+" products" )
@@ -880,15 +686,6 @@ def Related_productsSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# RPdSent(T,N,getRPd()[1],getRPd()[0],26,False)
-
-
-
 
 
 def Alcohol_by_volumeSent(tb,dn,F,it,tval=True,prem=False):
@@ -909,7 +706,6 @@ def Alcohol_by_volumeSent(tb,dn,F,it,tval=True,prem=False):
             mn = int(math.floor(float(di[tb[it]][0])))
             mx = int(math.floor(float(di[tb[it]][-1])))
             if(tval):
-    #             All = ','.join(di[tb[it]])
                 ts.append(str(random.sample([mn,mx],1)[0])+"% is alcohol in "+dn[tb[it]][0])
                 ts.append(str(100-mx)+"% is not alcohol")
                 ts.append("It has more than "+str(random.randint(mn-3,mn-1))+"% alcohol" )
@@ -917,7 +713,6 @@ def Alcohol_by_volumeSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append("Alcohol is the "+("major" if mx >= 50 else "not major")+"part of this beverage")
             else:
                 NT = random.randint(mx+1,mx+10)
-    #             All = ','.join(NT)
                 ts.append(str(NT)+"% is alcohol in "+dn[tb[it]][0])
                 ts.append(str(100-NT)+"% is not alcohol")
                 ts.append("It has less than "+str(random.randint(mn-3,mn-1))+"% alcohol" )
@@ -929,15 +724,6 @@ def Alcohol_by_volumeSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# AbvSent(T,N,getAbv()[1],getAbv()[0],61,False,True)
-
-
-
-
-
 def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -945,7 +731,6 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
     alldom = [".com",".co.in",".co.fr",".co.za"]
     if(prem):
         if(di[tb[it]][0] != None):
-    #         All = ','.join(di[tb[it]])
             ps1 = [ "The name of the website is "+di[tb[it]][0]
                   , "It has a website named "+di[tb[it]][0] 
                   , di[tb[it]][0]+" is the name of it's website"]
@@ -957,7 +742,6 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
         if(di[tb[it]][0] != None):
             
             if(tval):
-    #             All = ','.join(di[tb[it]])
                 dom = re.findall("\.[a-z.]+",di[tb[it]][0])[0]
                 ts.append("This can be "+random.sample(syn,1)[0]+" from "+di[tb[it]][0])
                 ts.append("This detail of the beverage can be found at "+di[tb[it]][0])
@@ -965,7 +749,6 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append('the website has a domain name of '+dom)                
             else:
                 NT = random.sample(list(set(univ)-set(di[tb[it]])),1)[0]
-    #             All = ','.join(NT)
                 dom = re.findall("\.[a-z.]+",di[tb[it]][0])[0]
                 ndom = random.sample(list(set(alldom)-set([dom])),1)[0]
                 ts.append("This can be "+random.sample(syn,1)[0]+" from "+NT )
@@ -976,15 +759,6 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# WSent(T,N,getW()[1],getW()[0],40,False)
-
-
-
 
 
 def ColorSent(tb,dn,F,it,tval=True,prem=False):
@@ -1012,8 +786,6 @@ def ColorSent(tb,dn,F,it,tval=True,prem=False):
                 ts.append("It comes in less than "+str(random.randint(len(di[tb[it]])+1,len(di[tb[it]])+4))+" color(s)" )
                 ts.append("It comes in "+("single color" if len(di[tb[it]])==1 else "multiple colors") )
             else:
-#                 NT = random.sample(list(set(univ)-set(di[tb[it]])),random.randint(1,2))[0]
-#                 All = ','.join(NT)
                 All = ','.join(di[tb[it]])
                 ts.append("It does not come in "+All)
                 ts.append("It comes in "+",".join(random.sample(list(set(univ)-set(di[tb[it]])),2)) )
@@ -1025,15 +797,6 @@ def ColorSent(tb,dn,F,it,tval=True,prem=False):
             ts.append(None)
         
         return ts
-
-
-
-
-
-# CSent(T,N,getC()[1],getC()[0],11,False)
-
-
-
 
 
 def Main_ingredientsSent(tb,dn,F,it,tval=True,prem=False):
@@ -1077,15 +840,6 @@ def Main_ingredientsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-
-
-
-# MInSent(T,N,getMIn()[1],getMIn()[0],2,False)
-
-
-
-
-
 def TypeSent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1120,16 +874,7 @@ def TypeSent(tb,dn,F,it,tval=True,prem=False):
         
         return ts
 
-
-
-
-
-# TSent(T,N,getT()[1],getT()[0],10)
-
-
-
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ur,R = F["Related_products"]
     Uv,V = F["Variants"]
@@ -1221,16 +966,7 @@ def multi_row1(tb,dn,F,it,tval=True):
 
     return ts
 
-
-
-
-
-# multi_row1(T,N,30)
-
-
-
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Uv,V = F["Variants"]
     Um,M = F["Manufacturer"]
@@ -1252,16 +988,7 @@ def multi_row2(tb,dn,F,it,tval=True):
 
     return ts
 
-
-
-
-
-# multi_row2(T,N,16)
-
-
-
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Ut,T = F["Type"]
     Ua,A = F["Alcohol_by_volume"]
@@ -1307,22 +1034,3 @@ def multi_row3(tb,dn,F,it,tval=True):
             ts["Type,Color"].append(Al1+" comes in "+Al2+" colors")
         
     return ts
-
-
-
-
-
-# multi_row3(T,N,18)
-
-
-
-
-
-
-
-
-
-
-
-
-

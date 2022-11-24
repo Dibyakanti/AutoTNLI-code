@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+
 
 
 from bs4 import BeautifulSoup
@@ -17,14 +17,14 @@ if './' not in sys.path:
     sys.path.append('./')
 
 
-# In[3]:
+
 
 
 rev_d_Months = {'January':1,'February':2,'March':3,'April':4,'May':5,'June':6,'July':7,'August':8,'September':9,'October':10,'November':11,'December':12}
 d_Months = {1: 'January',2: 'February',3: 'March',4: 'April',5: 'May',6: 'June',7: 'July',8: 'August',9: 'September',10: 'October',11: 'November',12: 'December'}
 
 
-# In[4]:
+
 
 
 getfa = {
@@ -54,14 +54,14 @@ getfa = {
 }
 
 
-# In[7]:
+
 
 
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t") 
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t") 
 
 
-# In[8]:
+
 
 
 Ptab = np.array(Catg[Catg.category.isin(['Person','Musician'])].table_id)
@@ -69,7 +69,7 @@ Ptab = np.array(Catg[Catg.category.isin(['Person','Musician'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 
 
-# In[9]:
+
 
 
 def parseFile(filename, tablesFolder):
@@ -99,7 +99,7 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-# In[10]:
+
 
 
 # Ptab = np.array(Catg[Catg.category.isin(['Person','Musician'])].table_id)
@@ -114,7 +114,7 @@ def parseFileJ(filename,tablesFolder):
     return data
 
 
-# In[11]:
+
 
 
 def get_Table_Title():
@@ -138,23 +138,23 @@ def get_Table_Title():
     return d,tb
 
 
-# In[12]:
+
 
 
 N,T = get_Table_Title()
 
 
-# In[13]:
 
 
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
+
 def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whethet to substitute/delete/add
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -195,7 +195,7 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = True): # selection bit selects whe
     return None
 
 
-# In[14]:
+
 
 
 '''
@@ -221,7 +221,7 @@ def FakeDFB(DfB):
     return df
 
 
-# In[15]:
+
 
 
 '''
@@ -384,13 +384,13 @@ def get_BDA(T,N,fake=False,sel=1):
     return df,placeB,placeD,country,state,place
 
 
-# In[16]:
+
 
 
 # get_BDA(T,N)[0]
 
 
-# In[17]:
+
 
 
 def get_Spouse(T,N,fake=False,sel=0):
@@ -436,13 +436,13 @@ def get_Spouse(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[18]:
+
 
 
 # get_Spouse(T,N,1)[1]
 
 
-# In[19]:
+
 
 
 def get_Children(T,N,fake=False,sel=0):
@@ -486,13 +486,13 @@ def get_Children(T,N,fake=False,sel=0):
     return list(u),ds
 
 
-# In[20]:
+
 
 
 # get_Children(T,N)[1]
 
 
-# In[21]:
+
 
 
 def get_Occupation(T,N,fake=False,sel=0):
@@ -529,13 +529,13 @@ def get_Occupation(T,N,fake=False,sel=0):
     return list(s),occ
 
 
-# In[22]:
+
 
 
 # getOcc(T,N,0)[1]
 
 
-# In[86]:
+
 
 
 def get_Education(T,N,fake=False,sel=0):  
@@ -600,13 +600,13 @@ def get_Education(T,N,fake=False,sel=0):
     return list(u),ed,al
 
 
-# In[89]:
+
 
 
 # get_Education(T,N,True)
 
 
-# In[111]:
+
 
 
 def get_Genres(T,N,fake=False,sel=0):
@@ -641,13 +641,13 @@ def get_Genres(T,N,fake=False,sel=0):
     return list(s),G
 
 
-# In[113]:
+
 
 
 # get_Genres(T,N)[1]
 
 
-# In[104]:
+
 
 
 def get_Labels(T,N,fake=False,sel=0):
@@ -681,13 +681,13 @@ def get_Labels(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[108]:
+
 
 
 # get_Labels(T,N)[1]
 
 
-# In[157]:
+
 
 
 def get_Website(T,N,fake=False,sel=0):
@@ -714,13 +714,13 @@ def get_Website(T,N,fake=False,sel=0):
     return list(u),W
 
 
-# In[159]:
+
 
 
 # get_Website(T,N)[1]
 
 
-# In[132]:
+
 
 
 def get_Conviction(T,N,fake=False,sel=0):
@@ -765,7 +765,7 @@ def get_Conviction(T,N,fake=False,sel=0):
     return list(s),C
 
 
-# In[134]:
+
 
 
 # get_Conviction(T,N)[1]
@@ -773,7 +773,7 @@ def get_Conviction(T,N,fake=False,sel=0):
 
 # #### Extract all data:
 
-# In[73]:
+
 
 
 def get_Data(fake=False):
@@ -791,7 +791,7 @@ def get_Data(fake=False):
 # F is the Extracted_data[key]
 
 
-# In[75]:
+
 
 
 # get_Data()
@@ -799,7 +799,7 @@ def get_Data(fake=False):
 
 # ### Rules and functions to create sentences
 
-# In[32]:
+
 
 
 '''
@@ -899,13 +899,13 @@ def BornSent(tb,dn,F,it,tval=True,prem=False):
         return ts        
 
 
-# In[44]:
+
 
 
 # BSent(T,N,getBirthDeathAge(300),125,False)
 
 
-# In[33]:
+
 
 
 def DiedSent(tb,dn,F,it,tval=True,prem=False):
@@ -990,13 +990,13 @@ def DiedSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[2]:
+
 
 
 # DSent(T,N,getBDA(T,N,0),2,True,True)
 
 
-# In[37]:
+
 
 
 def AgeSent(tb,dn,F,it,tval=True,prem=False):
@@ -1054,13 +1054,13 @@ def AgeSent(tb,dn,F,it,tval=True,prem=False):
     return ts
 
 
-# In[1]:
+
 
 
 # ASent(T,N,getBDA(T,N,0),2,False,True)
 
 
-# In[23]:
+
 
 
 def OccupationSent(tb,dn,F,it,tval=True,prem=False): # input : dictionary,list(uninversal),...
@@ -1100,13 +1100,13 @@ def OccupationSent(tb,dn,F,it,tval=True,prem=False): # input : dictionary,list(u
     return ts
 
 
-# In[43]:
+
 
 
 # OccSent(T,N,getOcc(T,N,0),2,True,True)
 
 
-# In[48]:
+
 
 
 def SpouseSent(tb,dn,F,it,tval=True,prem=False):
@@ -1174,13 +1174,13 @@ def SpouseSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[49]:
+
 
 
 # SpSent(T,N,getSp(T,N,0),2,True,True)
 
 
-# In[53]:
+
 
 
 def ChildrenSent(tb,dn,F,it,tval=True,prem=False):
@@ -1215,13 +1215,13 @@ def ChildrenSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[54]:
+
 
 
 # ChSent(T,N,getCh(),3,True)
 
 
-# In[56]:
+
 
 
 def multi_row1(tb,dn,F,it,tval=True):
@@ -1294,13 +1294,13 @@ def multi_row1(tb,dn,F,it,tval=True):
     return ts
 
 
-# In[57]:
+
 
 
 # multi_row1(T,N,7)
 
 
-# In[58]:
+
 
 
 def multi_row2(tb,dn,F,it,tval=True):
@@ -1369,13 +1369,13 @@ def multi_row2(tb,dn,F,it,tval=True):
     return ts
 
 
-# In[59]:
+
 
 
 # multi_row2(T,N,1)
 
 
-# In[ ]:
+
 
 
 
@@ -1383,13 +1383,13 @@ def multi_row2(tb,dn,F,it,tval=True):
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[10]:
+
 
 
 # %run Psn_tr1.ipynb
 
 
-# In[41]:
+
 
 
 def GenresSent(tb,dn,F,it,tval=True,prem=False):
@@ -1434,13 +1434,13 @@ def GenresSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[42]:
+
 
 
 # GenSent(T,N,getG(300),5,False)
 
 
-# In[43]:
+
 
 
 def EducationSent(tb,dn,F,it,tval=True,prem=False):
@@ -1490,13 +1490,13 @@ def EducationSent(tb,dn,F,it,tval=True,prem=False):
             return [ts2]
 
 
-# In[44]:
+
 
 
 # EdSent(T,N,diA,diE,UE,27,False,True)
 
 
-# In[45]:
+
 
 
 def LabelsSent(tb,dn,F,it,tval=True,prem=False):
@@ -1542,13 +1542,13 @@ def LabelsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[46]:
+
 
 
 # LSent(T,N,getL(300),5,True)
 
 
-# In[47]:
+
 
 
 def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
@@ -1587,13 +1587,13 @@ def WebsiteSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[48]:
+
 
 
 # WSent(T,N,getW(T,N,0),1)
 
 
-# In[49]:
+
 
 
 def ConvictionSent(tb,dn,F,it,tval=True,prem=False):
@@ -1638,7 +1638,7 @@ def ConvictionSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[50]:
+
 
 
 # CRSent(T,N,getCR(300),2,False)
@@ -1646,7 +1646,7 @@ def ConvictionSent(tb,dn,F,it,tval=True,prem=False):
 
 # # Second part starts here
 
-# In[51]:
+
 
 
 def get_Institutions(T,N,fake=False,sel=0):
@@ -1681,13 +1681,13 @@ def get_Institutions(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[52]:
+
 
 
 # get_Institutions(T,N,True)[1]
 
 
-# In[53]:
+
 
 
 def get_Fields(T,N,it,fake=False,sel=0):
@@ -1722,13 +1722,13 @@ def get_Fields(T,N,it,fake=False,sel=0):
     return list(u),d
 
 
-# In[54]:
+
 
 
 # getFl(300)[1]
 
 
-# In[55]:
+
 
 
 def get_Doctoral_students(T,N,fake=False,sel=0):
@@ -1763,13 +1763,13 @@ def get_Doctoral_students(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[56]:
+
 
 
 # getStD(300)[1]
 
 
-# In[57]:
+
 
 
 def get_Awards(T,N,fake=False,sel=0):
@@ -1810,13 +1810,13 @@ def get_Awards(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[58]:
+
 
 
 # getAw(300)[1]
 
 
-# In[59]:
+
 
 
 def get_Relatives(T,N,fake=False,sel=0):
@@ -1851,13 +1851,13 @@ def get_Relatives(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[60]:
+
 
 
 # getRel(300)[1]
 
 
-# In[61]:
+
 
 
 def get_Resting_place(T,N,fake=False,sel=0):
@@ -1892,13 +1892,13 @@ def get_Resting_place(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[62]:
+
 
 
 # getRP(300)[1]
 
 
-# In[63]:
+
 
 
 def get_Parents(T,N,fake=False,sel=0):
@@ -1949,13 +1949,13 @@ def get_Parents(T,N,fake=False,sel=0):
     return list(u1),d
 
 
-# In[64]:
+
 
 
 # getPrnt(300)[1]
 
 
-# In[65]:
+
 
 
 def get_Instruments(T,N,fake=False,sel=0):
@@ -1990,13 +1990,13 @@ def get_Instruments(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[66]:
+
 
 
 # getIns(300)[1]
 
 
-# In[67]:
+
 
 
 def get_Residence(T,N,fake=False,sel=0):
@@ -2031,13 +2031,13 @@ def get_Residence(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[68]:
+
 
 
 # get_Residence(T,N,True)[1]
 
 
-# In[69]:
+
 
 
 def get_Years_active(T,N,fake=False,sel=0):
@@ -2107,7 +2107,7 @@ def get_Years_active(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[70]:
+
 
 
 # get_Years_active(T,N,True)[1]
@@ -2115,7 +2115,7 @@ def get_Years_active(T,N,fake=False,sel=0):
 
 # #### Sentences :
 
-# In[71]:
+
 
 
 def InstitutionsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2168,13 +2168,13 @@ def InstitutionsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[72]:
+
 
 
 # InSent(T,N,getIn(300),12,False)
 
 
-# In[73]:
+
 
 
 def FieldsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2225,19 +2225,19 @@ def FieldsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[141]:
+
 
 
 # FlSent(T,N,getFl(T,N,39),39,False)
 
 
-# In[ ]:
+
 
 
 # getFl(300)[1]
 
 
-# In[ ]:
+
 
 
 def Doctoral_studentsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2294,13 +2294,13 @@ def Doctoral_studentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # StDSent(T,N,getStD(300),-12)
 
 
-# In[ ]:
+
 
 
 def AwardsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2350,13 +2350,13 @@ def AwardsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # AwSent(T,N,getAw(300),-12,True)
 
 
-# In[ ]:
+
 
 
 def RelativesSent(tb,dn,F,it,tval=True,prem=False):
@@ -2421,13 +2421,13 @@ def RelativesSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # RelSent(T,N,getRel(300),6,False)
 
 
-# In[ ]:
+
 
 
 def Resting_placeSent(tb,dn,F,it,tval=True,prem=False):
@@ -2476,13 +2476,13 @@ def Resting_placeSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # RPSent(T,N,getRP(300),20)
 
 
-# In[74]:
+
 
 
 def ParentsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2556,13 +2556,13 @@ def ParentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[78]:
+
 
 
 # ParentsSent(T,N,get_Parents(T,N),427)
 
 
-# In[ ]:
+
 
 
 def InstrumentsSent(tb,dn,F,it,tval=True,prem=False):
@@ -2617,13 +2617,13 @@ def InstrumentsSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # IntSent(T,N,getInt(300),5)
 
 
-# In[ ]:
+
 
 
 def ResidenceSent(tb,dn,F,it,tval=True,prem=False):
@@ -2669,13 +2669,13 @@ def ResidenceSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # ResdSent(T,N,getResd(300),-10,False,True)
 
 
-# In[ ]:
+
 
 
 def Years_activeSent(tb,dn,F,it,tval=True,prem=False):
@@ -2736,13 +2736,13 @@ def Years_activeSent(tb,dn,F,it,tval=True,prem=False):
         return ts
 
 
-# In[ ]:
+
 
 
 # YASent(T,N,getYA(),51)
 
 
-# In[ ]:
+
 
 
 def multi_row3(tb,dn,F,it,tval=True):
@@ -2782,13 +2782,13 @@ def multi_row3(tb,dn,F,it,tval=True):
     return ts
 
 
-# In[53]:
+
 
 
 # multi_row3(T,N,6)
 
 
-# In[ ]:
+
 
 
 

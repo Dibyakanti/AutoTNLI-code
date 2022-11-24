@@ -142,9 +142,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
     return None
 
 
-
-
-
 def get_Type(T,N,fake=False,sel=0):
     u = set([])
     d = {}

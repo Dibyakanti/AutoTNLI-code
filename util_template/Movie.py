@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -12,13 +6,12 @@ import random
 import sys
 import math
 import json
+import datetime
+
+day_i = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',5:'Saturday',6:'Sunday'}
 
 if './' not in sys.path:
     sys.path.append('./')
-
-
-# In[ ]:
-
 
 getfa = {
 "Movie_tr1":{"Directed_by":[0,1,2],"Produced_by":[0,1,2],"Screenplay_by":[1],"Starring":[0,1,2],"Music_by":[0,1,2],"Cinematography":[1]
@@ -43,28 +36,16 @@ getfa = {
     "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
 }
 
-
-# In[5]:
-
-
 Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories.tsv",sep="\t") 
 # Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-
-# In[4]:
-
 
 Ptab = np.array(Catg[Catg.category.isin(['Movie'])].table_id)
 tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
 # tablesFolder = "../../autotnlidatasetandcode/tables"
 
 
-# In[10]:
-
-
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
-#     print(soup)
     keys =[i.text for i in soup.find('tr').find_all('th')]
     vals = []
     for x in soup.find_all():
@@ -89,9 +70,6 @@ def parseFile(filename, tablesFolder):
     return dictionary
 
 
-# In[85]:
-
-
 def get_Table_Title():
     d = {}
     tb = []
@@ -100,33 +78,26 @@ def get_Table_Title():
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Title'])
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(dictionary['Title'])
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     return d,tb
 
 
-# In[86]:
-
-
 N,T = get_Table_Title()
 
 
-# In[13]:
 
-
-'''
-d1 : dict for that table
-univ : list of a set
-df : dataframe of Born/Death to get the table name
-sel: selection bit
-it : choose table name from the dataframe
-'''
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects whethet to substitute/delete/add
+def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
+    '''
+    d1 : dict for that table
+    univ : list of a set
+    df : dataframe of Born/Death to get the table name
+    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
+    it : choose table name from the dataframe
+    '''
     d1 = di
     univ = list(univ)
     if(sel==0): # add
@@ -167,9 +138,6 @@ def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False): # selection bit selects wh
     return None
 
 
-# In[14]:
-
-
 def get_Directed_by(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -200,15 +168,6 @@ def get_Directed_by(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[15]:
-
-
-# getDir()
-
-
-# In[16]:
-
-
 def get_Produced_by(T,N,fake=False,sel=0):
     u = set([])
     p = {}
@@ -217,7 +176,6 @@ def get_Produced_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Produced by" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Directed by'])
                 p[dictionary['Tablename']] = []
                 if(type(dictionary['Produced by']) == list):
                     for i in range(len(dictionary['Produced by'])):
@@ -228,7 +186,6 @@ def get_Produced_by(T,N,fake=False,sel=0):
                     p[dictionary['Tablename']].append(dictionary['Produced by'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 p[dictionary['Tablename']] = []
                 p[dictionary['Tablename']].append(None)
     if(fake):
@@ -239,15 +196,6 @@ def get_Produced_by(T,N,fake=False,sel=0):
             p = FakeDICT(T,N,u,p,it,sel)
         
     return list(u),p
-
-
-# In[17]:
-
-
-# getProd()
-
-
-# In[18]:
 
 
 def get_Screenplay_by(T,N,fake=False,sel=0):
@@ -258,7 +206,6 @@ def get_Screenplay_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Screenplay by" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Directed by'])
                 p[dictionary['Tablename']] = []
                 if(type(dictionary['Screenplay by']) == list):
                     for i in range(len(dictionary['Screenplay by'])):
@@ -269,7 +216,6 @@ def get_Screenplay_by(T,N,fake=False,sel=0):
                     p[dictionary['Tablename']].append(dictionary['Screenplay by'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 p[dictionary['Tablename']] = []
                 p[dictionary['Tablename']].append(None)
     if(fake):
@@ -282,16 +228,7 @@ def get_Screenplay_by(T,N,fake=False,sel=0):
     return list(u),p
 
 
-# In[19]:
-
-
-# getSP()
-
-
-# In[20]:
-
-
-def get_Based_on(T,N,fake=False,sel=0): # separate the authors from the materials (there is a by in between)
+def get_Based_on(T,N,fake=False,sel=0): 
     u = set([])
     b = {}
     k = "Based on"
@@ -299,7 +236,6 @@ def get_Based_on(T,N,fake=False,sel=0): # separate the authors from the material
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Based on" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Based on'])
                 b[dictionary['Tablename']] = []
                 if(type(dictionary['Based on']) == list):
                     for i in range(len(dictionary['Based on'])):
@@ -310,7 +246,6 @@ def get_Based_on(T,N,fake=False,sel=0): # separate the authors from the material
                     b[dictionary['Tablename']].append(dictionary['Based on'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 b[dictionary['Tablename']] = []
                 b[dictionary['Tablename']].append(None)
     if(fake):
@@ -323,15 +258,6 @@ def get_Based_on(T,N,fake=False,sel=0): # separate the authors from the material
     return list(u),b
 
 
-# In[21]:
-
-
-# get_Based_on()
-
-
-# In[22]:
-
-
 def get_Starring(T,N,fake=False,sel=0):
     u = set([])
     s = {}
@@ -340,7 +266,6 @@ def get_Starring(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Starring" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 s[dictionary['Tablename']] = []
                 if(type(dictionary['Starring']) == list):
                     for i in range(len(dictionary['Starring'])):
@@ -351,7 +276,6 @@ def get_Starring(T,N,fake=False,sel=0):
                     s[dictionary['Tablename']].append(dictionary['Starring'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 s[dictionary['Tablename']] = []
                 s[dictionary['Tablename']].append(None)
     if(fake):
@@ -364,15 +288,6 @@ def get_Starring(T,N,fake=False,sel=0):
     return list(u),s
 
 
-# In[23]:
-
-
-# U,S = getSR()
-
-
-# In[24]:
-
-
 def get_Music_by(T,N,fake=False,sel=0):
     u = set([])
     m = {}
@@ -381,7 +296,6 @@ def get_Music_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Music by" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 m[dictionary['Tablename']] = []
                 if(type(dictionary['Music by']) == list):
                     for i in range(len(dictionary['Music by'])):
@@ -392,7 +306,6 @@ def get_Music_by(T,N,fake=False,sel=0):
                     m[dictionary['Tablename']].append(dictionary['Music by'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 m[dictionary['Tablename']] = []
                 m[dictionary['Tablename']].append(None)
     if(fake):
@@ -405,15 +318,6 @@ def get_Music_by(T,N,fake=False,sel=0):
     return list(u),m
 
 
-# In[25]:
-
-
-# U,M = getM()
-
-
-# In[26]:
-
-
 def get_Cinematography(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -422,7 +326,6 @@ def get_Cinematography(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Cinematography" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary['Cinematography']) == list):
                     for i in range(len(dictionary['Cinematography'])):
@@ -433,7 +336,6 @@ def get_Cinematography(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary['Cinematography'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -444,15 +346,6 @@ def get_Cinematography(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[27]:
-
-
-# U,D = getCin()
-
-
-# In[28]:
 
 
 def get_Edited_by(T,N,fake=False,sel=0):
@@ -463,7 +356,6 @@ def get_Edited_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if("Edited by" in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary['Edited by']) == list):
                     for i in range(len(dictionary['Edited by'])):
@@ -474,7 +366,6 @@ def get_Edited_by(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary['Edited by'])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -487,15 +378,6 @@ def get_Edited_by(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[29]:
-
-
-# U,D = getEdiB()
-
-
-# In[30]:
-
-
 def get_Productioncompany(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -504,7 +386,6 @@ def get_Productioncompany(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -515,7 +396,6 @@ def get_Productioncompany(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -528,15 +408,6 @@ def get_Productioncompany(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[31]:
-
-
-# U,D = getPC()
-
-
-# In[32]:
-
-
 def get_Distributed_by(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -545,7 +416,6 @@ def get_Distributed_by(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -556,7 +426,6 @@ def get_Distributed_by(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -569,16 +438,7 @@ def get_Distributed_by(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[33]:
-
-
-# U,D = getDby()
-
-
-# In[34]:
-
-
-def get_Release_date(T,N,fake=False,sel=0): # gonna be a nightmare
+def get_Release_date(T,N,fake=False,sel=0):
     ud = set([])
     up = set([])
     d,p = {},{}
@@ -631,15 +491,6 @@ def get_Release_date(T,N,fake=False,sel=0): # gonna be a nightmare
     return list(ud),list(up),d,p
 
 
-# In[35]:
-
-
-# getRdate(T,N,0,True)[3]
-
-
-# In[36]:
-
-
 def get_Running_time(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -648,7 +499,6 @@ def get_Running_time(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -659,7 +509,6 @@ def get_Running_time(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -670,15 +519,6 @@ def get_Running_time(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[37]:
-
-
-# U,D = getRtime()
-
-
-# In[38]:
 
 
 def get_Country(T,N,fake=False,sel=0):
@@ -689,7 +529,6 @@ def get_Country(T,N,fake=False,sel=0):
         if(int(Ptab[n][1:]) <=2800 ):
             dictionary = parseFile(Ptab[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
-#                 print(dictionary['Tablename'],' : ',dictionary['Starring'])
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
                     for i in range(len(dictionary[k])):
@@ -700,7 +539,6 @@ def get_Country(T,N,fake=False,sel=0):
                     d[dictionary['Tablename']].append(dictionary[k])
                     
             else:
-#                 print(dictionary['Tablename'],':',"!!!")
                 d[dictionary['Tablename']] = []
                 d[dictionary['Tablename']].append(None)
     if(fake):
@@ -711,15 +549,6 @@ def get_Country(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[39]:
-
-
-# U,D = getCty()
-
-
-# In[40]:
 
 
 def get_Language(T,N,fake=False,sel=0):
@@ -752,15 +581,6 @@ def get_Language(T,N,fake=False,sel=0):
     return list(u),d
 
 
-# In[41]:
-
-
-# U,D = getLang()
-
-
-# In[42]:
-
-
 def get_Budget(T,N,fake=False,sel=0):
     u = set([])
     d = {}
@@ -789,15 +609,6 @@ def get_Budget(T,N,fake=False,sel=0):
             d = FakeDICT(T,N,u,d,it,sel)
         
     return list(u),d
-
-
-# In[43]:
-
-
-# U,D = getBudg()
-
-
-# In[44]:
 
 
 def get_Box_office(T,N,fake=False,sel=0):
@@ -829,17 +640,7 @@ def get_Box_office(T,N,fake=False,sel=0):
         
     return list(u),d
 
-
-# In[45]:
-
-
-# U,D = getBO()
-
-
-# #### Extract all data :
-
-# In[46]:
-
+# Extract all data :
 
 def get_Data(fake=False):
     
@@ -853,13 +654,8 @@ def get_Data(fake=False):
             Extracted_data[k].append(l)
             
     return Extracted_data
-# F is the Extracted_data[key]
 
-
-# #### Rules and functions to create sentences
-
-# In[47]:
-
+# Sentence generator :
 
 def Directed_bySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
@@ -894,15 +690,6 @@ def Directed_bySent(tb,dn,F,it,tval=True,prem=False):
         else:
             ts1=[None]
         return ts1
-
-
-# In[48]:
-
-
-# DirSent(T,N,D,U,37,True)
-
-
-# In[49]:
 
 
 def Produced_bySent(tb,dn,F,it,tval=True,prem=False):
@@ -940,9 +727,6 @@ def Produced_bySent(tb,dn,F,it,tval=True,prem=False):
             return [None]
 
 
-# In[50]:
-
-
 def Screenplay_bySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -970,22 +754,6 @@ def Screenplay_bySent(tb,dn,F,it,tval=True,prem=False):
             return [ts1]
         else:
             return [None]
-
-
-# In[51]:
-
-
-# SPySent(T,N,getSP()[1],getSP()[0],1,False)
-
-
-# In[52]:
-
-
-# def BSent(tb,dn,di,univ,it,tval = True):
-# getB()
-
-
-# In[53]:
 
 
 def StarringSent(tb,dn,F,it,tval=True,prem=False): # a bit goofed
@@ -1027,15 +795,6 @@ def StarringSent(tb,dn,F,it,tval=True,prem=False): # a bit goofed
             return [None]
 
 
-# In[54]:
-
-
-# SRSent(T,N,getSR()[1],getSR()[0],0)
-
-
-# In[55]:
-
-
 def Music_bySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1068,15 +827,6 @@ def Music_bySent(tb,dn,F,it,tval=True,prem=False):
             return [ts1,ts2,ts3,ts4,ts5]
         else:
             return [None]
-
-
-# In[56]:
-
-
-# MSent(T,N,getM(),1,False,True)
-
-
-# In[57]:
 
 
 def CinematographySent(tb,dn,F,it,tval=True,prem=False):
@@ -1112,15 +862,6 @@ def CinematographySent(tb,dn,F,it,tval=True,prem=False):
             return [None]
 
 
-# In[58]:
-
-
-# CinSent(T,N,getCin()[1],getCin()[0],2,False)
-
-
-# In[59]:
-
-
 def Edited_bySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1153,15 +894,6 @@ def Edited_bySent(tb,dn,F,it,tval=True,prem=False):
             return [ts1,ts2,ts3,ts4,ts5]
         else:
             return [None]
-
-
-# In[60]:
-
-
-# EdiBSent(T,N,getEdiB()[1],getEdiB()[0],5,False)
-
-
-# In[61]:
 
 
 def ProductioncompanySent(tb,dn,F,it,tval=True,prem=False):
@@ -1201,15 +933,6 @@ def ProductioncompanySent(tb,dn,F,it,tval=True,prem=False):
             return [None]
 
 
-# In[62]:
-
-
-# PCSent(T,N,getPC()[1],getPC()[0],10)
-
-
-# In[63]:
-
-
 def Distributed_bySent(tb,dn,F,it,tval=True,prem=False):
     di = F[1]
     univ = F[0]
@@ -1243,28 +966,6 @@ def Distributed_bySent(tb,dn,F,it,tval=True,prem=False):
             return [ts1,ts2,ts3,ts4,ts5]
         else:
             return [None]
-
-
-# In[64]:
-
-
-# DbySent(T,N,getDby()[1],getDby()[0],10,False)
-
-
-# In[65]:
-
-
-# getRdate()[1]
-
-
-# In[66]:
-
-
-import datetime
-day_i = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',5:'Saturday',6:'Sunday'}
-
-
-# In[67]:
 
 
 def Release_dateSent(tb,dn,F,it,tval = True,prem = False):
@@ -1353,11 +1054,6 @@ def Release_dateSent(tb,dn,F,it,tval = True,prem = False):
                 ns = random.sample(list(set(univ)-set(d[tb[it]])),1)[0]
                 nss = ns.split('(')
                 ndate = nss[0].strip()
-#                 nd = nss[1].replace(')','').strip().split('-')
-#                 nday = datetime.date( int(d[0]),int(d[1]),int(d[2]) ).weekday()
-#                 for i in range(len(di[tb[it]])):
-#                     if(len(di[tb[it]][i].split("("))>2):
-#                         plist.append(get_place(di[tb[it]][i]))
                 if(len(d[tb[it]])==len(p[tb[it]]) and p[tb[it]][0] != None ):
                     nplace = random.sample(list(set(p_univ)-set(plist)),1)[0]
                     ts.append(dn[tb[it]][0] + " was released on " + ndate + " in " + nplace)
@@ -1404,17 +1100,6 @@ def Release_dateSent(tb,dn,F,it,tval = True,prem = False):
             return [None]
 
 
-# In[68]:
-
-
-# RdateSent(T,N,getRdate(T,N,0),129)
-# getRdate(T,N,0)[3]
-# getRdate(T,N,1)[2][T[129]]
-
-
-# In[69]:
-
-
 def Running_timeSent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
     univ = F[0]
@@ -1436,7 +1121,6 @@ def Running_timeSent(tb,dn,F,it,tval = True,prem = False):
                 ts3 = 'The movie runs for more than '+ str(int(m)-random.randint(10,40)) + " minutes"
                 ts4 = 'The movie runs for less than '+ str(int(m)+random.randint(10,40)) + " minutes"
             else:
-#                 time = int(di[tb[it]][0].replace('minutes','').strip())
                 m = int(re.findall("[0-9]+",di[tb[it]][0])[0])
                 ts1 = dn[tb[it]][0] + " runs for " + str(random.randint(m+1,m+30)) + " minutes"
                 ts2 = "The movie is  " + str(random.randint(m+1,m+30)) + " minutes long"
@@ -1446,15 +1130,6 @@ def Running_timeSent(tb,dn,F,it,tval = True,prem = False):
             return [ts1,ts2,ts3,ts4]
         else:
             return [None]
-
-
-# In[70]:
-
-
-# RtimeSent(T,N,getRtime()[1],getRtime()[0],0,False)
-
-
-# In[71]:
 
 
 def CountrySent(tb,dn,F,it,tval = True,prem = False):
@@ -1493,15 +1168,6 @@ def CountrySent(tb,dn,F,it,tval = True,prem = False):
             return [None]
 
 
-# In[72]:
-
-
-# CtySent(T,N,getCty()[1],getCty()[0],0,False)
-
-
-# In[73]:
-
-
 def LanguageSent(tb,dn,F,it,tval = True,prem = False):
     di = F[1]
     univ = F[0]
@@ -1531,15 +1197,6 @@ def LanguageSent(tb,dn,F,it,tval = True,prem = False):
             return [ts1,ts2,ts3,ts4]
         else:
             return [None]
-
-
-# In[74]:
-
-
-# LangSent(T,N,getLang()[1],getLang()[0],3)
-
-
-# In[75]:
 
 
 def BudgetSent(tb,dn,F,it,tval = True,prem = False):
@@ -1582,15 +1239,6 @@ def BudgetSent(tb,dn,F,it,tval = True,prem = False):
             return [ts1,ts2,ts3,ts4,ts5,ts6,ts7,ts8]
         else:
             return [None]
-
-
-# In[76]:
-
-
-# BudgSent(T,N,getBudg()[1],getBudg()[0],10)
-
-
-# In[77]:
 
 
 def Box_officeSent(tb,dn,F,it,tval = True,prem = False):
@@ -1638,16 +1286,7 @@ def Box_officeSent(tb,dn,F,it,tval = True,prem = False):
         else:
             return [None]
 
-
-# In[78]:
-
-
-# BOSent(T,N,getBO()[1],getBO()[0],4,False)
-
-
-# In[79]:
-
-
+# 1st multi-row templates
 def multi_row1(tb,dn,F,it,tval=True):
     Ud,D = F["Directed_by"] # Director
     Up,P = F["Produced_by"]# Producer
@@ -1928,16 +1567,7 @@ def multi_row1(tb,dn,F,it,tval=True):
     
     return ts
 
-
-# In[80]:
-
-
-# multi_row1(T,N,6,False)
-
-
-# In[81]:
-
-
+# 2nd multi-row templates
 def multi_row2(tb,dn,F,it,tval=True):
     Upc,Pc = F["Productioncompany"] # Production company
     Udb,Db = F["Distributed_by"] # Distributed by
@@ -1962,16 +1592,7 @@ def multi_row2(tb,dn,F,it,tval=True):
     
     return ts
 
-
-# In[82]:
-
-
-# multi_row2(T,N,6,False)
-
-
-# In[94]:
-
-
+# 3rd multi-row templates
 def multi_row3(tb,dn,F,it,tval=True):
     Ubud,Bud = F['Budget'] # Budget
     Ubo,Bo = F["Box_office"] # Box office
@@ -2006,22 +1627,3 @@ def multi_row3(tb,dn,F,it,tval=True):
                 ts["Budget,Box_office"].append(dn[tb[it]][0]+" gained "+str(mbud-mbo)+" million")
         
     return ts
-
-
-# In[96]:
-
-
-# multi_row3(T,N,get_Data(),69)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
