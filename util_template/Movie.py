@@ -7,41 +7,14 @@ import sys
 import math
 import json
 import datetime
+from util import *
 
-day_i = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',5:'Saturday',6:'Sunday'}
 
 if './' not in sys.path:
     sys.path.append('./')
 
-getfa = {
-"Movie_tr1":{"Directed_by":[0,1,2],"Produced_by":[0,1,2],"Screenplay_by":[1],"Starring":[0,1,2],"Music_by":[0,1,2],"Cinematography":[1]
-  ,"Edited_by":[0,1,2],"Productioncompany":[1],"Distributed_by":[0,1,2],"Release_date":[0,1,2],"Running_time":[1]
-  ,"Country":[0,1,2],"Language":[0,1,2],"Budget":[1],"Box_office":[1]},
-"Book_tr1":{"Publisher":[1],"Schedule":[1],"Format":[0,1,2],"Genre":[0,1,2],"Publication_date":[1],
-        "No_of_issues":[1],"Main_character":[0,1,2],"Written_by":[0,1,2]},
-"FnD_tr1":{"Manufacturer":[1],"Country_of_origin":[0,1,2],"Variants":[0,1,2],"Introduced":[1],"Related_products":[0,1,2],
-    "Alcohol_by_volume":[1],"Website":[1],"Color":[0,1,2],"Main_ingredients":[0,1,2],"Type":[0,1,2]},
-"Organiz_tr1":{"Wesbsite":[1],"Headquarters":[1],"Founded":[1],"Industry":[0,1,2],"Key_people":[0,1,2],"Products":[0,1,2]
-	,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
-	,"Parent":[1],"Owner":[1],"Predecessor":[1]},
-"Paint_tr1":{"Artist":[1],"Year":[1],"Medium":[1],"Dimensions":[1],"Location":[1]},
-"Fest_tr1":{"Type":[0,1,2],"Observed_by":[0,1,2],"Frequency":[1],"Celebrations":[0,1,2],"Significance":[0,1,2],"Observances":[0,1,2],
-    "Date":[1],"Related_to":[0,1,2],"Also_called":[0,1,2],"Official_name":[1],"Begins":[1],"Ends":[1],
-    "2021_date":[1],"2020_date":[1],"2019_date":[1],"2018_date":[1]},
-"SpEv_tr1":{"Venue":[0,1,2],"Date":[1],"Competitors":[0,1,2],"Teams":[1],
-	"No_of_events":[1],"Established":[1],"Official_site":[1]},
-"Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
-    "Motto":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
-    "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
-    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
-}
 
-Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories.tsv",sep="\t") 
-# Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
-
-Ptab = np.array(Catg[Catg.category.isin(['Movie'])].table_id)
-tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
-# tablesFolder = "../../autotnlidatasetandcode/tables"
+table_index = np.array(category_map[category_map.category.isin(['Movie'])].table_id)
 
 
 def parseFile(filename, tablesFolder):
@@ -74,8 +47,8 @@ def get_Table_Title():
     d = {}
     tb = []
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
                 d[dictionary['Tablename']] = []
@@ -89,62 +62,13 @@ def get_Table_Title():
 N,T = get_Table_Title()
 
 
-
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
-    '''
-    d1 : dict for that table
-    univ : list of a set
-    df : dataframe of Born/Death to get the table name
-    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
-    it : choose table name from the dataframe
-    '''
-    d1 = di
-    univ = list(univ)
-    if(sel==0): # add
-        if(d1[tb[it]][0]==None):
-            d1[tb[it]]=[]
-        ulimit = min(2,len(di[tb[it]])+1) # choose an upper limit of how many to add
-        n_add = ulimit
-        if(ulimit>1):
-            n_add = random.randint(1,ulimit)
-        add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
-        d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
-        return d1
-    elif(sel==1): 
-        if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
-            if(len(di[tb[it]])>1):
-                keep = random.sample(d1[tb[it]],1)
-                ulimit = min(len(list(set(univ)-set(d1[tb[it]]))),len(d1[tb[it]])-1)
-                substitute = random.sample(list(set(univ)-set(d1[tb[it]])),ulimit)
-            else:
-                keep=[]
-                substitute = random.sample(list(set(univ)-set(d1[tb[it]])),len(d1[tb[it]]))
-            d1[tb[it]] =  list(set(substitute).union(set(keep)))
-        elif(len(di[tb[it]])>0):
-            possible_sub = random.sample(list(set(univ)-set(d1[tb[it]])),1)
-            for i in range(6): # Probability that none is chose = 1/7
-                possible_sub.append(random.sample(list(set(univ)-set(d1[tb[it]])),1)[0])
-            possible_sub.append(None)
-            sub = random.sample(possible_sub,1)
-            d1[tb[it]][random.randint(0,len(d1[tb[it]])-1)] = sub[0]
-        return d1
-    elif(sel==2): # delete nd : for size = 1
-        if(len(di[tb[it]])>1 and di[tb[it]][0] != None):
-            llimit = max(1,len(d1[tb[it]])-1)
-            keep = random.sample(d1[tb[it]], random.randint(1,llimit) ) 
-            d1[tb[it]] = keep
-        return d1
-    
-    return None
-
-
 def get_Directed_by(T,N,fake=False,sel=0):
     u = set([])
     d = {}
     k = "Directed by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Directed by" in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary['Directed by']) == list):
@@ -160,7 +84,7 @@ def get_Directed_by(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -173,8 +97,8 @@ def get_Produced_by(T,N,fake=False,sel=0):
     p = {}
     k = "Produced by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Produced by" in dictionary.keys()):
                 p[dictionary['Tablename']] = []
                 if(type(dictionary['Produced by']) == list):
@@ -190,7 +114,7 @@ def get_Produced_by(T,N,fake=False,sel=0):
                 p[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(p[T[it]])<2):
                 sel = 1
             p = FakeDICT(T,N,u,p,it,sel)
@@ -203,8 +127,8 @@ def get_Screenplay_by(T,N,fake=False,sel=0):
     p = {}
     k = "Screenplay by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Screenplay by" in dictionary.keys()):
                 p[dictionary['Tablename']] = []
                 if(type(dictionary['Screenplay by']) == list):
@@ -220,7 +144,7 @@ def get_Screenplay_by(T,N,fake=False,sel=0):
                 p[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(p[T[it]])<2):
                 sel = 1
             p = FakeDICT(T,N,u,p,it,sel)
@@ -233,8 +157,8 @@ def get_Based_on(T,N,fake=False,sel=0):
     b = {}
     k = "Based on"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Based on" in dictionary.keys()):
                 b[dictionary['Tablename']] = []
                 if(type(dictionary['Based on']) == list):
@@ -250,7 +174,7 @@ def get_Based_on(T,N,fake=False,sel=0):
                 b[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(b[T[it]])<2):
                 sel = 1
             b = FakeDICT(T,N,u,b,it,sel)
@@ -263,8 +187,8 @@ def get_Starring(T,N,fake=False,sel=0):
     s = {}
     k = "Starring"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Starring" in dictionary.keys()):
                 s[dictionary['Tablename']] = []
                 if(type(dictionary['Starring']) == list):
@@ -280,7 +204,7 @@ def get_Starring(T,N,fake=False,sel=0):
                 s[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(s[T[it]])<2):
                 sel = 1
             s = FakeDICT(T,N,u,s,it,sel)
@@ -293,8 +217,8 @@ def get_Music_by(T,N,fake=False,sel=0):
     m = {}
     k = "Music by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Music by" in dictionary.keys()):
                 m[dictionary['Tablename']] = []
                 if(type(dictionary['Music by']) == list):
@@ -310,7 +234,7 @@ def get_Music_by(T,N,fake=False,sel=0):
                 m[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(m[T[it]])<2):
                 sel = 1
             m = FakeDICT(T,N,u,m,it,sel)
@@ -323,8 +247,8 @@ def get_Cinematography(T,N,fake=False,sel=0):
     d = {}
     k = "Cinematography"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Cinematography" in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary['Cinematography']) == list):
@@ -340,7 +264,7 @@ def get_Cinematography(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -353,8 +277,8 @@ def get_Edited_by(T,N,fake=False,sel=0):
     d = {}
     k = "Edited by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if("Edited by" in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary['Edited by']) == list):
@@ -370,7 +294,7 @@ def get_Edited_by(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -383,8 +307,8 @@ def get_Productioncompany(T,N,fake=False,sel=0):
     d = {}
     k = "Productioncompany "
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -400,7 +324,7 @@ def get_Productioncompany(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -413,8 +337,8 @@ def get_Distributed_by(T,N,fake=False,sel=0):
     d = {}
     k = "Distributed by"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -430,7 +354,7 @@ def get_Distributed_by(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -444,8 +368,8 @@ def get_Release_date(T,N,fake=False,sel=0):
     d,p = {},{}
     k = "Release date"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 p[dictionary['Tablename']] = []
@@ -478,12 +402,12 @@ def get_Release_date(T,N,fake=False,sel=0):
                 p[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,ud,d,it,sel)
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(p[T[it]])<2):
                 sel = 1
             p = FakeDICT(T,N,up,p,it,sel)
@@ -496,8 +420,8 @@ def get_Running_time(T,N,fake=False,sel=0):
     d = {}
     k = "Running time"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -513,7 +437,7 @@ def get_Running_time(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -526,8 +450,8 @@ def get_Country(T,N,fake=False,sel=0):
     d = {}
     k = "Country"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -543,7 +467,7 @@ def get_Country(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -556,8 +480,8 @@ def get_Language(T,N,fake=False,sel=0):
     d = {}
     k = "Language"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -573,7 +497,7 @@ def get_Language(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -586,8 +510,8 @@ def get_Budget(T,N,fake=False,sel=0):
     d = {}
     k = "Budget"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -603,7 +527,7 @@ def get_Budget(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -616,8 +540,8 @@ def get_Box_office(T,N,fake=False,sel=0):
     d = {}
     k = "Box office"
     for n in range(200):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -633,7 +557,7 @@ def get_Box_office(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(200): # for getting all the fakes in one go
-            sel = random.sample(getfa["Movie_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Movie"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -1045,7 +969,7 @@ def Release_dateSent(tb,dn,F,it,tval = True,prem = False):
                 ts.append("In year "+y+", the movie was released")
                 if(len(dt)>2):
                     day = datetime.date( int(dt[0]),int(dt[1]),int(dt[2]) ).weekday()
-                    ts.append(dn[tb[it]][0] + " was released on a " + str(day_i[day]))
+                    ts.append(dn[tb[it]][0] + " was released on a " + str(day_of_week[day]))
 
                 
             else:
@@ -1091,7 +1015,7 @@ def Release_dateSent(tb,dn,F,it,tval = True,prem = False):
                 ts.append(dn[tb[it]][0] + " was released before " + str(int(dt[0])-5))
                 if(len(dt)>2):
                     day = datetime.date( int(dt[0]),int(dt[1]),int(dt[2]) ).weekday()
-                    ts.append(dn[tb[it]][0] + " was released on a " + str(day_i[(day+2)%7]))
+                    ts.append(dn[tb[it]][0] + " was released on a " + str(day_of_week[(day+2)%7]))
                 ts.append("The movie came on " + ndate)
                 ts.append("In year "+str(y + random.randint(3,5))+", the movie was released")
 

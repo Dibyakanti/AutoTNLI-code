@@ -15,7 +15,6 @@ import pendulum
 
 nlp = spacy.load("en_core_web_sm")
 
-
 def readInputFile(filename):
     colnames=['TABLE', 'CATEGORY']
     df = pd.read_csv(filename, sep='\t', names = colnames)
@@ -1267,13 +1266,7 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
             producers = ", ".join(x for x in v)
         result["Producer"].append(producers + " produced this album.")
 
-    return result  
-    # return ". ".join(result)
-    
-
-
-# In[59]:
-
+    return result
 
 # table_list = ["T0", "T10", "T13", "T42","T55", "T69", "T80", "T65", "T28", "T93"]
 # tables_list = []
@@ -1393,15 +1386,6 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 
 
 
-    
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
 
 # #Read category File
 # filename = 'wikipediaTableCategories.tsv'
@@ -1455,17 +1439,3 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 #         for statement in final_result:
 #             outputFile.write(statement + "\n")
                 
-                
-
-
-# # 
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-

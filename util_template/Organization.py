@@ -1,42 +1,21 @@
-
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
 import re
 import random
 import sys
+import math
+import json
+import datetime
+from util import *
+
 
 if './' not in sys.path:
     sys.path.append('./')
 
-getfa = {	
-"Movie_tr1":{"Dir":[0,1,2],"Prod":[0,1,2],"SP":[1],"SR":[0,1,2],"M":[0,1,2],"Cin":[1],"EdiB":[0,1,2],"PC":[1],
-    "Dby":[0,1,2],"Rdate":[0,1,2],"Rtime":[1],"Cty":[0,1,2],"Lang":[0,1,2],"Budg":[1],"BO":[1]},
-"Book_tr1":{"P":[1],"Sch":[1],"Fmt":[0,1,2],"Gen":[0,1,2],"PubDate":[1],
-        "NI":[1],"MChar":[0,1,2],"Wby":[0,1,2]},
-"FnD_tr1":{"Mf":[1],"COP":[0,1,2],"VF":[0,1,2],"In":[1],"RPd":[0,1,2],
-    "Abv":[1],"W":[1],"C":[0,1,2],"MIn":[0,1,2],"T":[0,1,2]},
-"Organiz_tr1":{"Website":[1],"Headquarters":[1],"Founded":[1],"Industry":[0,1,2],"Key_people":[0,1,2],"Products":[0,1,2]
-	,"Number_of_employees":[1],"Traded_as":[0,1,2],"Founder":[0,1,2],"Area_served":[0,1,2],"Type":[1],"Subsidiaries":[0,1,2]
-	,"Parent":[1],"Owner":[1],"Predecessor":[1]},
-"Paint_tr1":{"Artist":[1],"Year":[1],"Medium_Type":[1],"Dimensions":[1],"Location":[1]},
-"Fest_tr1":{"Type":[0,1,2],"Observed_by":[0,1,2],"Frequency":[1],"Celebrations":[0,1,2],"Significance":[0,1,2],"Observances":[0,1,2],
-    "Date":[1],"Related_to":[0,1,2],"Also_called":[0,1,2],"Official_name":[1],"Begins":[1],"Ends":[1],
-    "2021_date":[1],"2020_date":[1],"2019_date":[1],"2018_date":[1]},
-"SpEv_tr1":{"Venue_Location":[0,1,2],"Date_Dates":[1],"Competitors":[0,1,2],"Teams":[1],
-	"No_of_events":[1],"Established_Founded":[1],"Official_site":[1]},
-"Univ_tr1":{"Website":[1],"Type":[0,1,2],"Established":[1],"Undergraduates":[1],"Postgraduates":[1],
-    "Motto_Motto_in_English":[0,1,2],"Location":[1],"Nickname":[1],"Campus":[1],"Colors":[0,1,2],
-    "Students":[1],"Academic_staff":[1],"Administrative_staff":[1],"President":[1],"Endowment":[1],"Mascot":[1],
-    "Provost":[1],"Sporting_affiliations":[0,1,2],"Academic_affiliations":[0,1,2],"Former_names":[1]}
-}
 
-Catg = pd.read_csv("/content/drive/My Drive/Auto-TNLI/data/table_categories modified.tsv",sep="\t")
-# Catg = pd.read_csv("../../autotnlidatasetandcode/table_categories modified.tsv",sep="\t")
+table_index = np.array(category_map[category_map.category.isin(['Organization'])].table_id)
 
-Ptab = np.array(Catg[Catg.category.isin(['Organization'])].table_id)
-tablesFolder = "/content/drive/My Drive/Auto-TNLI/data/tables"
-# tablesFolder = "../../autotnlidatasetandcode/tables"
 
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename, encoding="utf8"), 'html.parser')
@@ -71,8 +50,8 @@ def get_Table_Title():
     d = {}
     tb = []
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             tb.append(dictionary['Tablename'])
             if("Title" in dictionary.keys()):
                 d[dictionary['Tablename']] = []
@@ -86,52 +65,7 @@ def get_Table_Title():
 N,T = get_Table_Title()
 
 
-def FakeDICT(tb,dn,univ,di,it,sel=0,subNone = False):
-    '''
-    d1 : dict for that table
-    univ : list of a set
-    df : dataframe of Born/Death to get the table name
-    sel: selection bit to select whether to 0 : add / 1 : substitute / 2 : delete
-    it : choose table name from the dataframe
-    '''
-    d1 = di
-    univ = list(univ)
-    if(sel==0): # add
-        if(d1[tb[it]][0]==None):
-            d1[tb[it]]=[]
-        ulimit = min(2,len(di[tb[it]])+1) # choose an upper limit of how many to add
-        n_add = ulimit
-        if(ulimit>1):
-            n_add = random.randint(1,ulimit)
-        add = random.sample(list(set(univ)-set(d1[tb[it]])),n_add)
-        d1[tb[it]] =  list(set(d1[tb[it]]).union(set(add)))
-        return d1
-    elif(sel==1): # substitute 
-        if(len(di[tb[it]])>0 and di[tb[it]][0] != None):
-            if(len(di[tb[it]])>1):
-                keep = random.sample(d1[tb[it]],1)
-                ulimit = min(len(list(set(univ)-set(d1[tb[it]]))),len(d1[tb[it]])-1)
-                substitute = random.sample(list(set(univ)-set(d1[tb[it]])),ulimit)
-            else:
-                keep=[]
-                substitute = random.sample(list(set(univ)-set(d1[tb[it]])),len(d1[tb[it]]))
-            d1[tb[it]] =  list(set(substitute).union(set(keep)))
-        elif(len(di[tb[it]])>0):
-            possible_sub = random.sample(list(set(univ)-set(d1[tb[it]])),1)
-            for i in range(6): # Probability that none is chose = 1/7
-                possible_sub.append(random.sample(list(set(univ)-set(d1[tb[it]])),1)[0])
-            possible_sub.append(None)
-            sub = random.sample(possible_sub,1)
-            d1[tb[it]][random.randint(0,len(d1[tb[it]])-1)] = sub[0]
-        return d1
-    elif(sel==2): # delete nd : for size = 1
-        if(len(di[tb[it]])>1 and di[tb[it]][0] != None):
-            llimit = max(1,len(d1[tb[it]])-1)
-            keep = random.sample(d1[tb[it]], random.randint(1,llimit) ) 
-            d1[tb[it]] = keep
-        return d1
-    
-    return None
+
 
 
 def get_Website(T,N,fake=False,sel=0):
@@ -139,8 +73,8 @@ def get_Website(T,N,fake=False,sel=0):
     d = {}
     k = "Website"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -157,7 +91,7 @@ def get_Website(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -170,8 +104,8 @@ def get_Headquarters(T,N,fake=False,sel=0):
     d = {}
     k = "Headquarters"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -187,7 +121,7 @@ def get_Headquarters(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -201,8 +135,8 @@ def get_Founded(T,N,fake=False,sel=0):
     k1 = "Founded"
     k2 = "Formation"
     for n in range(79):
-        if(int(Ptab[n][1:]) <= 2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <= 2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
@@ -226,7 +160,7 @@ def get_Founded(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"]["Founded"],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"]["Founded"],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -239,8 +173,8 @@ def get_Industry(T,N,fake=False,sel=0):
     d = {}
     k = "Industry"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -257,7 +191,7 @@ def get_Industry(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -270,8 +204,8 @@ def get_Key_people(T,N,fake=False,sel=0):
     d = {}
     k = "Key people"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -293,7 +227,7 @@ def get_Key_people(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -306,8 +240,8 @@ def get_Products(T,N,fake=False,sel=0):
     d = {}
     k = "Products"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -325,7 +259,7 @@ def get_Products(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -338,8 +272,8 @@ def get_Number_of_employees(T,N,fake=False,sel=0):
     d = {}
     k = "Number of employees"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -358,7 +292,7 @@ def get_Number_of_employees(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -371,8 +305,8 @@ def get_Traded_as(T,N,fake=False,sel=0):
     d = {}
     k = "Traded as"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -395,7 +329,7 @@ def get_Traded_as(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -409,8 +343,8 @@ def get_Founder(T,N,fake=False,sel=0):
     k1 = "Founder"
     k2 = "Founders"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k1 in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k1]) == list):
@@ -439,7 +373,7 @@ def get_Founder(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"]["Founder"],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"]["Founder"],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -452,8 +386,8 @@ def get_Area_served(T,N,fake=False,sel=0):
     d = {}
     k = "Area served"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -471,7 +405,7 @@ def get_Area_served(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -484,8 +418,8 @@ def get_Type(T,N,fake=False,sel=0):
     d = {}
     k = "Type"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -502,7 +436,7 @@ def get_Type(T,N,fake=False,sel=0):
                 d[dictionary['Tablename']].append(None)
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -515,8 +449,8 @@ def get_Subsidiaries(T,N,fake=False,sel=0):
     d = {}
     k = "Subsidiaries"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -534,7 +468,7 @@ def get_Subsidiaries(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -547,8 +481,8 @@ def get_Parent(T,N,fake=False,sel=0):
     d = {}
     k = "Parent"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys()):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -566,7 +500,7 @@ def get_Parent(T,N,fake=False,sel=0):
         
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -579,8 +513,8 @@ def get_Owner(T,N,fake=False,sel=0):
     d = {}
     k = "Owner"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys() and n!=78):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -598,7 +532,7 @@ def get_Owner(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
@@ -611,8 +545,8 @@ def get_Predecessor(T,N,fake=False,sel=0):
     d = {}
     k = "Predecessor"
     for n in range(79):
-        if(int(Ptab[n][1:]) <=2800 ):
-            dictionary = parseFile(Ptab[n]+".html", tablesFolder)
+        if(int(table_index[n][1:]) <=2800 ):
+            dictionary = parseFile(table_index[n]+".html", tablesFolder)
             if(k in dictionary.keys() and n!=78):
                 d[dictionary['Tablename']] = []
                 if(type(dictionary[k]) == list):
@@ -630,7 +564,7 @@ def get_Predecessor(T,N,fake=False,sel=0):
     
     if(fake):
         for it in range(79): # for getting all the fakes in one go
-            sel = random.sample(getfa["Organiz_tr1"][k.replace(" ","_")],1)[0]
+            sel = random.sample(FakeDICT_helper["Organization"][k.replace(" ","_")],1)[0]
             if(sel==2 and len(d[T[it]])<2):
                 sel = 1
             d = FakeDICT(T,N,u,d,it,sel)
