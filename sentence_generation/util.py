@@ -24,7 +24,7 @@ month_of_year = {1: 'January',2: 'February',3: 'March',4: 'April',5: 'May',6: 'J
 
 Dict = {
 "Book":["Publisher","Schedule","Format","Genre","Publication_date","No_of_issues","Main_character","Written_by"],
-"City":["Elevation","Metro","Urban","City","Location","Government","Highest_elevation","Lowest_elevation","Land","Water","Demonym","Province","Mayor","Named_for","Area_code","Postal_code","Coordinates","Incorporated","Density","Urban_density","Metro_density"]
+"City":["Elevation","Metro","Urban","City","Location","Government","Highest_elevation","Lowest_elevation","Land","Water","Demonym","Province","Mayor","Named_for","Area_code","Postal_code","Coordinates","Incorporated","Density","Urban_density","Metro_density"],
 "Festival":["Type","Observed_by","Frequency","Celebrations","Significance","Observances","Date","Related_to","Also_called","Official_name","Begins","Ends","2021_date","2020_date","2019_date","2018_date"],
 "FoodnDrinks":["Manufacturer","Country_of_origin","Variants","Introduced","Related_products","Alcohol_by_volume","Website","Color","Main_ingredients","Type"],
 "Movie":["Directed_by","Produced_by","Screenplay_by","Starring","Music_by","Cinematography","Edited_by","Productioncompany","Distributed_by","Release_date","Running_time","Country","Language","Budget","Box_office"],

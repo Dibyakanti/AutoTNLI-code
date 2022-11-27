@@ -103,7 +103,7 @@ def getDate(val):
     elif "(" in val:
         val = val.split("(")[0].strip()    
     try:
-        # to ignore values like 15, 
+        # to ignore values like 15
         if len(val) > 2:
             #parses into date time format
             datetime_obj = dateparser.parse(val, settings={'STRICT_PARSING': True})

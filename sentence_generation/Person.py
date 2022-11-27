@@ -324,7 +324,7 @@ def get_Children(T,N,fake=False,sel=0):
     if(fake):
         for it in range(len(T)): # for getting all the fakes in one go
             sel = random.sample(FakeDICT_helper["Person"]["Children"],1)[0]
-            if(sel==2 and len(L[T[it]])<2):
+            if(sel==2 and len(ds[T[it]])<2):
                 sel = 1
             ds= FakeDICT(T,N,u,ds,it,sel)
             
@@ -1182,7 +1182,7 @@ def OccupationSent(tb,dn,F,it,tval=True,prem=False): # input : dictionary,list(u
     Nm = dn[tb[it]][0]
     if(prem):
         if(di[tb[it]][0] != None):
-            All = ', 'join(di[tb[it]])
+            All = ', '.join(di[tb[it]])
             ps1 = [ Nm+" worked as a "+All
                    ,All+" are the occupations of this person"
                    ,All+" are the person's occupation"  ]
