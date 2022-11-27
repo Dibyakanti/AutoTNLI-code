@@ -9,3 +9,4 @@ from sentence_generation.Paint import *
 from sentence_generation.Person import *
 from sentence_generation.SportsnEvents import *
 from sentence_generation.University import *
+from sentence_generation.util import *

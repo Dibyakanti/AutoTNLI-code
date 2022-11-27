@@ -18,8 +18,8 @@ nlp = spacy.load("en_core_web_sm")
 
 
 def readInputFile(filename):
-    colnames=['TABLE', 'CATEGORY']
-    df = pd.read_csv(filename, sep='\t', names = colnames)
+    colnames = ['TABLE', 'CATEGORY']
+    df = pd.read_csv(filename, sep='\t', names=colnames)
     return df
 
 
@@ -31,15 +31,18 @@ def getCategoryTables(df, categoryName):
 
 def parseFile(filename, tablesFolder):
     soup = BeautifulSoup(open(tablesFolder + '/' + filename), 'html.parser')
-    keys =[i.text for i in soup.find('tr').find_all('th')]
+    keys = [i.text for i in soup.find('tr').find_all('th')]
     vals = []
     for i in soup.find('tr').find_all('td'):
-        result = [val.text.strip().replace("\n", "").replace("\t", "") for val in i.find_all('li')]
+        result = [val.text.strip().replace("\n", "").replace("\t", "")
+                  for val in i.find_all('li')]
         if not result:
             if "â€“" in i.text:
-                result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€“")]
+                result = [val.strip().replace("\n", "").replace("\t", "")
+                          for val in i.text.split("â€“")]
             elif "â€”" in i.text:
-                result = [val.strip().replace("\n", "").replace("\t", "") for val in i.text.split("â€”")]
+                result = [val.strip().replace("\n", "").replace("\t", "")
+                          for val in i.text.split("â€”")]
             else:
                 result = i.text.strip().replace("\n", "").replace("\t", "")
         vals.append(result)
@@ -61,7 +64,8 @@ class Value:
         for entity in doc.ents:
             self.tag = entity.label_
             break
-        if key == "Tablename": self.tag = "ID"
+        if key == "Tablename":
+            self.tag = "ID"
 
 
 def reformDict(dictionary):
@@ -72,106 +76,122 @@ def reformDict(dictionary):
 
 def generateRandom(start, end):
     return random.randint(start, end)
-    
+
 
 def getDate(val):
     months = {
-        "January":1,
-        "February":2,
-        "March":3,
-        "April":4,
-        "May":5,
-        "June":6,
-        "July":7,
-        "August":8,
-        "September":9,
-        "October":10,
-        "November":11,
-        "December ":12
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December ": 12
     }
 
     result = None
-    #if multiple values
+    # if multiple values
     if type(val) == list:
-        #date of format 18 October 2011(18 - 10 - 11)
+        # date of format 18 October 2011(18 - 10 - 11)
         if "(" in val[0]:
             val = val[0].split("(")[0]
-        #dates of format("october 2100, march 2018")
+        # dates of format("october 2100, march 2018")
         else:
             val = val[-1]
-    #date of format 18 October 2011 ( 18 - 10 - 11)
+    # date of format 18 October 2011 ( 18 - 10 - 11)
     elif "(" in val:
-        val = val.split("(")[0].strip()    
+        val = val.split("(")[0].strip()
     try:
         # to ignore values like 15
         if len(val) > 2:
-            #parses into date time format
-            datetime_obj = dateparser.parse(val, settings={'STRICT_PARSING': True})
+            # parses into date time format
+            datetime_obj = dateparser.parse(
+                val, settings={'STRICT_PARSING': True})
             splits = (str(datetime_obj).split()[0]).split("-")
             day, month, year = splits[2], splits[1], splits[0]
             result = (day, month, year)
     except:
         result = None
-    
+
     if len(val) == 4 and int(val) > 1500:
         result = None
-    
+
     if not result:
-        #1. Month Year
+        # 1. Month Year
         splits = val.split()
-        if len(splits) == 2 and splits[0].replace(",","").strip() in months.keys() and int(splits[1]) > 1500:
-            month, year = splits[0].replace(",","").strip(), splits[1]
+        if len(splits) == 2 and splits[0].replace(",", "").strip() in months.keys() and int(splits[1]) > 1500:
+            month, year = splits[0].replace(",", "").strip(), splits[1]
             result = ((None, months[month], year))
         # Year
         elif len(splits) == 1 and int(splits[0]) > 1500:
             year = splits[0]
             result = (None, None, year)
     return result
-    
+
 
 def preprocessDate(dictionary):
     months_list = set()
     years_list = set()
     days_list = set()
     for k, v in dictionary.items():
-        if v.tag == "DATE": 
+        if v.tag == "DATE":
             if k == "Recorded":
                 date_start = getDate(v.val[0])
                 date_ended = getDate(v.val[1])
                 v.original = [date_start, date_ended]
                 if date_start:
-                    if date_start[0]: days_list.add(date_start[0])
-                    if date_start[1]: months_list.add(date_start[1])
-                    if date_start[2]: years_list.add(date_start[2])
+                    if date_start[0]:
+                        days_list.add(date_start[0])
+                    if date_start[1]:
+                        months_list.add(date_start[1])
+                    if date_start[2]:
+                        years_list.add(date_start[2])
                 if date_ended:
-                    if date_ended[0]: days_list.add(date_ended[0])
-                    if date_ended[1]: months_list.add(date_ended[1])
-                    if date_ended[2]: years_list.add(date_ended[2])
+                    if date_ended[0]:
+                        days_list.add(date_ended[0])
+                    if date_ended[1]:
+                        months_list.add(date_ended[1])
+                    if date_ended[2]:
+                        years_list.add(date_ended[2])
             else:
                 result = getDate(v.val)
                 if result:
                     v.original = result
-                    if result[0] :days_list.add(result[0])
-                    if result[1]: months_list.add(result[1])
-                    if result[2]: years_list.add(result[2])
-    
+                    if result[0]:
+                        days_list.add(result[0])
+                    if result[1]:
+                        months_list.add(result[1])
+                    if result[2]:
+                        years_list.add(result[2])
+
     for k, v in dictionary.items():
-        
-        if v.tag == "DATE" and v.original: 
+
+        if v.tag == "DATE" and v.original:
             days_start_adverse, month_start_adverse, year_start_adverse = set(), set(), set()
             days_ended_adverse, month_ended_adverse, year_ended_adverse = set(), set(), set()
             if k == "Recorded":
                 date_start = v.original[0]
                 date_ended = v.original[1]
                 for day in days_list:
-                    if day != date_start[0]: days_start_adverse.add(day)
-                    if day != date_start[0]: days_ended_adverse.add(day)
+                    if day != date_start[0]:
+                        days_start_adverse.add(day)
+                    if day != date_start[0]:
+                        days_ended_adverse.add(day)
                 for month in months_list:
-                    if month != date_start[1]: month_start_adverse.add(month)
-                    if month != date_start[1]: month_ended_adverse.add(month)
+                    if month != date_start[1]:
+                        month_start_adverse.add(month)
+                    if month != date_start[1]:
+                        month_ended_adverse.add(month)
                 for year in years_list:
-                    if year != date_start[2]: year_start_adverse.add(year)
-                    if year != date_start[2]: year_ended_adverse.add(year)
+                    if year != date_start[2]:
+                        year_start_adverse.add(year)
+                    if year != date_start[2]:
+                        year_ended_adverse.add(year)
                 v.adverse = [[days_start_adverse, month_start_adverse, year_start_adverse],
                              [days_ended_adverse, month_ended_adverse, year_ended_adverse]]
             else:
@@ -192,7 +212,8 @@ def albumDateOuputGenerator(name, key, indicator, func_keyword, data, truth_valu
     '''
     indicator: 1 - > day based, 2-> leap year, 3-> odd/even, 4-> dateBased, 5-> ecentury, 6-> orderBased, 7-> weekMonth
     '''
-    if not data: data.append("X")
+    if not data:
+        data.append("X")
     template = {
         1: str(data[0]),
         2: "a " + str(data[0]) + " year.",
@@ -200,40 +221,53 @@ def albumDateOuputGenerator(name, key, indicator, func_keyword, data, truth_valu
         5: str(data[0]) + "th century."
     }
     if indicator == 4:
-        if len(data) == 3: template[4] = str(data[0]) + " of " + str(data[1]) + " in " + str(data[2]) + "."
-        elif len(data) == 2: template[4]= str(data[0]) + " in " + str(data[1]) + "."
-        else: template[4] = str(data[0]) + "."
+        if len(data) == 3:
+            template[4] = str(data[0]) + " of " + str(data[1]
+                                                      ) + " in " + str(data[2]) + "."
+        elif len(data) == 2:
+            template[4] = str(data[0]) + " in " + str(data[1]) + "."
+        else:
+            template[4] = str(data[0]) + "."
     elif indicator == 6:
-        if len(data) == 3: template[6] = data[0] + " " + getMonth(int(data[1])) + ", " + data[2] + "."
-        elif len(data) == 2: template[6]= getMonth(int(data[0])) + ", " + data[1] + "."
-        else: template[6] = data[0] + "."
-        result = []    
+        if len(data) == 3:
+            template[6] = data[0] + " " + \
+                getMonth(int(data[1])) + ", " + data[2] + "."
+        elif len(data) == 2:
+            template[6] = getMonth(int(data[0])) + ", " + data[1] + "."
+        else:
+            template[6] = data[0] + "."
+        result = []
         if key == "recording started":
-            result.append("The recording of the album started " + " " + func_keyword + " " + template[indicator] + " " + truth_value)
+            result.append("The recording of the album started " + " " +
+                          func_keyword + " " + template[indicator] + " " + truth_value)
         elif key == "recording ended":
-            result.append("The recording of the album ended " + " " + func_keyword + " " + template[indicator] + " " + truth_value)
-        return result   
+            result.append("The recording of the album ended " + " " +
+                          func_keyword + " " + template[indicator] + " " + truth_value)
+        return result
     elif indicator == 7:
         template[7] = data[0] + " week of " + data[1] + " in " + data[2]
-    
-    prefixes = ["The album \"" +name + "\" was "]
+
+    prefixes = ["The album \"" + name + "\" was "]
     result = []
     for prefix in prefixes:
-        result.append(prefix + key + " " + func_keyword + " " + template[indicator] + " " + truth_value)
+        result.append(prefix + key + " " + func_keyword + " " +
+                      template[indicator] + " " + truth_value)
     return result
 
 
 def dayBasedSentenceGenerator(day, name, key):
     result = []
     days = []
-    
+
     randomDay = generateRandom(0, 6)
     while randomDay == day:
-        randomDay = generateRandom(0,6)
+        randomDay = generateRandom(0, 6)
     days.append((calendar.day_name[randomDay], False))
     days.append((calendar.day_name[day], True))
     for day, truthVal in days:
-        result = result + albumDateOuputGenerator(name, key.lower(), 1, "on", [day], str(truthVal))
+        result = result + \
+            albumDateOuputGenerator(
+                name, key.lower(), 1, "on", [day], str(truthVal))
     return result
 
 
@@ -245,67 +279,66 @@ def week_of_month(dt):
     if (dt.day < 10):
         day = "0"+str(dt.day)
     else:
-        day = str(dt.day)  
+        day = str(dt.day)
     year = str(dt.year)
     curr_date = year + "-" + month + "-" + day
     week_number = pendulum.parse(curr_date).week_of_month
-    if (week_number<0 or week_number>5):
+    if (week_number < 0 or week_number > 5):
         week_number = 5
     return week_number
 
 
 def dayBased(value, name):
     date = " ".join(x for x in value.original)
-    day = datetime.datetime.strptime(date, '%d %m %Y').weekday() 
+    day = datetime.datetime.strptime(date, '%d %m %Y').weekday()
     d = datetime.datetime.strptime(date, '%d %m %Y')
     return dayBasedSentenceGenerator(day, name, value.key)
 
 
-
 def leapYear(value, name):
     leap, result = False, []
-    if calendar.isleap(int(value.original[2])): leap = True
-    key = value.key.lower()    
+    if calendar.isleap(int(value.original[2])):
+        leap = True
+    key = value.key.lower()
     result += albumDateOuputGenerator(name, key, 2, "in", ["leap"], str(leap))
-    result += albumDateOuputGenerator(name, key, 2, "in", ["non leap"], str(not leap))
+    result += albumDateOuputGenerator(name, key,
+                                      2, "in", ["non leap"], str(not leap))
     return result
-
 
 
 def oddEvenBased(value, name):
     even, result = False, []
     key = value.key.lower()
     if int(value.original[0]) % 2 == 0:
-        even = True    
+        even = True
     result += albumDateOuputGenerator(name, key, 3, "on", ["even"], str(even))
-    result += albumDateOuputGenerator(name, key, 3, "on", ["odd"], str(not even))
+    result += albumDateOuputGenerator(name,
+                                      key, 3, "on", ["odd"], str(not even))
     return result
 
 
 def getMonth(num):
     reverseMap = {
-        1 : "January",
-        2 : "February",
-        3 : "March",
-        4 : "April",
-        5 : "May",
-        6 : "June",
-        7 : "July",
-        8 : "August",
-        9 : "September",
-        10 : "October",
-        11 : "November",
-        12 : "December"
+        1: "January",
+        2: "February",
+        3: "March",
+        4: "April",
+        5: "May",
+        6: "June",
+        7: "July",
+        8: "August",
+        9: "September",
+        10: "October",
+        11: "November",
+        12: "December"
     }
     return reverseMap[num]
 
 
-
-
-
 def dateChange(value, name):
     day, month, year = value.original
-    if month: month_str = getMonth(int(month))
+    if month:
+        month_str = getMonth(int(month))
     adv_days, adv_months, adv_years = value.adverse
     fake_days, fake_months, fake_years = [], [], []
     key = value.key.lower()
@@ -319,9 +352,11 @@ def dateChange(value, name):
         else:
             for day2 in adv_days:
                 fake_days.append(day2)
-        for fake_day in fake_days:  
-            result += albumDateOuputGenerator(name, key, 4, "on", [fake_day, month_str, year], str(False))
-        result += albumDateOuputGenerator(name, key, 4, "on", [day, month_str, year], str(True))
+        for fake_day in fake_days:
+            result += albumDateOuputGenerator(name, key, 4,
+                                              "on", [fake_day, month_str, year], str(False))
+        result += albumDateOuputGenerator(name, key,
+                                          4, "on", [day, month_str, year], str(True))
     if month:
         if not adv_months:
             val = generateRandom(1, 12)
@@ -332,17 +367,20 @@ def dateChange(value, name):
             for month_a in adv_months:
                 fake_months.append(int(month_a))
             #month and day
-        if day: 
+        if day:
             for fake_month in fake_months:
                 fake_month_str = getMonth(fake_month)
-                result += albumDateOuputGenerator(name, key, 4, "on", [ day, fake_month_str, year], str(False))
-        #only month and not day - add true ones for this case
+                result += albumDateOuputGenerator(name, key, 4,
+                                                  "on", [day, fake_month_str, year], str(False))
+        # only month and not day - add true ones for this case
         else:
             for fake_month in fake_months:
                 fake_month_str = getMonth(fake_month)
-                result += albumDateOuputGenerator(name, key, 4, "in", [ fake_month_str, year], str(False))
+                result += albumDateOuputGenerator(name, key,
+                                                  4, "in", [fake_month_str, year], str(False))
             month_str = getMonth(int(month))
-            result += albumDateOuputGenerator(name, key, 4, "in", [ month_str, year], str(True))
+            result += albumDateOuputGenerator(name, key,
+                                              4, "in", [month_str, year], str(True))
     if year:
         if not adv_years:
             val = generateRandom(int(year) - 5, int(year) + 5)
@@ -352,27 +390,27 @@ def dateChange(value, name):
         else:
             for year_a in adv_years:
                 fake_years.append(year_a)
-            #if day and month both present
+            # if day and month both present
         if day and month:
             for fake_year in fake_years:
-                result += albumDateOuputGenerator(name, key, 4, "in", [ day, month_str, fake_year], str(False))
+                result += albumDateOuputGenerator(name, key, 4,
+                                                  "in", [day, month_str, fake_year], str(False))
             # if not day but month and year present
         elif not day and month:
             for fake_year in fake_years:
-                result += albumDateOuputGenerator(name, key, 4, "in", [ month_str, fake_year], str(False))
+                result += albumDateOuputGenerator(name, key,
+                                                  4, "in", [month_str, fake_year], str(False))
         elif not day and not month:
             for fake_year in fake_years:
-                result += albumDateOuputGenerator(name, key, 4, "in", [fake_year], str(False))
-            result += albumDateOuputGenerator(name, key, 4, "in", [year], str(True))
+                result += albumDateOuputGenerator(name,
+                                                  key, 4, "in", [fake_year], str(False))
+            result += albumDateOuputGenerator(name,
+                                              key, 4, "in", [year], str(True))
     return result
-   
-
-
-
 
 
 def centuryBased(value, name):
-    
+
     result = []
     year = value.original[2]
     century = int(year[0] + year[1]) + 1
@@ -386,15 +424,14 @@ def centuryBased(value, name):
     if len(fake_century) == 0:
         fake_cent = generateRandom(century-2, century + 2)
         while fake_cent == century:
-            fake_cent = generateRandom(century-2, century+ 2)
+            fake_cent = generateRandom(century-2, century + 2)
         fake_century.add(fake_cent)
     for fake_cent in fake_century:
-        result += albumDateOuputGenerator(name, key, 5, "in", [str(fake_cent)], str(False))
-    result += albumDateOuputGenerator(name, key, 5, "in", [str(century)], str(True))            
+        result += albumDateOuputGenerator(name, key,
+                                          5, "in", [str(fake_cent)], str(False))
+    result += albumDateOuputGenerator(name,
+                                      key, 5, "in", [str(century)], str(True))
     return result
-
-
-
 
 
 def orderBased(value, name, key, original_val, adverse_val):
@@ -408,67 +445,88 @@ def orderBased(value, name, key, original_val, adverse_val):
         less_year, greater_year = None, None
         if adv_years:
             adv_year = int(adv_years.pop())
-            if adv_year > int(year): greater_year = adv_year
-            elif adv_year < int(year): less_year = adv_year
-        if not less_year: less_year = generateRandom(int(year) - 5, int(year)-1)
-        if not greater_year: greater_year = generateRandom(int(year) + 1, int(year)+5)  
-        generation_set["Y"] = (less_year, greater_year) 
+            if adv_year > int(year):
+                greater_year = adv_year
+            elif adv_year < int(year):
+                less_year = adv_year
+        if not less_year:
+            less_year = generateRandom(int(year) - 5, int(year)-1)
+        if not greater_year:
+            greater_year = generateRandom(int(year) + 1, int(year)+5)
+        generation_set["Y"] = (less_year, greater_year)
     if month:
         less_month, greater_month = None, None
         if adv_months:
             adv_month = int(adv_months.pop())
-            if adv_month > int(month): greater_month = adv_month
-            elif adv_month < int(month): less_month = adv_month
-        if not less_month and int(month)!= 1: less_month = generateRandom(1, int(month)-1)
-        if not greater_month and int(month)!= 12: greater_month = generateRandom(int(month) + 1, 12)  
-        generation_set["M"] = (less_month, greater_month) 
+            if adv_month > int(month):
+                greater_month = adv_month
+            elif adv_month < int(month):
+                less_month = adv_month
+        if not less_month and int(month) != 1:
+            less_month = generateRandom(1, int(month)-1)
+        if not greater_month and int(month) != 12:
+            greater_month = generateRandom(int(month) + 1, 12)
+        generation_set["M"] = (less_month, greater_month)
     if day:
         less_day, greater_day = None, None
         if adv_days:
             adv_day = int(adv_days.pop())
-            if adv_day > int(day): greater_day = adv_day
-            elif adv_day < int(day): less_day = adv_day
-        if not less_day and int(day)!= 1: less_day = generateRandom(1, int(day)-1)
-        if not greater_day and int(day)!= 31: greater_day = generateRandom(int(day) + 1, 31)  
-        generation_set["D"] = (less_day, greater_day) 
-    
+            if adv_day > int(day):
+                greater_day = adv_day
+            elif adv_day < int(day):
+                less_day = adv_day
+        if not less_day and int(day) != 1:
+            less_day = generateRandom(1, int(day)-1)
+        if not greater_day and int(day) != 31:
+            greater_day = generateRandom(int(day) + 1, 31)
+        generation_set["D"] = (less_day, greater_day)
+
     keywords = ["before", "after"]
-    truth_vals = [(True, False),(False,True)]
+    truth_vals = [(True, False), (False, True)]
     # print("generated:", str(generation_set["D"][1]), month, year)
     if day and month and year:
         if generation_set["D"][1]:
             for index in range(0, len(keywords)):
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["D"][1]), month, year], str(truth_vals[index][0]))
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(
+                    generation_set["D"][1]), month, year], str(truth_vals[index][0]))
         if generation_set["D"][0]:
-            for index in range(0, len(keywords)):                                              
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["D"][0]), month, year], str(truth_vals[index][1]))
+            for index in range(0, len(keywords)):
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(
+                    generation_set["D"][0]), month, year], str(truth_vals[index][1]))
         if generation_set["M"][1]:
-            for index in range(0, len(keywords)): 
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, str(generation_set["M"][1]), year], str(truth_vals[index][0])) 
+            for index in range(0, len(keywords)):
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, str(
+                    generation_set["M"][1]), year], str(truth_vals[index][0]))
         if generation_set["M"][0]:
-            for index in range(0, len(keywords)): 
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, str(generation_set["M"][0]), year], str(truth_vals[index][1])) 
+            for index in range(0, len(keywords)):
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, str(
+                    generation_set["M"][0]), year], str(truth_vals[index][1]))
         for index in range(len(keywords)):
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, month, str(generation_set["Y"][1])], str(truth_vals[index][0]))
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [day, month, str(generation_set["Y"][0])], str(truth_vals[index][1]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              day, month, str(generation_set["Y"][1])], str(truth_vals[index][0]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              day, month, str(generation_set["Y"][0])], str(truth_vals[index][1]))
     elif month and year:
         if generation_set["M"][1]:
-            for index in range(0, len(keywords)): 
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["M"][1]), year], str(truth_vals[index][0]))
+            for index in range(0, len(keywords)):
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(
+                    generation_set["M"][1]), year], str(truth_vals[index][0]))
         if generation_set["M"][0]:
-            for index in range(0, len(keywords)): 
-                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["M"][0]), year], str(truth_vals[index][1]))
+            for index in range(0, len(keywords)):
+                result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(
+                    generation_set["M"][0]), year], str(truth_vals[index][1]))
         for index in range(len(keywords)):
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [month, str(generation_set["Y"][1])], str(truth_vals[index][0]))
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [month, str(generation_set["Y"][0])], str(truth_vals[index][1]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              month, str(generation_set["Y"][1])], str(truth_vals[index][0]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              month, str(generation_set["Y"][0])], str(truth_vals[index][1]))
     elif year:
         for index in range(len(keywords)):
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["Y"][1])], str(truth_vals[index][0]))
-            result += albumDateOuputGenerator(name, key, 6, keywords[index], [str(generation_set["Y"][0])], str(truth_vals[index][1]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              str(generation_set["Y"][1])], str(truth_vals[index][0]))
+            result += albumDateOuputGenerator(name, key, 6, keywords[index], [
+                                              str(generation_set["Y"][0])], str(truth_vals[index][1]))
     return result
-
-
-
 
 
 def weekBased(value, name):
@@ -476,143 +534,168 @@ def weekBased(value, name):
     date = " ".join(x for x in value.original)
     day, month, year = value.original
     month = int(month)
-    day = datetime.datetime.strptime(date, '%d %m %Y').weekday() 
+    day = datetime.datetime.strptime(date, '%d %m %Y').weekday()
     d = datetime.datetime.strptime(date, '%d %m %Y')
     real_week = week_of_month(d)
-    fake_week = generateRandom(1,5)
+    fake_week = generateRandom(1, 5)
     while fake_week == real_week:
-        fake_week = generateRandom(1,5)
+        fake_week = generateRandom(1, 5)
     less_week, greater_week = None, None
-    if real_week > 1:less_week = generateRandom(1,real_week-1)
-    if real_week < 5:greater_week = generateRandom(real_week+1,6)    
+    if real_week > 1:
+        less_week = generateRandom(1, real_week-1)
+    if real_week < 5:
+        greater_week = generateRandom(real_week+1, 6)
     keywords = ["before", "after", "in"]
     truth_vals = [str(True), str(False)]
-    suffix = {1: "st", 2:"nd", 3: "rd", 4: "th", 5: "th",6 : "th"}
-    #in
+    suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
+    # in
     # print (real_week,fake_week)
-    result += albumDateOuputGenerator(name, key, 7, keywords[2], [str(fake_week) + suffix[fake_week], getMonth(month), str(year)], truth_vals[1])
-    result += albumDateOuputGenerator(name, key, 7, keywords[2], [str(real_week) + suffix[real_week], getMonth(month), str(year)], truth_vals[0])
+    result += albumDateOuputGenerator(name, key, 7, keywords[2], [str(
+        fake_week) + suffix[fake_week], getMonth(month), str(year)], truth_vals[1])
+    result += albumDateOuputGenerator(name, key, 7, keywords[2], [str(
+        real_week) + suffix[real_week], getMonth(month), str(year)], truth_vals[0])
     if less_week:
-        result += albumDateOuputGenerator(name, key, 7, keywords[0], [str(less_week) + suffix[less_week], getMonth(month), str(year)], truth_vals[1])
-        result += albumDateOuputGenerator(name, key, 7, keywords[1], [str(less_week) + suffix[less_week], getMonth(month), str(year)], truth_vals[0])
+        result += albumDateOuputGenerator(name, key, 7, keywords[0], [str(
+            less_week) + suffix[less_week], getMonth(month), str(year)], truth_vals[1])
+        result += albumDateOuputGenerator(name, key, 7, keywords[1], [str(
+            less_week) + suffix[less_week], getMonth(month), str(year)], truth_vals[0])
     if greater_week:
-        result += albumDateOuputGenerator(name, key, 7, keywords[0], [str(greater_week)+ suffix[greater_week], getMonth(month), str(year)], truth_vals[0])
-        result += albumDateOuputGenerator(name, key, 7, keywords[1], [str(greater_week)+ suffix[greater_week], getMonth(month), str(year)], truth_vals[1])
+        result += albumDateOuputGenerator(name, key, 7, keywords[0], [str(
+            greater_week) + suffix[greater_week], getMonth(month), str(year)], truth_vals[0])
+        result += albumDateOuputGenerator(name, key, 7, keywords[1], [str(
+            greater_week) + suffix[greater_week], getMonth(month), str(year)], truth_vals[1])
     return result
-    
-    
-    
-
-
-
 
 
 def dateRules(dictionary):
     name = None
     result = {}
     for key, value in dictionary.items():
-        if value.key == "Title": name = value.val
+        if value.key == "Title":
+            name = value.val
     date_recorded, date_released = None, None
     length_label, length_genre = None, None
     for key, value in dictionary.items():
-        if key == "Label": length_label = len(value.val) if type(value.val) == list else 1
-        if key == "Genre": length_genre = len(value.val) if type(value.val) == list else 1
+        if key == "Label":
+            length_label = len(value.val) if type(value.val) == list else 1
+        if key == "Genre":
+            length_genre = len(value.val) if type(value.val) == list else 1
         if value.tag == "DATE" and value.original and key == "Released":
             result["Released"] = []
             date_released = value.original
             # print("Date rules for released")
             if all(value.original):
                 # print("day based")
-                result["Released"] = result["Released"] + dayBased(value,name) #day based
+                result["Released"] = result["Released"] + \
+                    dayBased(value, name)  # day based
                 # print("odd/even based")
-                result["Released"] = result["Released"] + oddEvenBased(value, name) #odd even
+                result["Released"] = result["Released"] + \
+                    oddEvenBased(value, name)  # odd even
                 # print("week based")
-                result["Released"] = result["Released"] + weekBased(value, name) # week based
+                result["Released"] = result["Released"] + \
+                    weekBased(value, name)  # week based
             if value.original[2]:
                 # print("leap year")
-                result["Released"] = result["Released"] + leapYear(value, name) #leap year
+                result["Released"] = result["Released"] + \
+                    leapYear(value, name)  # leap year
                 # print("century")
-                result["Released"] = result["Released"] + centuryBased(value, name) #century based
+                result["Released"] = result["Released"] + \
+                    centuryBased(value, name)  # century based
             # print("datechange")
-            result["Released"] = result["Released"] + dateChange(value, name) #day month year interchange
+            result["Released"] = result["Released"] + \
+                dateChange(value, name)  # day month year interchange
             # print("order based")
-            result["Released"] = result["Released"] + orderBased(value.val, name, value.key.lower(), value.original, value.adverse) #orderbased
+            result["Released"] = result["Released"] + orderBased(
+                value.val, name, value.key.lower(), value.original, value.adverse)  # orderbased
         if value.tag == "DATE" and value.original and key == "Recorded":
             result["Recorded"] = []
-            # print("roder based recording started") 
-            result["Recorded"] = result["Recorded"] + orderBased(value.val, name, "recording started", value.original[0], value.adverse[0])
+            # print("roder based recording started")
+            result["Recorded"] = result["Recorded"] + orderBased(
+                value.val, name, "recording started", value.original[0], value.adverse[0])
             # print("roder based recording end")
-            result["Recorded"] = result["Recorded"] + orderBased(value.val, name, "recording ended", value.original[1], value.adverse[1])
+            result["Recorded"] = result["Recorded"] + orderBased(
+                value.val, name, "recording ended", value.original[1], value.adverse[1])
             # print("diff based")
-            result["Recorded"] = result["Recorded"] + diffBased(value.original[0], value.original[1], name, type_t = "single")
+            result["Recorded"] = result["Recorded"] + \
+                diffBased(
+                    value.original[0], value.original[1], name, type_t="single")
             date_recorded = value.original[1]
     # print("diff based multi")
-    result["Recorded","Released"] = []
-    result["Recorded","Released"] = result["Recorded","Released"] + diffBased(date_recorded, date_released, name, type_t = "multi")
+    result["Recorded", "Released"] = []
+    result["Recorded", "Released"] = result["Recorded", "Released"] + \
+        diffBased(date_recorded, date_released, name, type_t="multi")
     # print("multi label genre")
     # print (length_label, length_genre, name)
     if length_label and length_genre:
-        result["Label","Genre"] = []
-        result["Label","Genre"] = result["Label","Genre"] + multiRowLabelGenre(length_label, length_genre, name)
+        result["Label", "Genre"] = []
+        result["Label", "Genre"] = result["Label", "Genre"] + \
+            multiRowLabelGenre(length_label, length_genre, name)
     return result
-
-
-
 
 
 def diffBasedOutputGenerator(data, name, truth_val, param):
     result = []
-    if not data[0]: years_diff, months_diff = None, str(data[1])
-    else: years_diff, months_diff = str(data[0]), str(data[1])
+    if not data[0]:
+        years_diff, months_diff = None, str(data[1])
+    else:
+        years_diff, months_diff = str(data[0]), str(data[1])
     truth_val = str(truth_val)
     if param == 1:
         if not years_diff:
-            result.append("It took around" + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val)
+            result.append("It took around" + months_diff + " months " +
+                          " for the album " + name + " to record." + "\t" + truth_val)
         else:
-            result.append("It took around " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val)
-            
+            result.append("It took around " + years_diff + " years, " + months_diff +
+                          " months " + " for the album " + name + " to record." + "\t" + truth_val)
+
     elif param == 2:
         if not years_diff:
-            result.append("It took less than " + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val)
-        else: 
-            result.append("It took less than " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val)
+            result.append("It took less than " + months_diff + " months " +
+                          " for the album " + name + " to record." + "\t" + truth_val)
+        else:
+            result.append("It took less than " + years_diff + " years, " + months_diff +
+                          " months " + " for the album " + name + " to record." + "\t" + truth_val)
     if param == 3:
         if not years_diff:
-            result.append("It took more than " + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val) 
+            result.append("It took more than " + months_diff + " months " +
+                          " for the album " + name + " to record." + "\t" + truth_val)
         else:
-            result.append("It took more than " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to record." + "\t" + truth_val)
+            result.append("It took more than " + years_diff + " years, " + months_diff +
+                          " months " + " for the album " + name + " to record." + "\t" + truth_val)
     return result
-
-
-
 
 
 def diffBasedMultiOutputGenerator(data, name, truth_val, param):
     result = []
     # print(data)
-    if not data[0]: years_diff, months_diff = None, str(data[1])
-    else: years_diff, months_diff = str(data[0]), str(data[1])
+    if not data[0]:
+        years_diff, months_diff = None, str(data[1])
+    else:
+        years_diff, months_diff = str(data[0]), str(data[1])
     truth_val = str(truth_val)
     if param == 1:
         if not years_diff:
-            result.append("It took around " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
+            result.append("It took around " + months_diff + " months " + " for the album " +
+                          name + " to release after being recorded." + "\t" + truth_val)
         else:
-            result.append("It took around " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
+            result.append("It took around " + years_diff + " years, " + months_diff + " months " +
+                          " for the album " + name + " to release after being recorded." + "\t" + truth_val)
     elif param == 2:
         if not years_diff:
-            result.append("It took less than " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
-        else: 
-            result.append("It took less than " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
+            result.append("It took less than " + months_diff + " months " + " for the album " +
+                          name + " to release after being recorded." + "\t" + truth_val)
+        else:
+            result.append("It took less than " + years_diff + " years, " + months_diff + " months " +
+                          " for the album " + name + " to release after being recorded." + "\t" + truth_val)
     if param == 3:
         if not years_diff:
-            result.append("It took more than " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
+            result.append("It took more than " + months_diff + " months " + " for the album " +
+                          name + " to release after being recorded." + "\t" + truth_val)
         else:
-            result.append("It took more than " + years_diff + " years, " + months_diff + " months " + " for the album " + name + " to release after being recorded." + "\t" + truth_val)
-            
+            result.append("It took more than " + years_diff + " years, " + months_diff + " months " +
+                          " for the album " + name + " to release after being recorded." + "\t" + truth_val)
+
     return result
-
-
-
 
 
 def diffBased(date1, date2, name, type_t):
@@ -622,91 +705,145 @@ def diffBased(date1, date2, name, type_t):
     if type_t == "single":
         if years_diff == 0:
             result.append("The album was recorded within one year. \t True")
-            result.append("The album was recorded in more than one year. \t False")
-            result = result + diffBasedOutputGenerator([None, months_diff],name, True, 1)
+            result.append(
+                "The album was recorded in more than one year. \t False")
+            result = result + \
+                diffBasedOutputGenerator([None, months_diff], name, True, 1)
             fake_month_diff = generateRandom(1, 12)
             while fake_month_diff == months_diff:
                 fake_month_diff = generateRandom(1, 12)
-            result = result + diffBasedOutputGenerator([None, fake_month_diff],name, False, 1)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [None, fake_month_diff], name, False, 1)
             if months_diff > 2:
-                fake_val_before = generateRandom(1 , months_diff - 2)
-                result = result + diffBasedOutputGenerator([None, fake_val_before],name, False, 2)
-                result = result + diffBasedOutputGenerator([None, fake_val_before],name, True, 3)
+                fake_val_before = generateRandom(1, months_diff - 2)
+                result = result + \
+                    diffBasedOutputGenerator(
+                        [None, fake_val_before], name, False, 2)
+                result = result + \
+                    diffBasedOutputGenerator(
+                        [None, fake_val_before], name, True, 3)
             if months_diff < 10:
                 fake_val_after = generateRandom(months_diff + 2, 12)
-                result = result + diffBasedOutputGenerator([None, fake_val_after],name, True, 2)
-                result = result + diffBasedOutputGenerator([None, fake_val_after],name, False, 3)
-            
+                result = result + \
+                    diffBasedOutputGenerator(
+                        [None, fake_val_after], name, True, 2)
+                result = result + \
+                    diffBasedOutputGenerator(
+                        [None, fake_val_after], name, False, 3)
+
         else:
             result.append("The album was recorded within one year. \tFalse")
-            result.append("The album was recorded in more than one year. \tTrue")
+            result.append(
+                "The album was recorded in more than one year. \tTrue")
             fake_diff_year = generateRandom(1, years_diff + 5)
             while fake_diff_year == years_diff:
                 fake_diff_year = generateRandom(1, years_diff + 5)
             fake_month_diff = generateRandom(1, 12)
             while fake_month_diff == months_diff:
                 fake_month_diff = generateRandom(1, 12)
-            result = result + diffBasedOutputGenerator([years_diff, months_diff],name, True, 1)
-            result = result + diffBasedOutputGenerator([fake_diff_year, months_diff],name, False, 1)
-            result = result + diffBasedOutputGenerator([years_diff, fake_month_diff],name, False, 1)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [years_diff, months_diff], name, True, 1)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [fake_diff_year, months_diff], name, False, 1)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [years_diff, fake_month_diff], name, False, 1)
 
             actual_val = years_diff * 12 + months_diff
             fake_val_before = generateRandom(actual_val - 12, actual_val - 1)
             fake_val_after = generateRandom(actual_val + 1, actual_val + 12)
             fake_years_before, fake_months_before = fake_val_before // 12, fake_val_before % 12
             fake_years_after, fake_months_after = fake_val_after // 12, fake_val_after % 12
-            result = result + diffBasedOutputGenerator([fake_years_before, fake_months_before],name, False, 2)
-            result = result + diffBasedOutputGenerator([fake_years_before,fake_months_before ],name, True, 3)
-            result = result + diffBasedOutputGenerator([fake_years_after,fake_months_after],name, True, 2)
-            result = result + diffBasedOutputGenerator([fake_years_after,fake_months_after],name, False, 3)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [fake_years_before, fake_months_before], name, False, 2)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [fake_years_before, fake_months_before], name, True, 3)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [fake_years_after, fake_months_after], name, True, 2)
+            result = result + \
+                diffBasedOutputGenerator(
+                    [fake_years_after, fake_months_after], name, False, 3)
     else:
         if years_diff == 0:
-            result.append("The album was released within one year after it was recorded. \t True")
-            result.append("The album took more than one year to release after it was recorded. \t False")
-            result = result + diffBasedMultiOutputGenerator([None, months_diff],name, True, 1)
+            result.append(
+                "The album was released within one year after it was recorded. \t True")
+            result.append(
+                "The album took more than one year to release after it was recorded. \t False")
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [None, months_diff], name, True, 1)
             fake_month_diff = generateRandom(1, 12)
             while fake_month_diff == months_diff:
                 fake_month_diff = generateRandom(1, 12)
-            result = result + diffBasedMultiOutputGenerator([None, fake_month_diff],name, False, 1)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [None, fake_month_diff], name, False, 1)
             if months_diff > 2:
-                fake_val_before = generateRandom(1 , months_diff - 2)
-                result = result + diffBasedMultiOutputGenerator([None, fake_val_before],name, False, 2)
-                result = result + diffBasedMultiOutputGenerator([None, fake_val_before],name, True, 3)
+                fake_val_before = generateRandom(1, months_diff - 2)
+                result = result + \
+                    diffBasedMultiOutputGenerator(
+                        [None, fake_val_before], name, False, 2)
+                result = result + \
+                    diffBasedMultiOutputGenerator(
+                        [None, fake_val_before], name, True, 3)
             if months_diff < 10:
                 fake_val_after = generateRandom(months_diff + 2, 12)
-                result = result + diffBasedMultiOutputGenerator([None, fake_val_after],name, True, 2)
-                result = result + diffBasedMultiOutputGenerator([None, fake_val_after],name, False, 3)
+                result = result + \
+                    diffBasedMultiOutputGenerator(
+                        [None, fake_val_after], name, True, 2)
+                result = result + \
+                    diffBasedMultiOutputGenerator(
+                        [None, fake_val_after], name, False, 3)
         else:
-            result.append("The album took more than one year to release after it was recorded. \t True")
-            result.append("The album was recorded in more than one year. \tTrue")
+            result.append(
+                "The album took more than one year to release after it was recorded. \t True")
+            result.append(
+                "The album was recorded in more than one year. \tTrue")
             fake_diff_year = generateRandom(1, years_diff + 5)
             while fake_diff_year == years_diff:
                 fake_diff_year = generateRandom(1, years_diff + 5)
             fake_month_diff = generateRandom(1, 12)
             while fake_month_diff == months_diff:
                 fake_month_diff = generateRandom(1, 12)
-            result = result + diffBasedMultiOutputGenerator([years_diff, months_diff],name, True, 1)
-            result = result + diffBasedMultiOutputGenerator([fake_diff_year, months_diff],name, False, 1)
-            result = result + diffBasedMultiOutputGenerator([years_diff, fake_month_diff],name, False, 1)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [years_diff, months_diff], name, True, 1)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [fake_diff_year, months_diff], name, False, 1)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [years_diff, fake_month_diff], name, False, 1)
 
             actual_val = years_diff * 12 + months_diff
             fake_val_before = generateRandom(actual_val - 12, actual_val - 1)
             fake_val_after = generateRandom(actual_val + 1, actual_val + 12)
             fake_years_before, fake_months_before = fake_val_before // 12, fake_val_before % 12
             fake_years_after, fake_months_after = fake_val_after // 12, fake_val_after % 12
-            result = result + diffBasedMultiOutputGenerator([fake_years_before, fake_months_before],name, False, 2)
-            result = result + diffBasedMultiOutputGenerator([fake_years_before,fake_months_before ],name, True, 3)
-            result = result + diffBasedMultiOutputGenerator([fake_years_after,fake_months_after],name, True, 2)
-            result = result + diffBasedMultiOutputGenerator([fake_years_after,fake_months_after],name, False, 3)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [fake_years_before, fake_months_before], name, False, 2)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [fake_years_before, fake_months_before], name, True, 3)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [fake_years_after, fake_months_after], name, True, 2)
+            result = result + \
+                diffBasedMultiOutputGenerator(
+                    [fake_years_after, fake_months_after], name, False, 3)
     return result
-
-
-
 
 
 def generate_global_lists(dictionary, global_lists, global_info):
     for key, value in dictionary.items():
-        if global_lists.get(key): 
+        if global_lists.get(key):
             if type(value.val) == list:
                 global_info[key] = True
                 global_lists[key] = global_lists[key].union(set(value.val))
@@ -721,7 +858,6 @@ def generate_global_lists(dictionary, global_lists, global_info):
                 global_lists[key] = set([value.val])
 
 
-
 def generate_fake_lists(dictionary, fake_adverse_list, global_info):
     title = (dictionary["Tablename"].val).split("_")[-1]
     # print (title,dictionary["Tablename"].val)
@@ -731,7 +867,7 @@ def generate_fake_lists(dictionary, fake_adverse_list, global_info):
         fake_adverse_list[title] = {}
         current_dic = fake_adverse_list[title]
     for key, value in dictionary.items():
-        if current_dic.get(key): 
+        if current_dic.get(key):
             if type(value.val) == list:
                 global_info[key] = True
                 current_dic[key] = current_dic[key].union(set(value.val))
@@ -747,10 +883,6 @@ def generate_fake_lists(dictionary, fake_adverse_list, global_info):
     fake_adverse_list[title] = current_dic
 
 
-
-
-
-
 def table_generator(dictionary, global_lists, global_info, iteration):
     new_dict = {}
     for key, value in dictionary.items():
@@ -761,7 +893,7 @@ def table_generator(dictionary, global_lists, global_info, iteration):
         if type(value.val) == list:
             new_value_list = []
             for list_entry in value.val:
-                random_num = generateRandom(0,3)
+                random_num = generateRandom(0, 3)
 #                 print("Random value1: ", random_num, dictionary["Tablename"].val)
                 global_values = list(global_lists[key])
                 index_random = generateRandom(0, len(global_values)-1)
@@ -774,31 +906,31 @@ def table_generator(dictionary, global_lists, global_info, iteration):
 #                 print(key, "v:", value.val)
 #                 print("list:", global_values)
 #                 print("new:", new_value)
-                
+
                 # same val
                 if random_num == 0:
                     new_value_list.append(list_entry)
                 # substitute
                 elif random_num == 1:
                     new_value_list.append(new_value)
-                #addition
+                # addition
                 elif random_num == 2:
                     new_value_list.append(list_entry)
                     new_value_list.append(new_value)
-                #deletion   
-                
-            #empty list
+                # deletion
+
+            # empty list
             if not new_value_list:
                 new_value_list = value.val
-                    
+
             new_dict[key] = Value(key, list(set(new_value_list)))
         else:
             # if key_type == list
             #
             #
 
-            random_num = generateRandom(0,1)
-            #single value substitute
+            random_num = generateRandom(0, 1)
+            # single value substitute
             global_values = list(global_lists[key])
             index_random = generateRandom(0, len(global_values)-1)
             counter = 0
@@ -806,37 +938,36 @@ def table_generator(dictionary, global_lists, global_info, iteration):
                 index_random = generateRandom(0, len(global_values)-1)
                 counter += 1
             new_value = global_values[index_random]
-                
+
             if key == "Title":
-#                 if random_num == 0:
+                #                 if random_num == 0:
                 new_dict[key] = Value(key, value.val)
 #                 else:
 #                     new_dict[key] = Value(key, new_value)
             else:
                 new_dict[key] = Value(key, new_value)
-                
-                
+
+
 #         print("Old:", value.val)
 #         print("New:", new_dict[key].val)
-    
-    new_value = "F" + str(iteration+1) + "_"  +  (dictionary["Tablename"].val).split("_")[-1]
+
+    new_value = "F" + str(iteration+1) + "_" + \
+        (dictionary["Tablename"].val).split("_")[-1]
     new_dict["Tablename"] = Value(key, new_value)
-        
+
     return new_dict
-                    
-
-
-
 
 
 def producerOutputGenerator(number, data, name, truth_val, param):
     data, truth_val = str(data), str(truth_val)
     if not number:
-        return ["The album " + name + " was " + " produced by " + data +" . \t" + truth_val]
+        return ["The album " + name + " was " + " produced by " + data + " . \t" + truth_val]
     if number:
         if param == 1:
-            if data == "single": return ["The album " + name + " was produced by a " + data + " person.  \t" + truth_val]
-            else: return ["The album " + name + " was produced by " + data + " people.  \t" + truth_val]
+            if data == "single":
+                return ["The album " + name + " was produced by a " + data + " person.  \t" + truth_val]
+            else:
+                return ["The album " + name + " was produced by " + data + " people.  \t" + truth_val]
         if param == "less":
             return ["The album " + name + " was " + " produced by less than " + data + " person. \t" + truth_val]
         elif param == "more":
@@ -846,15 +977,16 @@ def producerOutputGenerator(number, data, name, truth_val, param):
         return ["The album " + name + " was " + " produced by " + data + " people.\t" + truth_val]
 
 
-
 def studioOutputGenerator(numbased, data, name, truth_val, param):
     data, truth_val = str(data), str(truth_val)
     if not numbased:
-        return ["The album " + name + " was recorded in " + data +" studio.  \t" + truth_val]
+        return ["The album " + name + " was recorded in " + data + " studio.  \t" + truth_val]
     else:
         if param == 1:
-            if data == "single": return ["The album " + name + " was recoreded in a " + data + " studio.  \t" + truth_val]
-            else: return ["The album " + name + " was recorded in " + data + " studios.  \t" + truth_val]
+            if data == "single":
+                return ["The album " + name + " was recoreded in a " + data + " studio.  \t" + truth_val]
+            else:
+                return ["The album " + name + " was recorded in " + data + " studios.  \t" + truth_val]
         if param == "less":
             return ["The album " + name + " was recorded in less than " + data + " studios. \t" + truth_val]
         elif param == "more":
@@ -864,17 +996,16 @@ def studioOutputGenerator(numbased, data, name, truth_val, param):
         return ["The album " + name + " was recorded in " + data + " studios.  \t" + truth_val]
 
 
-
-
-
 def genreOutputGenerator(numbased, data, name, truth_val, param):
     data, truth_val = str(data), str(truth_val)
     if not numbased:
-        return ["The album " + name + " has songs of " + data +" genre.  \t" + truth_val]
+        return ["The album " + name + " has songs of " + data + " genre.  \t" + truth_val]
     else:
         if param == 1:
-            if data == "single": return ["The album " + name + " has " + data + " genre.  \t" + truth_val]
-            else: return ["The album " + name + " has " + data + " genres.  \t" + truth_val]
+            if data == "single":
+                return ["The album " + name + " has " + data + " genre.  \t" + truth_val]
+            else:
+                return ["The album " + name + " has " + data + " genres.  \t" + truth_val]
         if param == "less":
             return ["The album " + name + " has less than " + data + " genres.  \t" + truth_val]
         elif param == "more":
@@ -884,17 +1015,16 @@ def genreOutputGenerator(numbased, data, name, truth_val, param):
         return ["The album " + name + " has " + data + " genres.  \t" + truth_val]
 
 
-
-
-
 def labelOutputGenerator(numbased, data, name, truth_val, param):
     data, truth_val = str(data), str(truth_val)
-    if not numbased:                                                                                                                    
-        return ["The album " + name + " is associated with the label " + data +".  \t" + truth_val]
+    if not numbased:
+        return ["The album " + name + " is associated with the label " + data + ".  \t" + truth_val]
     else:
         if param == 1:
-            if data == "single": return ["The album " + name + " is associated with a " + data + " label.  \t" + truth_val]
-            else: return ["The album " + name + " is associated with " + data + " labels.  \t" + truth_val]
+            if data == "single":
+                return ["The album " + name + " is associated with a " + data + " label.  \t" + truth_val]
+            else:
+                return ["The album " + name + " is associated with " + data + " labels.  \t" + truth_val]
         if param == "less":
             return ["The album " + name + " is associated with less than " + data + " labels.  \t" + truth_val]
         elif param == "more":
@@ -902,9 +1032,6 @@ def labelOutputGenerator(numbased, data, name, truth_val, param):
         elif data == "1":
             return ["The album " + name + " is associated with " + data + " label. \t" + truth_val]
         return ["The album " + name + " is associated with " + data + " labels. \t" + truth_val]
-
-
-
 
 
 def call_generator(function_name, arg1, arg2, arg3, arg4, arg5):
@@ -916,9 +1043,6 @@ def call_generator(function_name, arg1, arg2, arg3, arg4, arg5):
     }[function_name]()
 
 
-
-
-
 def number_based_multiple(v, name, type_cat):
     result = []
     if type(v.val) == list:
@@ -926,54 +1050,60 @@ def number_based_multiple(v, name, type_cat):
     else:
         true_num = 1
     fake_num = generateRandom(true_num + 1, true_num + 5)
-    result = result + call_generator(type_cat, True, fake_num, name, False, None)
-    result = result + call_generator(type_cat, True, true_num, name, True, None)
+    result = result + \
+        call_generator(type_cat, True, fake_num, name, False, None)
+    result = result + \
+        call_generator(type_cat, True, true_num, name, True, None)
     less_num = None
-    
+
     if true_num == 1:
-        result = result + call_generator(type_cat, True, "single", name, True, 1)
-        result = result + call_generator(type_cat, True, "multiple", name, False, 1)                                                       
+        result = result + \
+            call_generator(type_cat, True, "single", name, True, 1)
+        result = result + \
+            call_generator(type_cat, True, "multiple", name, False, 1)
     else:
-        result = result + call_generator(type_cat, True, "multiple", name, True, 1)
-        result = result + call_generator(type_cat, True, "single", name, False, 1)
-    
+        result = result + \
+            call_generator(type_cat, True, "multiple", name, True, 1)
+        result = result + \
+            call_generator(type_cat, True, "single", name, False, 1)
+
     if true_num > 1:
         less_num = generateRandom(1, true_num-1)
     greater_num = generateRandom(true_num + 1, true_num + 10)
-    
-    #less than
+
+    # less than
     if less_num:
-        result = result + call_generator(type_cat, True, less_num, name, False, "less")
-    result = result + call_generator(type_cat, True, greater_num, name, True, "less")
-    
-    #more than
-    if less_num: 
-        result = result + call_generator(type_cat, True, greater_num, name, False, "more")
-    result = result + call_generator(type_cat, True, less_num, name, True, "more")
+        result = result + \
+            call_generator(type_cat, True, less_num, name, False, "less")
+    result = result + \
+        call_generator(type_cat, True, greater_num, name, True, "less")
+
+    # more than
+    if less_num:
+        result = result + \
+            call_generator(type_cat, True, greater_num, name, False, "more")
+    result = result + \
+        call_generator(type_cat, True, less_num, name, True, "more")
     return result
-
-
-
 
 
 def nameswap_multiple(global_list, v, name, type_cat):
     result = []
     true_list = v.val
-    if type(true_list) == list and len(true_list)>1:
+    if type(true_list) == list and len(true_list) > 1:
         true_val = true_list[generateRandom(0, len(true_list)-1)]
-    else: true_val = v.val
-    index = generateRandom(0,len(global_list)-1)
+    else:
+        true_val = v.val
+    index = generateRandom(0, len(global_list)-1)
     if (set(true_list) != set(global_list)):
         while global_list[index] in true_list:
-            index = generateRandom(0,len(global_list)-1)
+            index = generateRandom(0, len(global_list)-1)
         fake_val = global_list[index]
-        result = result + call_generator(type_cat, False, fake_val, name, False, None)
-    result = result + call_generator(type_cat, False, true_val, name, True, None)       
+        result = result + \
+            call_generator(type_cat, False, fake_val, name, False, None)
+    result = result + \
+        call_generator(type_cat, False, true_val, name, True, None)
     return result
-    
-
-
-
 
 
 def commonRules(dictionary, global_lists, num):
@@ -986,105 +1116,104 @@ def commonRules(dictionary, global_lists, num):
     result, key = [], rulesMap[num]
 
     for k, v in dictionary.items():
-        if k == "Title": name = v.val            
+        if k == "Title":
+            name = v.val
     for k, v in dictionary.items():
         if k == key:
             global_list = list(global_lists[key])
-            #number based
+            # number based
             # print("number_based_multiple")
             result = result + number_based_multiple(v, name, rulesMap[num])
-            #accross table substitutiontab
+            # accross table substitutiontab
             # print("nameswap_multiple")
-            result = result + nameswap_multiple(global_list, v, name, rulesMap[num])
+            result = result + \
+                nameswap_multiple(global_list, v, name, rulesMap[num])
     return result
-
-
-
 
 
 def lengthOutputGenerator(type_cat, data, truth_val, param, name):
     truth_val = str(truth_val)
     if type_cat == 1:
-        if not param: 
-            hours, mins = str(data[0]), str(data[1]) 
-            return ("The album " + name + " is " + hours + " hours " + mins + " minutes long." + "\t" +truth_val)
+        if not param:
+            hours, mins = str(data[0]), str(data[1])
+            return ("The album " + name + " is " + hours + " hours " + mins + " minutes long." + "\t" + truth_val)
         elif param == "more":
-            hours= str(data[0])
-            return ("The album " + name + " is longer than " + hours + " hours." + "\t" +truth_val)
+            hours = str(data[0])
+            return ("The album " + name + " is longer than " + hours + " hours." + "\t" + truth_val)
         elif param == "less":
-            hours= str(data[0])
-            return ("The album " + name + " is shorter than " + hours + " hours." + "\t" +truth_val)
-            
-
-
-
+            hours = str(data[0])
+            return ("The album " + name + " is shorter than " + hours + " hours." + "\t" + truth_val)
 
 
 def hoursBased(v, name):
     result = []
-    if type(v.val) is list: return []
+    if type(v.val) is list:
+        return []
     hours, mins = v.val.split(":")[0], v.val.split(":")[1]
     if len(hours) == 2 and len(mins) == 2:
         hours, mins = int(hours), int(mins)
-    else: return []
+    else:
+        return []
     if hours < 60:
-        result.append(lengthOutputGenerator(1, [1],True, "less", name))
-        result.append(lengthOutputGenerator(1, [1],False, "more", name))
+        result.append(lengthOutputGenerator(1, [1], True, "less", name))
+        result.append(lengthOutputGenerator(1, [1], False, "more", name))
         return result
     hours_new = hours // 60
     mins_rem = hours % 60
-    
+
     hours_new_fake = generateRandom(hours_new+1, hours_new+4)
     mins_new = mins + mins_rem
-    result.append(lengthOutputGenerator(1, [hours_new_fake, mins_new],False, None, name))
+    result.append(lengthOutputGenerator(
+        1, [hours_new_fake, mins_new], False, None, name))
     if mins_new != 1:
         mins_new_fake = generateRandom(1, mins_new-1)
-        result.append(lengthOutputGenerator(1, [hours_new, mins_new_fake],False, None, name))
-        result.append(lengthOutputGenerator(1, [hours_new_fake, mins_new_fake],False, None, name))
-    
-    result.append(lengthOutputGenerator(1, [hours_new, mins_new],True, None, name))
-    
+        result.append(lengthOutputGenerator(
+            1, [hours_new, mins_new_fake], False, None, name))
+        result.append(lengthOutputGenerator(
+            1, [hours_new_fake, mins_new_fake], False, None, name))
+
+    result.append(lengthOutputGenerator(
+        1, [hours_new, mins_new], True, None, name))
+
     less_hours = None
     if hours_new > 1:
         less_hours = generateRandom(1, hours_new-1)
     greater_hours = generateRandom(hours_new + 1, hours_new + 5)
-    
-    # more than less True, 
-    if less_hours: result.append(lengthOutputGenerator(1, [less_hours],True, "more", name))
-    #more than greater False
-    result.append(lengthOutputGenerator(1, [greater_hours],False, "more", name))
-    #less than less False
-    if less_hours: result.append(lengthOutputGenerator(1, [less_hours],False, "less", name))
-    #less than greater True
-    result.append(lengthOutputGenerator(1, [greater_hours],True, "less", name))
+
+    # more than less True,
+    if less_hours:
+        result.append(lengthOutputGenerator(
+            1, [less_hours], True, "more", name))
+    # more than greater False
+    result.append(lengthOutputGenerator(
+        1, [greater_hours], False, "more", name))
+    # less than less False
+    if less_hours:
+        result.append(lengthOutputGenerator(
+            1, [less_hours], False, "less", name))
+    # less than greater True
+    result.append(lengthOutputGenerator(
+        1, [greater_hours], True, "less", name))
     return result
-        
-
-     
-
-
-
 
 
 def lengthRules(dictionary):
     result = []
     key = "Length"
     for k, v in dictionary.items():
-        if k == "Title": name = v.val            
+        if k == "Title":
+            name = v.val
     for k, v in dictionary.items():
         if k == key:
             result = result + hoursBased(v, name)
     return result
-    
-
-
-
 
 
 def preprocesStudio(dictionary, global_lists):
     result = []
     for key, value in dictionary.items():
-        if value.key == "Title": name = value.val
+        if value.key == "Title":
+            name = value.val
     new_location = []
     for k, v in dictionary.items():
         if k == "Studio":
@@ -1092,7 +1221,7 @@ def preprocesStudio(dictionary, global_lists):
                 origloc = loc
                 loc = loc[loc.find("(")+1:loc.find(")")]
                 try:
-                    new_location += [origloc + " (" + location.address +") "]
+                    new_location += [origloc + " (" + location.address + ") "]
                 except:
                     new_location += [origloc]
             dictionary["Studio"] = Value("Studio", new_location)
@@ -1104,34 +1233,36 @@ def constriants(dictionary):
     recorded_date_end = recorded_date[1]
     recorded_date_start = recorded_date[0]
     released_date = dictionary["Released"].val
-    Dates = [recorded_date_start,recorded_date_end,released_date]
+    Dates = [recorded_date_start, recorded_date_end, released_date]
     d1, m1, y1 = getDate(recorded_date_start)
     d2, m2, y2 = getDate(recorded_date_end)
     d3, m3, y3 = getDate(released_date)
-    date1 = int(y1 + m1 +d1)
-    date2 = int(y2 +m2+d2)
+    date1 = int(y1 + m1 + d1)
+    date2 = int(y2 + m2+d2)
     date3 = int(y3+m3+d3)
-    dates  = [date1,date2,date3]
+    dates = [date1, date2, date3]
     sorted_index = np.argsort(dates)
     dictionary["Released"].val = Dates[sorted_index[2]]
-    dictionary["Recorded"].val = Dates[sorted_index[0]] +" - "+ Dates[sorted_index[1]]
+    dictionary["Recorded"].val = Dates[sorted_index[0]] + \
+        " - " + Dates[sorted_index[1]]
     return dictionary
 
 
 def splitDateRange(dictionary):
-    for k, v  in dictionary.items():
-        if k == "Released": v.tag = "DATE"
-        if k == "Length": v.tag = "CARDINAL"
-        if k == "Producer": v.tag = "PERSON"
-        if k == "Label": v.tag = None
-        if k == "Genre": v.tag = None
+    for k, v in dictionary.items():
+        if k == "Released":
+            v.tag = "DATE"
+        if k == "Length":
+            v.tag = "CARDINAL"
+        if k == "Producer":
+            v.tag = "PERSON"
+        if k == "Label":
+            v.tag = None
+        if k == "Genre":
+            v.tag = None
         if "-" in v.val and k == "Recorded":
             v.val = [x.strip() for x in v.val.split("-")]
             v.tag = "DATE"
-            
-
-
-
 
 
 def dateDiff(date1, date2):
@@ -1139,44 +1270,45 @@ def dateDiff(date1, date2):
     month1, month2 = int(date1[1]), int(date2[1])
     day1, day2 = int(date1[0]), int(date2[0])
     diff = [day2-day1, month2-month1, year2-year1]
-    
+
     year_diff = diff[2] * 12
     difference_months = year_diff + diff[1]
-    
+
     year_diff = difference_months // 12
     difference_months = difference_months % 12
-    
+
     if diff[0] < -15:
         difference_months -= 1
     elif diff[0] > 15:
         difference_months += 1
-    
+
     return year_diff, difference_months
-    
-    
-
-
-
 
 
 def multiRowLabelGenre(length_label, length_genre, name):
     result = []
-    greater_val, same, less_val =  None, False, None 
+    greater_val, same, less_val = None, False, None
     if length_label > length_genre:
         greater_val, less_val = "labels", "genres"
-        result.append("The album " + name + " is associated with more labels than it has genres. \t True")
-        result.append("The album " + name + " is associated with less labels than it has genres. \t False")
+        result.append("The album " + name +
+                      " is associated with more labels than it has genres. \t True")
+        result.append("The album " + name +
+                      " is associated with less labels than it has genres. \t False")
     elif length_label == length_genre:
         same = True
-        result.append("The album " + name + " is associated with the same number of labels as it has genres. \t True")
-        result.append("The album " + name + " is associated with the same number of labels as it has genres. \t False")
+        result.append("The album " + name +
+                      " is associated with the same number of labels as it has genres. \t True")
+        result.append("The album " + name +
+                      " is associated with the same number of labels as it has genres. \t False")
 #         result.append("The album " + name + " has same genres as the number of labels it is associated with. \t True")
 #   result.append("The album " + name + " has same genres as the number of labels it is associated with. \t False")
     else:
         greater_val, less_val = "genres", "labels"
-        result.append("The album " + name + " is associated with less labels than it has genres. \t True")
-        result.append("The album " + name + " is associated with more labels than it has genres. \t False")
-    
+        result.append("The album " + name +
+                      " is associated with less labels than it has genres. \t True")
+        result.append("The album " + name +
+                      " is associated with more labels than it has genres. \t False")
+
     if not same:
         diff = abs(length_label - length_genre)
         fake_diff = generateRandom(diff + 1, diff + 4)
@@ -1185,22 +1317,30 @@ def multiRowLabelGenre(length_label, length_genre, name):
             fake_diff = generateRandom(diff + 1, diff + 4)
         # print ("out of while fake diff :",fake_diff)
         if greater_val == "genres":
-            result.append("The album " + name + " has " + str(diff) + " more genres than the labels it is assocatied with. \t True")
-            result.append("The album " + name + " has " + str(fake_diff) + " more genres than the labels it is assocatied with. \t False")
+            result.append("The album " + name + " has " + str(diff) +
+                          " more genres than the labels it is assocatied with. \t True")
+            result.append("The album " + name + " has " + str(fake_diff) +
+                          " more genres than the labels it is assocatied with. \t False")
         else:
-            result.append("The album " + name + " is associated with " + str(diff) + " more labels than the genres it has. \t True")
-            result.append("The album " + name + " is associated with " + str(fake_diff) + " more labels than the genres it has. \t False")
+            result.append("The album " + name + " is associated with " +
+                          str(diff) + " more labels than the genres it has. \t True")
+            result.append("The album " + name + " is associated with " +
+                          str(fake_diff) + " more labels than the genres it has. \t False")
         fake_diff_after = str(generateRandom(diff + 1, diff + 4))
-        result.append("The difference between the labels associated with the album " + name + " and the genres it has is more than " + fake_diff_after + ". \t False")
-        result.append("The difference between the labels associated with the album " + name + " and the genres it has is less than " + fake_diff_after + ". \t True")
-        if diff > 2: 
+        result.append("The difference between the labels associated with the album " +
+                      name + " and the genres it has is more than " + fake_diff_after + ". \t False")
+        result.append("The difference between the labels associated with the album " +
+                      name + " and the genres it has is less than " + fake_diff_after + ". \t True")
+        if diff > 2:
             fake_diff_before = str(generateRandom(diff - 2, diff - 1))
-            result.append("The difference between the labels associated with the album " + name + " and the genres it has is more than " + fake_diff_before + ". \t True")
-            result.append("The difference between the labels associated with the album " + name + " and the genres it has is less than " + fake_diff_before + ". \t False")
+            result.append("The difference between the labels associated with the album " +
+                          name + " and the genres it has is more than " + fake_diff_before + ". \t True")
+            result.append("The difference between the labels associated with the album " +
+                          name + " and the genres it has is less than " + fake_diff_before + ". \t False")
     # print(result)
     return result
-    
-    
+
+
 def get_json(dictionary):
     '''
 The album "_name" was released on _v1. The album "_name" was recorded from _v21-_v22. It was recorded in the studios _v31, _v32. It has the genres _v41, _v42. The album has length _v5. It is associated with label _v6. _v71, _v72 produced this album.
@@ -1211,11 +1351,13 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
     if dictionary.get("Released"):
         v = dictionary.get("Released").val
         result["Released"] = []
-        result["Released"].append("The album " + album + " was released on " + v)
+        result["Released"].append(
+            "The album " + album + " was released on " + v)
     if dictionary.get("Recorded"):
         v = dictionary.get("Recorded").val
         result["Recorded"] = []
-        result["Recorded"].append("The album " + album + " was recorded from " + v[0] + " to " + v[1])
+        result["Recorded"].append(
+            "The album " + album + " was recorded from " + v[0] + " to " + v[1])
     if dictionary.get("Studio"):
         v = dictionary.get("Studio").val
         result["Studio"] = []
@@ -1241,7 +1383,8 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
         result["Label"] = []
         if type(v) == list:
             labels = ", ".join(x for x in v)
-            result["Label"].append("It is associated with the labels " + labels)
+            result["Label"].append(
+                "It is associated with the labels " + labels)
         else:
             result["Label"].append("It is associated with the label " + v)
     if dictionary.get("Producer"):
@@ -1261,7 +1404,7 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 # # for i in range(0, 5):
 # #     tableFileName = table_list[i] + ".html"
 # #     dictionary = parseFile(tableFileName, "modifiedTable")
-# #     dictionary = reformDict(dictionary) 
+# #     dictionary = reformDict(dictionary)
 # #     dictionary["Tablename"].val = "T"+"0"+"_"+dictionary["Tablename"].val
 # #     tables_list.append(dictionary)
 # #     generate_global_lists(dictionary, global_lists, global_info)
@@ -1317,15 +1460,15 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 # for i in range(0, len(new_dicts)):
 # #     print("------------------ " + str(i) + "---------------------")
 #     splitDateRange(new_dicts[i])
-#     preprocessDate(new_dicts[i])  
-    
+#     preprocessDate(new_dicts[i])
+
 # # for i in range(0, len(new_dicts)):
 # #     dictionary = new_dicts[i]
 # #     for key, value in dictionary.items():
 # #         print( str(key) + ":" +  str(value.val) + str(value.tag) + "\n" )
 # # rules on all tables
 # serial_ctr = 1
-# for i in range(0, len(new_dicts)):    
+# for i in range(0, len(new_dicts)):
 #     dictionary = new_dicts[i]
 #     final_result = []
 #     for key, value in dictionary.items():
@@ -1340,7 +1483,7 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 #     json_table = get_json(dictionary)
 #     #length rules
 #     print ("length_rules")
-#     final_result = final_result + lengthRules(dictionary) 
+#     final_result = final_result + lengthRules(dictionary)
 #     #date rules
 #     print ("dates_rules")
 #     final_result = final_result + dateRules(dictionary)
@@ -1371,8 +1514,6 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 #             serial_ctr  += 1
 
 
-
-
 # #Read category File
 # filename = 'wikipediaTableCategories.tsv'
 # df = readInputFile(filename)
@@ -1383,7 +1524,7 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 # #Get tables for that category
 # albumTables = getCategoryTables(df, category)
 # # print(albumTables)
-# #Generalise later 
+# #Generalise later
 # # print(len(albumTables))
 # tables_list = []
 # global_lists, global_info = {}, {}
@@ -1391,13 +1532,13 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 #     tableFileName = albumTables[i] + ".html"
 #     dictionary = parseFile(tableFileName, "tables")
 #     dictionary = reformDict(dictionary)
-#     preprocessDate(dictionary)    
+#     preprocessDate(dictionary)
 #     tables_list.append(dictionary)
 # #     generate_global_lists(dictionary, global_lists, global_info)
 
 # # for k, v in global_lists.items():
 # #     print(k,"v:",v)
-    
+
 # # for i in range(0, 1):
 # #     dictionary = tables_list[i]
 # #     print(" ----- original ----------")
@@ -1408,20 +1549,19 @@ The album "_name" was released on _v1. The album "_name" was recorded from _v21-
 # #         print(" ----- new ----------")
 # #         for key, value in new_dict.items():
 # #             print(key, "Value:", value.val)
- 
-# print(len(albumTables))    
+
+# print(len(albumTables))
 # for i in range(0, len(albumTables)):
-    
+
 #     dictionary = tables_list[i]
 #     final_result = []
 #     outputFile.write("-------------------------- " + dictionary["Tablename"].val + "--------------------------\n")
 #     final_result = final_result + lengthRules(dictionary)
 # #     final_result = final_result + dateRules(dictionary)
-    
+
 # #     for i in range(1,5):
 # #         final_result = final_result + commonRules(dictionary, global_lists, i)
-    
+
 #     if final_result:
 #         for statement in final_result:
 #             outputFile.write(statement + "\n")
-                

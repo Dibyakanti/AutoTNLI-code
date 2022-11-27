@@ -1116,7 +1116,7 @@ def MetroSent(table,t_name,F,it,tval=True,premise=False):
                 premises["Population"].append(val+" is the population of the metro region of "+Nm)
                 premises["Population"].append("The metro region has "+val+" population")
                 
-        if(count(premises.keys()) == 2):
+        if(len(premises.keys()) == 2):
             for area_sent in premises["Area"]:
                 sentences.append( area_sent+random.sample(premises["Population"],1)[0])
         else:
@@ -1180,7 +1180,7 @@ def UrbanSent(table,t_name,F,it,tval=True,premise=False):
                 premises["Population"].append(val+" is the population of the urban region of "+Nm)
                 premises["Population"].append("The urban region has "+val+" population")
                 
-        if(count(premises.keys()) == 2):
+        if(len(premises.keys()) == 2):
             for area_sent in premises["Area"]:
                 sentences.append( area_sent+random.sample(premises["Population"],1)[0])
         else:
@@ -1249,7 +1249,7 @@ def CitySent(table,t_name,F,it,tval=True,premise=False):
                 premises["Population"].append(val+" is the population of "+Nm)
                 premises["Population"].append(Nm+" has "+val+" population")
                 
-        if(count(premises.keys()) == 2):
+        if(len(premises.keys()) == 2):
             for area_sent in premises["Area"]:
                 sentences.append( area_sent+random.sample(premises["Population"],1)[0])
         else:
