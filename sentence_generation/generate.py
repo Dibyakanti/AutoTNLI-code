@@ -35,7 +35,6 @@ if './' not in sys.path:
 def config(parser):
     parser.add_argument('--interval',  default=1000, type=int)
     parser.add_argument('--category', default="Person", type=str)
-#     parser.add_argument('--category_list', default=["Person","Album"],  action='store', type=str, nargs='*')
     return parser
 
 
@@ -138,6 +137,6 @@ if __name__ == "__main__":
                     print("{} : {}".format(j, (time.time()-start)/60))
         df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                            "label": label, "key & premises_used": premises_used, "json_name": json_name})
-        df.to_csv("/content/drive/MyDrive/psn/"+i.split("_")
+        df.to_csv("../autotnli_data"+i.split("_")
                   [0].lower()+"_T0_"+str(int(tag/interval))+".tsv", sep="\t")
         del df

@@ -35,6 +35,7 @@ if './' not in sys.path:
 def config(parser):
     parser.add_argument('--interval',  default=1000, type=int)
     parser.add_argument('--category', default="Person", type=str)
+    parser.add_argument('--store_json', default=False, type=bool)
 #     parser.add_argument('--category_list', default=["Person","Album"],  action='store', type=str, nargs='*')
     return parser
 
@@ -67,40 +68,41 @@ if __name__ == "__main__":
                 start = time.time()
 
                 # save as json
-                json_file = {}
-                json_file["title"] = N[T[j]]
-                for kjson in set(Extracted_Data.keys()):
-                    if (kjson == "BDA"):
-                        to_be_json = []
-                        df = Extracted_Data["BDA"][0]
-                        dct = Extracted_Data["BDA"][1]
-                        to_be_json.append(
-                            str(df["Born_D"][j])+" "+df["Born_M"][j]+","+str(df["Born_Y"][j]))
-                        if (dct[T[j]][0] != None):
-                            to_be_json.append(",".join(dct[T[j]][::-1]))
-                        json_file["Born"] = [",".join(to_be_json)]
-                        if (df.isna().Died_Y[j] == False):
+                if(args['store_json']==True):
+                    json_file = {}
+                    json_file["title"] = N[T[j]]
+                    for kjson in set(Extracted_Data.keys()):
+                        if (kjson == "BDA"):
                             to_be_json = []
-                            dct = Extracted_Data["BDA"][2]
+                            df = Extracted_Data["BDA"][0]
+                            dct = Extracted_Data["BDA"][1]
                             to_be_json.append(
-                                str(df["Died_D"][j])+" "+df["Died_M"][j]+","+str(df["Died_Y"][j]))
+                                str(df["Born_D"][j])+" "+df["Born_M"][j]+","+str(df["Born_Y"][j]))
                             if (dct[T[j]][0] != None):
                                 to_be_json.append(",".join(dct[T[j]][::-1]))
-                            json_file["Died"] = [",".join(to_be_json)]
-                        if (df.isna().Age[j] == False):
-                            json_file["Age"] = [df.Age[j]]
-                    else:
-                        to_be_json = []
-                        for parser in Extracted_Data[kjson]:
-                            if (type(parser) == dict and parser[T[j]][0] != None):
-                                for temp_parser in parser[T[j]]:
-                                    if (len(str(temp_parser)) > 3 or type(temp_parser) == int):
-                                        to_be_json.append(str(temp_parser))
-                        if (len(to_be_json) > 0):
-                            json_file[kjson.replace("_", " ")] = [
-                                ', '.join(to_be_json)]
-                with open("/content/drive/MyDrive/Auto-TNLI/json/"+T[j]+fake_n+".json", "w") as fp:
-                    json.dump(json_file, fp)
+                            json_file["Born"] = [",".join(to_be_json)]
+                            if (df.isna().Died_Y[j] == False):
+                                to_be_json = []
+                                dct = Extracted_Data["BDA"][2]
+                                to_be_json.append(
+                                    str(df["Died_D"][j])+" "+df["Died_M"][j]+","+str(df["Died_Y"][j]))
+                                if (dct[T[j]][0] != None):
+                                    to_be_json.append(",".join(dct[T[j]][::-1]))
+                                json_file["Died"] = [",".join(to_be_json)]
+                            if (df.isna().Age[j] == False):
+                                json_file["Age"] = [df.Age[j]]
+                        else:
+                            to_be_json = []
+                            for parser in Extracted_Data[kjson]:
+                                if (type(parser) == dict and parser[T[j]][0] != None):
+                                    for temp_parser in parser[T[j]]:
+                                        if (len(str(temp_parser)) > 3 or type(temp_parser) == int):
+                                            to_be_json.append(str(temp_parser))
+                            if (len(to_be_json) > 0):
+                                json_file[kjson.replace("_", " ")] = [
+                                    ', '.join(to_be_json)]
+                    with open("../autotnli_data/json/"+T[j]+fake_n+".json", "w") as fp:
+                        json.dump(json_file, fp)
 
                 premise = []
                 count = 0  # count the number of premises to be generated
@@ -177,6 +179,6 @@ if __name__ == "__main__":
                     print("{} : {}".format(j, (time.time()-start)/60))
         df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                            "label": label, "key & premises_used": premises_used, "json_name": json_name})
-        df.to_csv("/content/drive/MyDrive/psn/"+i.split("_")
+        df.to_csv("../autotnli_data"+i.split("_")
                   [0].lower()+fake_n+"_"+str(int(tag/interval))+".tsv", sep="\t")
         del df
