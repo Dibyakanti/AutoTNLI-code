@@ -48,7 +48,7 @@ if __name__ == "__main__":
     interval = int(args['interval'])
     p = ThreadPool()
 
-    for tag in np.arange(0, 200, interval):
+    for tag in np.arange(0, category_table_count[str(args['category'])], interval):
         fake_n = "_CF"
         premises = []
         hypothesis = []
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
             for j in range(tag, min(tag+interval, category_table_count[i])):
                 start = time.time()
-                
+
                 # save as json
                 json_file = {}
                 json_file["title"] = N[T[j]]
@@ -99,10 +99,7 @@ if __name__ == "__main__":
                         if (len(to_be_json) > 0):
                             json_file[kjson.replace("_", " ")] = [
                                 ', '.join(to_be_json)]
-                    # if(Extracted_Data[kjson][1][T[j]][0] != None):
-                    #   json_file[kjson.replace("_"," ")] = Extracted_Data[kjson][1][T[j]]
                 with open("/content/drive/MyDrive/Auto-TNLI/json/"+T[j]+fake_n+".json", "w") as fp:
-                    # with open(T[j]+fake_n+".json","w") as fp:
                     json.dump(json_file, fp)
 
                 premise = []
@@ -179,7 +176,7 @@ if __name__ == "__main__":
                 if (j % 10):
                     print("{} : {}".format(j, (time.time()-start)/60))
         df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
-                        "label": label, "key & premises_used": premises_used, "json_name": json_name})
+                           "label": label, "key & premises_used": premises_used, "json_name": json_name})
         df.to_csv("/content/drive/MyDrive/psn/"+i.split("_")
-                [0].lower()+fake_n+"_"+str(int(tag/interval))+".tsv", sep="\t")
+                  [0].lower()+fake_n+"_"+str(int(tag/interval))+".tsv", sep="\t")
         del df
