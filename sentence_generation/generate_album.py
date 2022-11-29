@@ -33,6 +33,7 @@ if './' not in sys.path:
 
 
 def config(parser):
+    parser.add_argument('--category', default="Album", type=str)
     parser.add_argument('--store_json', default=False, type=bool)
     return parser
 
@@ -50,7 +51,6 @@ if __name__ == "__main__":
         table_list.append("T"+str(i))
     tables_list = []
     global_lists, global_info, fake_adverse_list = {}, {}, {}
-    outputFile = open('results_onefake.txt', "w+")
 
     fp = open("../wiki_data/all_jsons.json", "r")
     all_jsons = json.load(fp)
@@ -93,7 +93,6 @@ if __name__ == "__main__":
     for i in range(0, len(new_dicts)):
         splitDateRange(new_dicts[i])
         preprocessDate(new_dicts[i])
-
 
     table = []
     premises = []
@@ -165,7 +164,7 @@ if __name__ == "__main__":
                 table_name_entry = dictionary["Tablename"].val
                 table_names_list = table_name_entry.split("_")
                 table.append(table_names_list[0])
-                # create premises    import time
+                # create premises
 
                 json_name.append(table_names_list[1])
                 json_sent = []
@@ -196,7 +195,7 @@ if __name__ == "__main__":
     df.to_csv("../autotnli_data/Album"+".csv", sep="\t")
 
     # get all json in a folder
-    if(args['store_json']==True):
+    if (args['store_json'] == True):
         for i in range(len(new_dicts)):
             single_table = new_dicts[i]
             for key in single_table:

@@ -10,7 +10,8 @@ import json
 import multiprocessing
 from multiprocessing.pool import ThreadPool
 import argparse
-
+if './' not in sys.path:
+    sys.path.append('./')
 from Album import *
 import Person
 import Movie
@@ -28,13 +29,12 @@ from util import _append
 # !pip install dateparser
 # !pip install pendulum
 
-if './' not in sys.path:
-    sys.path.append('./')
-
 
 def config(parser):
     parser.add_argument('--interval',  default=1000, type=int)
-    parser.add_argument('--category', default="Person", type=str)
+    # parser.add_argument('--category', default="Person", type=str)
+    parser.add_argument('--category_list', default=["Book", "City", "Festival", "FoodnDrinks", "Movie",
+                        "Organization", "Paint", "Person", "SportsnEvents", "University"],  action='store', type=str, nargs='*')
     return parser
 
 
@@ -46,23 +46,24 @@ if __name__ == "__main__":
 
     interval = int(args['interval'])
     p = ThreadPool()
-    for tag in np.arange(0, category_table_count[str(args['category'])], interval):
-        premises = []
-        hypothesis = []
-        label = []
-        json_name = []
-        table = []
-        premises_used = []
 
-        for i in [args['category']]:
-            N, T = getattr(eval(i), "get_Table_Title")()
+    for i in args['category_list']:
 
-            # getting all the extracted data at once in a dictionary
-            Extracted_Data = getattr(eval(i), "get_Data")()
+        N, T = getattr(eval(i), "get_Table_Title")()
+        # getting all the extracted data at once in a dictionary
+        Extracted_Data = getattr(eval(i), "get_Data")()
+
+        for tag in np.arange(0, category_table_count[i], interval):
+            premises = []
+            hypothesis = []
+            label = []
+            json_name = []
+            table = []
+            premises_used = []
 
             for j in range(tag, min(tag+interval, category_table_count[i])):
                 start = time.time()
-                
+
                 premise = []
                 count = 0  # keep count of the number of premises to be generated
                 key_premises = {}

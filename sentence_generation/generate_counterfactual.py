@@ -34,9 +34,10 @@ if './' not in sys.path:
 
 def config(parser):
     parser.add_argument('--interval',  default=1000, type=int)
-    parser.add_argument('--category', default="Person", type=str)
+    # parser.add_argument('--category', default="Person", type=str)
     parser.add_argument('--store_json', default=False, type=bool)
-#     parser.add_argument('--category_list', default=["Person","Album"],  action='store', type=str, nargs='*')
+    parser.add_argument('--category_list', default=["Book", "City", "Festival", "FoodnDrinks", "Movie",
+                        "Organization", "Paint", "Person", "SportsnEvents", "University"],  action='store', type=str, nargs='*')
     return parser
 
 
@@ -49,26 +50,26 @@ if __name__ == "__main__":
     interval = int(args['interval'])
     p = ThreadPool()
 
-    for tag in np.arange(0, category_table_count[str(args['category'])], interval):
-        fake_n = "_CF"
-        premises = []
-        hypothesis = []
-        label = []
-        json_name = []
-        table = []
-        premises_used = []
+    for i in args['category_list']:
+        
+        N, T = getattr(eval(i), "get_Table_Title")()
+        # getting all the extracted data at once in a dictionary
+        Extracted_Data = getattr(eval(i), "get_Data")(fake=True)
 
-        for i in [args['category']]:
-            N, T = getattr(eval(i), "get_Table_Title")()
-
-            # getting all the extracted data at once in a dictionary
-            Extracted_Data = getattr(eval(i), "get_Data")(fake=True)
+        for tag in np.arange(0, category_table_count[i], interval):
+            fake_n = "_CF"
+            premises = []
+            hypothesis = []
+            label = []
+            json_name = []
+            table = []
+            premises_used = []
 
             for j in range(tag, min(tag+interval, category_table_count[i])):
                 start = time.time()
 
                 # save as json
-                if(args['store_json']==True):
+                if (args['store_json'] == True):
                     json_file = {}
                     json_file["title"] = N[T[j]]
                     for kjson in set(Extracted_Data.keys()):
@@ -87,7 +88,8 @@ if __name__ == "__main__":
                                 to_be_json.append(
                                     str(df["Died_D"][j])+" "+df["Died_M"][j]+","+str(df["Died_Y"][j]))
                                 if (dct[T[j]][0] != None):
-                                    to_be_json.append(",".join(dct[T[j]][::-1]))
+                                    to_be_json.append(
+                                        ",".join(dct[T[j]][::-1]))
                                 json_file["Died"] = [",".join(to_be_json)]
                             if (df.isna().Age[j] == False):
                                 json_file["Age"] = [df.Age[j]]
