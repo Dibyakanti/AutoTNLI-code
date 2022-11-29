@@ -316,7 +316,8 @@ def generate_album(args):
             print("error in constraints: ", e)
             continue
         new_dicts.append(dictionary)
-        num_of_fake_per_table = args['counterfactuals']  # change this to change number of fake tables
+        # change this to change number of fake tables
+        num_of_fake_per_table = args['counterfactuals']
         for index in range(0, num_of_fake_per_table):
             new_dict = table_generator(
                 dictionary, global_lists, global_info, index)
@@ -455,9 +456,9 @@ if __name__ == "__main__":
 
     for Category in args['category_list']:
         if Category != "Album":
-            generate(Category,args)
+            generate(Category, args)
 
-            for counterfactuals_temp in range(args['counterfactuals']):
+            for counterfactuals_temp in range(int(args['counterfactuals'])):
                 generate_counterfactual(Category, counterfactuals_temp+1, args)
         else:
             generate_album(args)
