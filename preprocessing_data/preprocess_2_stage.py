@@ -6,22 +6,23 @@ import copy
 import random
 import ast
 import json
+import os
 
 
 def config(parser):
     parser.add_argument('--cutoff', default=30, type=int)
     parser.add_argument('--relevant_rows', default=False, type=bool)
-    parser.add_argument('--root', default="../autotnli_data/", type=str)
-    parser.add_argument('--keep_addr', default="../splits/", type=str)
-    parser.add_argument('--category_list', default=["Book", "City", "Festival", "FoodnDrinks", "Movie",
-                        "Organization", "Paint", "Person", "SportsnEvents", "University"],  action='store', type=str, nargs='*')
+    parser.add_argument('--in_dir', default="../autotnli_data/", type=str)
+    parser.add_argument('--out_dir', default="../splits/random/", type=str)
+    parser.add_argument('--category_list', default=["book", "city", "festival", "foodndrinks", "movie",
+                        "organization", "paint", "person", "sportsnevents", "university"],  action='store', type=str, nargs='*')
     parser.add_argument('--table_list', default=[
                         "T0", "_F1", "_F2", "_F3", "_F4", "_F5"],  action='store', type=str, nargs='*')
     return parser
 
 
-def preprocess_data(root, keep_addr, category_list, table_list, cutoff=30, relevant_rows=False):
-
+def preprocess_data(in_dir, out_dir, category_list, table_list, cutoff=30, relevant_rows=False):
+    
     names = []
     for i in category_list:
         for j in table_list:
@@ -30,17 +31,16 @@ def preprocess_data(root, keep_addr, category_list, table_list, cutoff=30, relev
     train = []
 
     for name in names:
-        df = pd.read_csv(root+name+".tsv", sep="\t")
+        df = pd.read_csv(in_dir+name+".tsv", sep="\t")
 
         num = cutoff if len(df.json_name.unique()) > cutoff else len(
-            df.json_name.unique())  # for entail and non-entail # 30,200
+            df.json_name.unique())  # 30 (with counterfactuals), 200 (w/o counterfactuals)
         list_of_tables = random.sample(list(df.json_name.unique()), num)
         for t in list_of_tables:
             s1 = df[df.json_name == t].sample(frac=1)
             train.append(s1)
 
-    train_set = pd.concat(train, ignore_index=True).drop(
-        columns=["Unnamed: 0", "Unnamed: 0.1"])
+    train_set = pd.concat(train, ignore_index=True)
 
     for x in range(len(train_set.label)):  # correct the labels
         if (train_set.label[x] == 1 or train_set.label[x] == "E"):
@@ -73,9 +73,13 @@ def preprocess_data(root, keep_addr, category_list, table_list, cutoff=30, relev
     # test_set_mod_alpha2 = train_set_mod[train_set_mod.json_name.str.contains("T0")].sample(frac=1).reset_index(drop=True) # only real
     # test_set_mod_alpha3 = train_set_mod[train_set_mod.json_name.str.contains("_F")].sample(frac=1).reset_index(drop=True) # only counterfactual
 
-    train_set_mod.to_csv(keep_addr+"train.tsv", sep="\t", index_label="index")
-    dev_set_mod.to_csv(keep_addr+"dev.tsv", sep="\t", index_label="index")
-    test_set_mod.to_csv(keep_addr+"test_alpha1.tsv",
+    # make sure to have different out_dir for separate splits
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    train_set_mod.to_csv(out_dir+"train.tsv", sep="\t", index_label="index")
+    dev_set_mod.to_csv(out_dir+"dev.tsv", sep="\t", index_label="index")
+    test_set_mod.to_csv(out_dir+"test_alpha1.tsv",
                         sep="\t", index_label="index")
 
     return None
@@ -87,12 +91,12 @@ if __name__ == "__main__":
     parser = config(parser)
     args = vars(parser.parse_args())
 
-    root = args['root']
-    keep_addr = args['keep_addr']
+    in_dir = args['in_dir']
+    out_dir = args['out_dir']
     category_list = args['category_list']
     table_list = args['table_list']
     cutoff = args['cutoff']
     relevant_rows = args['relevant_rows']
 
-    preprocess_data(root, keep_addr, category_list,
+    preprocess_data(in_dir, out_dir, category_list,
                     table_list, cutoff, relevant_rows)
