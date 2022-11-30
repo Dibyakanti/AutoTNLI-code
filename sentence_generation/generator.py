@@ -430,7 +430,11 @@ def generate_album(args):
                     dict_prem[key] = []
                     dict_prem[key] = json_table[key]
                 premises_used.append(dict_prem)
-                label.append(str(truth_val))
+                # label.append(str(truth_val))
+                if truth_val:
+                    label.append("E")
+                else:
+                    label.append("N")
 
     df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                        "label": label, "key & premises_used": premises_used, "json_name": json_name})
