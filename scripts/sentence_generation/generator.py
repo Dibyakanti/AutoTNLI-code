@@ -134,7 +134,7 @@ def generate(category, args):
                 print("{} : {}".format(j, (time.time()-start)/60))
     df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                        "label": label, "key & premises_used": premises_used, "json_name": json_name})
-    df.to_csv("../autotnli_data"+i.split("_")
+    df.to_csv("../../autotnli_data"+i.split("_")
               [0].lower()+"_T0_"+str(int(tag/interval))+".tsv", sep="\t")
     del df
 
@@ -276,7 +276,7 @@ def generate_counterfactual(category, counterfactuals_temp, args):
                 print("{} : {}".format(j, (time.time()-start)/60))
     df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                        "label": label, "key & premises_used": premises_used, "json_name": json_name})
-    df.to_csv("../autotnli_data"+i.split("_")
+    df.to_csv("../../data/autotnli_data"+i.split("_")
               [0].lower()+fake_n+"_"+str(int(tag/interval))+".tsv", sep="\t")
     del df
 
@@ -438,7 +438,7 @@ def generate_album(args):
 
     df = pd.DataFrame({"table": table, "premises": premises, "hypothesis": hypothesis,
                        "label": label, "key & premises_used": premises_used, "json_name": json_name})
-    df.to_csv("../autotnli_data/Album"+".csv", sep="\t")
+    df.to_csv("../../data/autotnli_data/Album"+".csv", sep="\t")
 
     # get all json in a folder
     if (args['store_json'] == True):

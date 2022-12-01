@@ -12,8 +12,8 @@ import os
 def config(parser):
     parser.add_argument('--cutoff', default=30, type=int)
     parser.add_argument('--relevant_rows', default=False, type=bool)
-    parser.add_argument('--in_dir', default="../autotnli_data/", type=str)
-    parser.add_argument('--out_dir', default="../splits/random/", type=str)
+    parser.add_argument('--in_dir', default="../../data/autotnli_data/", type=str)
+    parser.add_argument('--out_dir', default="../../data/autotnli_splits/random/", type=str)
     parser.add_argument('--category_list', default=["book", "city", "festival", "foodndrinks", "movie",
                         "organization", "paint", "person", "sportsnevents", "university"],  action='store', type=str, nargs='*')
     parser.add_argument('--table_list', default=[

@@ -16,10 +16,10 @@ def config(parser):
     parser.add_argument('--train_complementary_test', default=False, type=bool)
     parser.add_argument('--post_cross_category', default=False, type=bool)
     parser.add_argument('--use_metadata', default=False, type=bool)
-    parser.add_argument('--in_dir', default="../autotnli_data/", type=str)
-    parser.add_argument('--out_dir', default="../splits/random/", type=str)
+    parser.add_argument('--in_dir', default="../../data/autotnli_data/", type=str)
+    parser.add_argument('--out_dir', default="../../data/autotnli/splits/random/", type=str)
     parser.add_argument('--metadata_path',
-                        default="../splits/", type=str)
+                        default="../../data/splits/", type=str)
     parser.add_argument('--category_list', default=["book", "city", "festival", "foodndrinks", "movie",
                         "organization", "paint", "person", "sportsnevents", "university"],  action='store', type=str, nargs='*')
     parser.add_argument('--table_list', default=[
@@ -584,12 +584,14 @@ if __name__ == "__main__":
     metadata_path = args['metadata_path']
     split_type = args['split_type']
 
-    if(args['split_type']=="category"):
-        preprocess_category_split(in_dir, out_dir, category_list, table_list, post_cross_category)
-    elif(args['split_type']=="key"):
-        preprocess_key_split(in_dir, out_dir, category_list, table_list, metadata_path, use_metadata)
-    elif(args['split_type']=="premise"):
-        preprocess_premise_split(in_dir, out_dir, category_list, table_list, train_complementary_test)
-    elif(args['split_type']=="entity"):
+    if (args['split_type'] == "category"):
+        preprocess_category_split(
+            in_dir, out_dir, category_list, table_list, post_cross_category)
+    elif (args['split_type'] == "key"):
+        preprocess_key_split(in_dir, out_dir, category_list,
+                             table_list, metadata_path, use_metadata)
+    elif (args['split_type'] == "premise"):
+        preprocess_premise_split(
+            in_dir, out_dir, category_list, table_list, train_complementary_test)
+    elif (args['split_type'] == "entity"):
         preprocess_entity_split(in_dir, out_dir, category_list, table_list)
-    

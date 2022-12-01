@@ -9,9 +9,9 @@ import multiprocessing
 from multiprocessing.pool import ThreadPool
 
 # Address
-category_map_address = "../wiki_data/table_categories modified.tsv"
-tablesFolder = "../wiki_data/tables"
-tablesFolderJson = "../wiki_data/json/"
+category_map_address = "../../data/wiki_data/table_categories modified.tsv"
+tablesFolder = "../../data/wiki_data/tables"
+tablesFolderJson = "../../data/wiki_data/json/"
 
 # Needed across categories
 category_map = pd.read_csv(category_map_address, sep="\t")
