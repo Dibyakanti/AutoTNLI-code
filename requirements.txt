@@ -1,0 +1,4 @@
+pickle
+nltk
+transformers==4.24.0
+pytorch-transformers==1.2.0
