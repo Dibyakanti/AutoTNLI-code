@@ -582,6 +582,14 @@ if __name__ == "__main__":
     post_cross_category = args['post_cross_category']
     use_metadata = args['use_metadata']
     metadata_path = args['metadata_path']
+    split_type = args['split_type']
 
-    
+    if(args['split_type']=="category"):
+        preprocess_category_split(in_dir, out_dir, category_list, table_list, post_cross_category)
+    elif(args['split_type']=="key"):
+        preprocess_key_split(in_dir, out_dir, category_list, table_list, metadata_path, use_metadata)
+    elif(args['split_type']=="premise"):
+        preprocess_premise_split(in_dir, out_dir, category_list, table_list, train_complementary_test)
+    elif(args['split_type']=="entity"):
+        preprocess_entity_split(in_dir, out_dir, category_list, table_list)
     
