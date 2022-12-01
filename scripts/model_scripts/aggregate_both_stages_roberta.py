@@ -34,6 +34,39 @@ def config(parser):
     parser.add_argument('--eval_splits', default=["train", "dev", "test_alpha1"],  action='store', type=str, nargs='*')
     return parser
 
+def test(model, classifier, data, args):
+    enc = torch.tensor(data['encodings']).cuda()
+    attention_mask = torch.tensor(data['attention_mask']).cuda()
+    segs = torch.tensor(data['segments']).cuda()
+    labs = torch.tensor(data['labels']).cuda()
+    ids = torch.tensor(data['uid']).cuda()
+
+    dataset = TensorDataset(enc, attention_mask,
+                            segs, labs, ids)
+
+    loader = DataLoader(dataset, batch_size=args['batch_size'])
+
+    model.eval()
+    correct = 0
+    total = 0
+    gold_inds = []
+    predictions_inds = []
+
+    for batch_ndx, (enc, mask, seg, gold, ids) in enumerate(loader):
+        with torch.no_grad():
+            outputs = model(enc, attention_mask=mask)
+            predictions = classifier(outputs[1])
+
+        _, inds = torch.max(predictions, 1)
+        gold_inds.extend(gold.tolist())
+        predictions_inds.extend(inds.tolist())
+        # print(gold)
+        # print(predictions)
+        correct += inds.eq(gold.view_as(inds)).cpu().sum().item()
+        total += len(enc)
+
+    return correct/total, gold_inds, predictions_inds
+
 
 def test_data_two_stage(args, stage=1):
     result_dir = args["save_dir"]+args["save_folder"] + ("first_stage/" if stage == 1 else "second_stage/")
