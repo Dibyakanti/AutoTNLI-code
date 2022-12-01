@@ -21,13 +21,15 @@ import os
 def config(parser):
     parser.add_argument('--epochs',  default=10, type=int)
     parser.add_argument('--batch_size',  default=4, type=int)
-    parser.add_argument('--in_dir', default="./../../temp/processed/parapremise/", type=str)
     parser.add_argument('--nooflabels', default=3, type=int)
-    parser.add_argument('--save_dir', default="./../../temp/models", type=str)
-    parser.add_argument('--save_folder', default="parapremise/", type=str)
-    parser.add_argument('--model_dir', default="./../../temp/models/parapremise/", type=str)
+    parser.add_argument('--in_dir', default="../../data/autotnli_splits/processed/", type=str)
+    parser.add_argument('--save_dir', default="./../../data/models_saved/", type=str)
+    parser.add_argument('--save_folder', default="./autotnli/", type=str)
+    parser.add_argument('--model_dir', default="./../../data/models_saved/autotnli/", type=str)
     parser.add_argument('--model_name', default="model_4_0.301", type=str)
     parser.add_argument('--mode', default="train", type=str)
+    parser.add_argument('--dev_file', default="dev", type=str)
+    parser.add_argument('--train_file', default="train", type=str)
     parser.add_argument('--embed_size', default=768, type=int)
     parser.add_argument('--save_enable', default=0, type=int)
     parser.add_argument('--eval_splits', default=["train", "dev", "test_alpha1"],  action='store', type=str, nargs='*')
@@ -37,9 +39,6 @@ def config(parser):
     parser.add_argument('--load', default=False, type=bool)
     parser.add_argument('--learning_rate', default=1e-4, type=float)
     parser.add_argument('--store_best', default=False, type=bool)
-    parser.add_argument('--dev_file', default="dev", type=str)
-    parser.add_argument('--train_file', default="train", type=str)
-    # parser.add_argument('--multi_gpu_on', action='store_true')   # use for multi gpu training (not needed)
     return parser
 
 

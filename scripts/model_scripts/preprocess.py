@@ -13,9 +13,9 @@ import time, os, sys
 
 def preprocess_config(parser):
 	parser.add_argument('--max_len', default= 512, type=int)
-	parser.add_argument('--data_dir', default="./splits/", type=str)
-	parser.add_argument('--in_dir', default="",type=str)
-	parser.add_argument('--out_dir',default="./splits/processed",type=str)
+	parser.add_argument('--data_dir', default="../../data/", type=str)
+	parser.add_argument('--in_dir', default="./autotnli_splits",type=str)
+	parser.add_argument('--out_dir',default="./autotnli_splits/processed",type=str)
 	parser.add_argument('--single_sentence', default=0,type=int)
 	parser.add_argument('--splits',default=["train","dev","test_alpha1","test_alpha2","test_alpha3"],  action='store', type=str, nargs='*')
 	parser.add_argument('--model',default="Roberta", type=str)

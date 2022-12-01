@@ -223,11 +223,11 @@ def get_BERTbase_vector(sent1, sent2=None, max_sent1_len=400, max_sent2_len=100,
 
 def two_stage_aggregate(args):
 	for dataset in args["eval_splits"]:
-		f = open(args['in_dir_first_stage']+str(dataset)+'.json',)
+		f = open(args["save_dir"]+args["save_folder"]+"first_stage/"+str(dataset)+'.json',)
 		first_part_json = json.load(f)
 		f.close()
 
-		f = open(args['in_dir_second_stage']+str(dataset)+'.json',)
+		f = open(args["save_dir"]+args["save_folder"]+"second_stage/"+str(dataset)+'.json',)
 		second_part_json = json.load(f)
 		f.close()
 
