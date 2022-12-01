@@ -9,10 +9,7 @@ import nltk
 import numpy as np
 import pandas as pd
 from nltk.corpus import stopwords
-
 from util import *
-
-nltk.download('stopwords')
 
 
 def config(parser):
@@ -22,11 +19,12 @@ def config(parser):
     parser.add_argument('--in_dir', default="../autotnli_data/", type=str)
     parser.add_argument('--out_dir', default="../splits/random/", type=str)
     parser.add_argument('--metadata_path',
-                        default="../splits/random/", type=str)
+                        default="../splits/", type=str)
     parser.add_argument('--category_list', default=["book", "city", "festival", "foodndrinks", "movie",
                         "organization", "paint", "person", "sportsnevents", "university"],  action='store', type=str, nargs='*')
     parser.add_argument('--table_list', default=[
                         "T0", "_F1", "_F2", "_F3", "_F4", "_F5"],  action='store', type=str, nargs='*')
+    parser.add_argument('--split_type', default="key", type=str)
     return parser
 
 
@@ -570,6 +568,8 @@ def preprocess_entity_split(in_dir, out_dir, category_list, table_list):
 
 if __name__ == "__main__":
 
+    nltk.download('stopwords')
+
     parser = argparse.ArgumentParser()
     parser = config(parser)
     args = vars(parser.parse_args())
@@ -582,3 +582,6 @@ if __name__ == "__main__":
     post_cross_category = args['post_cross_category']
     use_metadata = args['use_metadata']
     metadata_path = args['metadata_path']
+
+    
+    
