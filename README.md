@@ -1,6 +1,6 @@
 # AutoTNLI-code
 
-This repository contains the code for the paper : [Realistic Data Augmentation Framework for Enhancing Tabular Reasoning](https://vgupta123.github.io/docs/autotnli.pdf).
+This repository contains the official code for the paper : [Realistic Data Augmentation Framework for Enhancing Tabular Reasoning](https://vgupta123.github.io/docs/autotnli.pdf).
 
 ## 0. Prerequisites
 
