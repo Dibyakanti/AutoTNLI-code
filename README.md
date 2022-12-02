@@ -86,3 +86,5 @@ python3 ./scripts/preprocessing_data/preprocess_infotabs.py --in_dir ./data/info
 ```
 Note : Make separate folders for each split
 ## 3. Training and Evaluation
+
+## TODO: 
