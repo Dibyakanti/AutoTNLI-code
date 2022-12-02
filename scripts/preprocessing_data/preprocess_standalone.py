@@ -23,7 +23,7 @@ def config(parser):
     parser.add_argument('--category_list', default=["book", "city", "festival", "foodndrinks", "movie",
                         "organization", "paint", "person", "sportsnevents", "university"],  action='store', type=str, nargs='*')
     parser.add_argument('--table_list', default=[
-                        "T0", "_F1", "_F2", "_F3", "_F4", "_F5"],  action='store', type=str, nargs='*')
+                        "_T0", "_F1", "_F2", "_F3", "_F4", "_F5"],  action='store', type=str, nargs='*')
     parser.add_argument('--split_type', default="key", type=str)
     return parser
 

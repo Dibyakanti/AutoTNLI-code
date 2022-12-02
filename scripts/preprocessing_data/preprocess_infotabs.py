@@ -11,7 +11,7 @@ import os
 
 def config(parser):
     parser.add_argument('--stage', default=3, type=int)
-    parser.add_argument('--in_dir', default="../../data/infotabs_data/", type=str)
+    parser.add_argument('--in_dir', default="../../data/infotabs_data/original_data/", type=str)
     parser.add_argument('--out_dir', default="../../data/infotabs_data/test/", type=str)
     parser.add_argument('--few_shot', default=False, type=bool)
     return parser
