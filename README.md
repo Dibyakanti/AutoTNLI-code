@@ -31,9 +31,11 @@ The data will be generated in the folder `data/autotnli_data/` for each category
 ### 2.1. Preprocessing data for standalone setting
 To generate splits for checking how does AutoTNLI data perform when used for both training and evaluation
 ```
-python3 ./scripts/preprocessing_data/preprocess_standalone.py --split_type <type_of_split> --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/<type_of_split>/ --category_list <list_of_categories> --table_list <list_of_tables>
+python3 ./scripts/preprocessing_data/preprocess_standalone.py --split_type <split_type> --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/<type_of_split>/ --category_list <list_of_categories> --table_list <list_of_tables>
 
 argument details for each split type :
+-- in_dir: Path to folder where the AutoTNLI data is generated and stored
+-- out_dir: Path to folder where you want the preprocessed data to be stored
 -- category_list: list of categories that you want to generate the data for (i.e. Album, Book, City, Festival, FoodnDrinks, Movie, Organization, Paint, Person, SportsnEvents, University )
 -- table_list: list of tables (example: _T0, _F1, _F2)
 -- split_type: Type of split you wanna make (i.e. category, key, premise, entity)
@@ -55,7 +57,32 @@ python3 ./scripts/preprocessing_data/preprocess_standalone.py --split_type premi
 Note : Make separate folders for each split
 
 ### 2.2 Preprocessing data for 2-stage classifier
+To generate splits for pre-finetuning with AutoTNLi data
+```
+python3 ./scripts/preprocessing_data/preprocess_2_stage.py --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/<type_of_split>/ --category_list <list_of_categories> --table_list <list_of_tables> --cutoff 30 --relevant_rows False
 
+argument details :
+-- in_dir: Path to folder where the AutoTNLI data is generated and stored
+-- out_dir: Path to folder where you want the preprocessed data to be stored
+-- category_list: list of categories that you want to generate the data for (i.e. Album, Book, City, Festival, FoodnDrinks, Movie, Organization, Paint, Person, SportsnEvents, University )
+-- table_list: list of tables (example: _T0, _F1, _F2)
+-- cutoff: how many max tables should be chosen from each category
+-- relevant_rows: If you only want to store the relevant premises
+```
+Note : Make separate folders for each split
 ### 2.3 Preprocessing Infotabs data
+To generate spits from the infotabs data which will be used for fine-tuning
+```
+python3 ./scripts/preprocessing_data/preprocess_infotabs.py --in_dir ./data/infotabs_data/original_data --out_dir ./data/infotabs_data/<type_of_split>/ --stage <int> --few_shot False
 
+argument details :
+-- in_dir: Path to folder where the AutoTNLI data is generated and stored
+-- out_dir: Path to folder where you want the preprocessed data to be stored
+-- stage: Put 1 for stage-1, 2 for stage-2 and 3 for the test data.
+-- few_shot: Set to True of you want to generate 5,10,15,20,25 percent train data splits
+
+example command:
+python3 ./scripts/preprocessing_data/preprocess_infotabs.py --in_dir ./data/infotabs_data/original_data --out_dir ./data/infotabs_data/first_stage_limited/ --stage 1 --few_shot True
+```
+Note : Make separate folders for each split
 ## 3. Training and Evaluation
