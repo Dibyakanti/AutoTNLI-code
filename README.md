@@ -10,7 +10,10 @@ Install requirements with the command `pip intall -r requirements.txt`
 ## 1. Data generation
 To generate AutoTNLI use the command :
 ```
-python3 ./scripts/sentence_generation/generator.py --category_list <list_of_categories> --counterfactuals <number_of_counterfactuals> --store_json False
+python3 ./scripts/sentence_generation/generator.py \
+--category_list <list_of_categories> \
+--counterfactuals <number_of_counterfactuals> \
+--store_json False
 
 argument details :
 -- category_list: list of categories that you want to generate the data for (i.e. Album, Book, City, Festival, FoodnDrinks, Movie, Organization, Paint, Person, SportsnEvents, University )
@@ -18,7 +21,10 @@ argument details :
 -- store_json: In case the user wants to store the json files generated for the counterfactual tables
 
 example command:
-python3 ./scripts/sentence_generation/generator.py --category_list Book City Movie --counterfactuals 2 --store_json True
+python3 ./scripts/sentence_generation/generator.py \
+--category_list Book City Movie \
+--counterfactuals 2 \
+--store_json True
 ```
 OR
 
@@ -31,7 +37,12 @@ The data will be generated in the folder `data/autotnli_data/` for each category
 ### 2.1. Preprocessing data for standalone setting
 To generate splits for checking how does AutoTNLI data perform when used for both training and evaluation
 ```
-python3 ./scripts/preprocessing_data/preprocess_standalone.py --split_type <split_type> --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/<type_of_split>/ --category_list <list_of_categories> --table_list <list_of_tables>
+python3 ./scripts/preprocessing_data/preprocess_standalone.py \
+--split_type <split_type> \
+--in_dir ./data/autotnli_data/ \
+--out_dir ./data/autotnli_splits/<type_of_split>/ \
+--category_list <list_of_categories> \
+--table_list <list_of_tables>
 
 argument details for each split type :
 -- in_dir: Path to folder where the AutoTNLI data is generated and stored
@@ -52,14 +63,26 @@ if split_type == premise then:
 -- train_complementary_test: Set to True if you want train to have different paraphrased premises compared to dev/test split
 
 example command:
-python3 ./scripts/preprocessing_data/preprocess_standalone.py --split_type premise --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/key --category_list Book Movie City --table_list _T0 _F1 _F2 --use_metadata False
+python3 ./scripts/preprocessing_data/preprocess_standalone.py \
+--split_type premise \
+--in_dir ./data/autotnli_data/ \
+--out_dir ./data/autotnli_splits/key/ \
+--category_list Book Movie City \
+--table_list _T0 _F1 _F2 \
+--use_metadata False
 ```
 Note : Make separate folders for each split
 
 ### 2.2 Preprocessing data for 2-stage classifier
 To generate splits for pre-finetuning with AutoTNLi data
 ```
-python3 ./scripts/preprocessing_data/preprocess_2_stage.py --in_dir ./data/autotnli_data/ --out_dir ./data/autotnli_splits/<type_of_split>/ --category_list <list_of_categories> --table_list <list_of_tables> --cutoff 30 --relevant_rows False
+python3 ./scripts/preprocessing_data/preprocess_2_stage.py \
+--in_dir ./data/autotnli_data/ \
+--out_dir ./data/autotnli_splits/<type_of_split>/ \
+--category_list <list_of_categories> \
+--table_list <list_of_tables> \
+--cutoff 30 \
+--relevant_rows False
 
 argument details :
 -- in_dir: Path to folder where the AutoTNLI data is generated and stored
@@ -73,7 +96,11 @@ Note : Make separate folders for each split
 ### 2.3 Preprocessing Infotabs data
 To generate spits from the infotabs data which will be used for fine-tuning
 ```
-python3 ./scripts/preprocessing_data/preprocess_infotabs.py --in_dir ./data/infotabs_data/original_data --out_dir ./data/infotabs_data/<type_of_split>/ --stage <int> --few_shot False
+python3 ./scripts/preprocessing_data/preprocess_infotabs.py \
+--in_dir ./data/infotabs_data/original_data \
+--out_dir ./data/infotabs_data/<type_of_split>/ \
+--stage <int> \
+--few_shot False
 
 argument details :
 -- in_dir: Path to folder where the AutoTNLI data is generated and stored
@@ -82,7 +109,10 @@ argument details :
 -- few_shot: Set to True of you want to generate 5,10,15,20,25 percent train data splits
 
 example command:
-python3 ./scripts/preprocessing_data/preprocess_infotabs.py --in_dir ./data/infotabs_data/original_data --out_dir ./data/infotabs_data/first_stage_limited/ --stage 1 --few_shot True
+python3 ./scripts/preprocessing_data/preprocess_infotabs.py \
+--in_dir ./data/infotabs_data/original_data \
+--out_dir ./data/infotabs_data/first_stage_limited/ \
+--stage 1 --few_shot True
 ```
 Note : Make separate folders for each split
 ## 3. Training and Evaluation
