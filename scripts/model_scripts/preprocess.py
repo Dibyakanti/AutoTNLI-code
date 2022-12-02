@@ -18,7 +18,7 @@ def preprocess_config(parser):
 	parser.add_argument('--out_dir',default="./autotnli_splits/processed",type=str)
 	parser.add_argument('--single_sentence', default=0,type=int)
 	parser.add_argument('--splits',default=["train","dev","test_alpha1","test_alpha2","test_alpha3"],  action='store', type=str, nargs='*')
-	parser.add_argument('--model',default="Roberta", type=str)
+	parser.add_argument('--model',default="RoBERTa", type=str)
 	return parser
 
 
@@ -70,12 +70,12 @@ if __name__ == "__main__":
 		for pt_dict in data[split]:
 			i+=1
 			if args['single_sentence']:
-				if(args['model']=="Roberta"):
+				if(args['model']=="RoBERTa"):
 					enc, amask, segments = get_BERT_vector(pt_dict['hypothesis'],single_sentence=True)
 				elif(args['model']=="Albert"):
 					enc, amask, segments = get_ALBERT_base_vector(pt_dict['hypothesis'],single_sentence=True)
 			else:
-				if(args['model']=="Roberta"):
+				if(args['model']=="RoBERTa"):
 					enc, amask, segments = get_BERT_vector(pt_dict['premise'],pt_dict['hypothesis'])
 				elif(args['model']=="Albert"):
 					enc, amask, segments = get_ALBERT_base_vector(pt_dict['premise'],pt_dict['hypothesis'])

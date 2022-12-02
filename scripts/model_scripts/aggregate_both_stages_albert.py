@@ -19,19 +19,10 @@ def config(parser):
     parser.add_argument('--save_dir', default="../../data/results/", type=str)
     parser.add_argument('--save_folder', default="./", type=str)
     parser.add_argument('--model_dir', default="../../models_saved/", type=str)
-    parser.add_argument('--model_name', default="model_4_0.301", type=str)
-    parser.add_argument('--mode', default="train", type=str)
+    parser.add_argument('--model_name_first_stage', default="model_4_0.301", type=str)
+    parser.add_argument('--model_name_second_stage', default="model_4_0.301", type=str)
     parser.add_argument('--embed_size', default=768, type=int)
-    parser.add_argument('--save_enable', default=0, type=int)
-    parser.add_argument('--eval_splits', default=["train", "dev", "test_alpha1"],  action='store', type=str, nargs='*')
-    parser.add_argument('--seed', default=13, type=int)
-    parser.add_argument('--parallel', default=0, type=int)
-    parser.add_argument('--inoculate', default=False, type=bool)
-    parser.add_argument('--load', default=False, type=bool)
-    parser.add_argument('--learning_rate', default=1e-4, type=float)
-    parser.add_argument('--store_best', default=False, type=bool)
-    parser.add_argument('--dev_file', default="dev", type=str)
-    parser.add_argument('--train_file', default="train", type=str)
+    parser.add_argument('--save_enable', default=1, type=int)
     parser.add_argument('--eval_splits', default=["train", "dev", "test_alpha1"],  action='store', type=str, nargs='*')
     return parser
 
@@ -70,7 +61,7 @@ def test(model, classifier, data, args):
     return correct/total, gold_inds, predictions_inds
 
 
-def test_data_two_stage(args):
+def test_data_two_stage(args,stage):
     result_dir = args["save_dir"]+args["save_folder"] + ("first_stage/" if stage == 1 else "second_stage/")
 
     if args['embed_size'] == 768:
@@ -84,7 +75,7 @@ def test_data_two_stage(args):
     classifier = FeedForward(args['embed_size'], int(
         args['embed_size']/2), args['nooflabels']).cuda()
 
-    checkpoint = torch.load(args['model_dir']  + ("first_stage/" if stage == 1 else "second_stage/") + args['model_name'])
+    checkpoint = torch.load(args['model_dir']  + ("first_stage/" if stage == 1 else "second_stage/") + (args['model_name_first_stage'] if stage == 1 else args['model_name_second_stage']) )
     model.load_state_dict(checkpoint['model_state_dict'])
     classifier.load_state_dict(checkpoint['classifier_state_dict'])
 
