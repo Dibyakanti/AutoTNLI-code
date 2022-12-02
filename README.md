@@ -230,3 +230,6 @@ argument details :
 Similar to `Section 3.1` while training and `Section 3.2` while testing.
 
 ## TODO: 
+```
+1. Directory structure representation
+```
