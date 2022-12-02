@@ -173,31 +173,60 @@ python3 ./scripts/model_scripts/classifier.py \
 --store_best False
 
 argument details :
--- epochs:
--- batch_size:
--- nooflabels:
--- in_dir: 
--- save_dir:
--- save_folder:
--- model_dir:
--- model_name:
--- mode:
--- dev_file:
--- train_file:
--- embed_size:
--- save_enable:
--- eval_splits:
--- seed:
--- parallel:
--- load:
--- learning_rate:
--- store_best:
-
+-- epochs: set training epochs number (only used while training, i.e., model is "train")
+-- batch_size: set batch size for training (only used while training)
+-- nooflabels: 
+-- in_dir: set as preprocessed directory name.
+-- save_dir: path to the directory where the trained models and the predictions are stored
+-- nooflabels: set as 3 as three labels entailment, neutral and contradiction)
+-- save_folder: name of the folder where the trained models and the predictions are stored
+-- model_dir: Path to directory containing the trained model (used while mode=="test" or when load=="True")
+-- model_name: model filename usually is in format 'model_<epoch>_<accuracy>' (used while mode=="test" or when load=="True")
+-- mode: set "train" for training, set "test" for prediction
+-- dev_file: name of the development set file
+-- train_file: name of the training set file
+-- embed_size: set this to 768 for base model and 1024 for large model
+-- save_enable: set as 1 to save prediction files as predict_<datasetname>.json in save_dir.
+-- eval_splits:  ' ' separated datasplits names [dev, test_alpha1, test_alpha2, test_alpha3] (only used while prediction, i.e., model is "test")
+-- seed: set a particular seed
+-- parallel: for a single GPU, 1 for multiple GPUs (used when training large data, use the same flag at both predictions and train time)
+-- load: to start training from a previously saved checkpoint
+-- learning_rate: set the learning rate
+-- store_best: to store the model with the best dev accuracy
 ```
-## 3.2 AutoTNLI as an Augmentation dataset
+Note : While training make sure the save_folder is set differently for each split to avoid overwriting and confusion
 
+## 3.2 AutoTNLI as an Augmentation dataset
+Similar to `Section 3.1` when training.
+
+While testing for RoBERTa make sure the first stage model is stored in model_dir + "first_stage" and model_dir + "second_stage" for second stage
+```
+python3 ./scripts/model_scripts/aggregrate_both_stages_roberta.py \
+--in_dir "./data/infotabs_data/test/processed/"
+--nooflabels 2
+--save_dir "./data/results/"
+--save_folder "./first_stage/"
+--model_dir "./models_saved/first_stage/"
+--model_name_first_stage "model_<epoch>_<accuracy>"
+--model_name_second_stage "model_<epoch>_<accuracy>"
+--embed_size 768
+--save_enable 1
+--eval_splits den test_alpha1 test_alpha2 test_alpha3
+
+argument details :
+-- in_dir: set as preprocessed directory name.
+-- nooflabels: set as 2 as three labels
+-- save_dir: path to the directory where the predictions are stored
+-- save_folder: name of the folder where the predictions are stored
+-- model_dir: Path to directory containing the trained model (used while mode=="test" or when load=="True")
+-- model_name_first_stage: model filename for the stage-1 usually is in format 'model_<epoch>_<accuracy>' 
+-- model_name_second_stage: model filename for the stage-2 usually is in format 'model_<epoch>_<accuracy>'
+-- embed_size: set this to 768 for base model and 1024 for large model
+-- save_enable: set as 1 to save prediction files as predict_<datasetname>.json in save_dir.
+-- eval_splits: ' ' separated datasplits names [dev, test_alpha1, test_alpha2, test_alpha3] (only used while prediction, i.e., model is "test")
+```
 
 ## 3.3 Few-shot setting
-
+Similar to `Section 3.1` while training and `Section 3.2` while testing.
 
 ## TODO: 
