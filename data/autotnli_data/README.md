@@ -14,6 +14,6 @@ premises: premise\
 hypothesis: hypothesis\
 label: label for the premise-hypothesis pair\
 key & premises_used: the key and the corresponding premises used to infer the hypothesis\
-json_name: name of the json from which the sentences were generated\
+json_name: name of the json from which the sentences were generated (different from the 'table' when it is counterfactual)
 
 For each category we have 5 .tsv files ending with _T0, _F1, _F2, _F3, _F4 and _F5. So, here we _T0 represents the ones generated from the original table, and _F<int> represents the ones generated from the counterfactual tables.
