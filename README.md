@@ -1,7 +1,23 @@
 # AutoTNLI-code
 
 This repository contains the official code for the paper : [Realistic Data Augmentation Framework for Enhancing Tabular Reasoning](https://vgupta123.github.io/docs/autotnli.pdf).
-
+```
+@inproceedings{kumar-etal-2022-autotnli,
+			title = "Realistic Data Augmentation Framework for Enhancing Tabular Reasoning",
+			author = "Kumar, Dibyakanti  and
+			  Gupta, Vivek  and
+			  Sharma, Soumya  and
+			  Zhang, Shuo",
+			booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+			month = dec,
+			year = "2022",
+			address = "Online and Abu Dhabi",
+			publisher = "Association for Computational Linguistics",
+			url = "https://vgupta123.github.io/docs/autotnli.pdf",
+			pages = "",
+			abstract = "Existing approaches to constructing training data for Natural Language Inference (NLI) tasks, such as for semi-structured table reasoning, are either via crowdsourcing or fully automatic methods. However, the former is expensive and time-consuming and thus limits scale, and the latter often produces naive examples that may lack complex reasoning. This paper develops a realistic semi-automated framework for data augmentation for tabular inference. Instead of manually generating a hypothesis for each table, our methodology generates hypothesis templates transferable to similar tables. In addition, our framework entails the creation of rational counterfactual tables based on human written logical constraints and premise paraphrasing. For our case study, we use the InfoTabS (Gupta et al., 2020), which is an entity-centric tabular inference dataset. We observed that our framework could generate human-like tabular inference examples, which could benefit training data augmentation, especially in the scenario with limited supervision.",
+		}
+```
 ## 0. Prerequisites
 
 Clone this repo - `git clone https://github.com/Dibyakanti/Auto-TNLI-code.git`\
