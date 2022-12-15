@@ -23,6 +23,83 @@ This repository contains the official code for the paper : [Realistic Data Augme
 Clone this repo - `git clone https://github.com/Dibyakanti/Auto-TNLI-code.git`\
 Install requirements with the command `pip intall -r requirements.txt`
 
+```
+├── data
+│   ├── autotnli_data
+│   │   └── README.md
+│   ├── autotnli_splits
+│   │   ├── category
+│   │   ├── category_cross
+│   │   ├── entity
+│   │   ├── key
+│   │   └── parapharsing
+│   ├── infotabs_data
+│   │   ├── first_stage
+│   │   ├── first_stage_limited
+│   │   ├── original_data
+│   │   │   ├── dev.tsv
+│   │   │   ├── test_alpha1.tsv
+│   │   │   ├── test_alpha2.tsv
+│   │   │   ├── test_alpha3.tsv
+│   │   │   └── train.tsv
+│   │   ├── second_stage
+│   │   ├── second_stage_limited
+│   │   └── test
+│   ├── models_saved
+│   │   ├── first_stage
+│   │   └── second_stage
+│   ├── results
+│   │   ├── first_stage
+│   │   └── second_stage
+│   └── wiki_data
+│       ├── all_jsons.json
+│       ├── json
+│       │   ├── T0.json
+│       │   ├── T1000.json
+│       │   ├── T1001.json
+│       ├── table_categories modified.tsv
+│       ├── table_categories.tsv
+│       ├── tables
+│       │   ├── T0.html
+│       │   ├── T1000.html
+│       │   ├── T1001.html
+│       └── wikipediaTableCategories.tsv
+│
+└── scripts
+│   ├── model_scripts
+│   │   ├── aggregate_both_stages_albert.py
+│   │   ├── aggregate_both_stages_roberta.py
+│   │   ├── classifier_albert.py
+│   │   ├── classifier.py
+│   │   ├── feedforward.py
+│   │   ├── preprocess.py
+│   │   └── utils.py
+│   ├── preprocessing_data
+│   │   ├── preprocess_2_stage.py
+│   │   ├── preprocess_infotabs.py
+│   │   └── preprocess_standalone.py
+│   └── sentence_generation
+│       ├── Album.py
+│       ├── Book.py
+│       ├── City.py
+│       ├── Festival.py
+│       ├── FoodnDrinks.py
+│       ├── generate.sh
+│       ├── generator.py
+│       ├── __init__.py
+│       ├── Movie.py
+│       ├── Organization.py
+│       ├── Paint.py
+│       ├── Person.py
+│       ├── SportsnEvents.py
+│       ├── University.py
+│       └── util.py
+├── LICENSE
+├── logo.png
+├── README.md
+├── requirements.txt
+```
+
 ## 1. Data generation
 To generate AutoTNLI use the command :
 ```
